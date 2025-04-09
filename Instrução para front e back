@@ -1,0 +1,47 @@
+CURSO_ELETRO - INSTRUÇÕES PARA DEV BACKEND E FRONTEND
+
+📦 OBJETIVO
+Sistema de gestão de ferramentas para uso em ambiente educacional, com controle de acesso por nível.
+
+🗃️ ESTRUTURA DO BANCO
+- Base: curso_eletro
+- Principais tabelas: Admins, Ferramentas, Niveis, Logs_Acoes
+- Usa Views e Procedures para segurança e organização
+
+🔐 SEGURANÇA
+- Senhas armazenadas com SHA2 no banco.
+  -> NO BACKEND: use bcrypt para hash da senha antes do INSERT ou comparação de login.
+- Procedimentos verificam permissões antes de registrar ou remover ferramentas.
+
+🔁 PROCEDURES IMPORTANTES
+1. criar_admin(nome, email, senha, nivel_nome)
+   -> Registra admin, associando ao nível.
+
+2. registrar_ferramenta(admin_id, nome, descricao)
+   -> Apenas coordenadores e professores podem registrar.
+
+3. remover_ferramenta(admin_id, ferramenta_id)
+   -> Apenas coordenadores podem remover (soft delete).
+
+🧠 VIEWS PARA FRONTEND
+1. Ferramentas_Ativas
+   -> Mostra apenas ferramentas em uso (ativo = TRUE)
+
+2. Admins_Com_Nivel
+   -> Mostra admins com nome do nível (join com tabela Niveis)
+
+📌 INSTRUÇÕES BACKEND
+- Usar `CALL` para procedures via SQL.
+- Proteger endpoints com middleware baseado no nível do admin (buscar pela view).
+- Registrar ações sensíveis manualmente se criar endpoints customizados.
+- Usar transações se for fazer múltiplas operações.
+
+📌 INSTRUÇÕES FRONTEND
+- Para listar ferramentas: usar `Ferramentas_Ativas`.
+- Para mostrar o tipo do admin logado: consultar `Admins_Com_Nivel`.
+- Ao deletar, faça "remover ferramenta" chamando a procedure (não `DELETE` direto).
+
+🔧 SUGESTÃO DE FUNCIONALIDADES FUTURAS
+- Adicionar tabela de reservas de ferramentas
+- Implementar controle de devolução
+- Aplicar JWT no backend para autenticação
