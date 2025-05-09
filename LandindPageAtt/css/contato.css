@@ -27,14 +27,14 @@ body {
     font-size: 2em;
     margin-bottom: 10px;
     text-align: center;
-    color: #76ff03; /* Verde limão */
+    color: #ff0101; /* Verde limão */
 }
 
 .contact-section p {
     font-size: 1.1em;
     margin-bottom: 30px;
     text-align: center;
-    color: #bdbdbd;
+    color: white;
 }
 
 /* Formulário */
@@ -49,7 +49,7 @@ body {
     width: 100%;
     padding: 12px 15px;
     background-color: #2c2c2c;
-    color: #e0e0e0;
+    color: white;
     border: 1px solid #444;
     border-radius: 6px;
     font-size: 1em;
@@ -58,14 +58,14 @@ body {
 
 .form-group input:focus,
 .form-group textarea:focus {
-    border-color: #76ff03;
+    border-color: #9c1e1e;
     background-color: #333;
     outline: none;
 }
 
 /* Botão */
 .submit-button {
-    background-color: #238636; /* Verde escuro */
+    background-color: #9c1e1e; /* Verde escuro */
     color: white;
     border: none;
     padding: 14px;
@@ -76,5 +76,5 @@ body {
 }
 
 .submit-button:hover {
-    background-color: #2e7d32;
+    background-color: #af2828;
 }

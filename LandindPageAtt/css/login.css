@@ -2,7 +2,7 @@ body {
     margin: 0;
     padding: 0;
     background-color: #0d1117;
-    color: #c9d1d9;
+    color: white;
     font-family: Arial, sans-serif;
     display: flex;
     justify-content: center;
@@ -24,7 +24,7 @@ body {
     height: 60px;
     margin-bottom: 20px;
     border-radius: 50%;
-    background: #ffffff22;
+    background: white;
 }
 
 h2 {
@@ -54,7 +54,7 @@ input[type="password"] {
 
 button {
     padding: 10px;
-    background-color: #238636;
+    background-color: #9c1e1e;
     color: white;
     border: none;
     border-radius: 5px;
@@ -62,14 +62,14 @@ button {
  }
 
  button:hover {
-    background-color: #2ea043;
+    background-color: #b91818;
  }
 
  .forgot {
     float: right;
     font-size: 0.8em;
     text-decoration: none;
-    color: #58a6ff;
+    color: #0379ff;
  }
 
 .signup {
@@ -78,6 +78,6 @@ button {
 }
 
 .signup a {
-    color: #58a6ff;
+    color: #0379ff;
     text-decoration: none;
 }
