@@ -75,7 +75,7 @@ h2 {
 }
 
 h3 {
-    color: #dd0303;
+    color: #fc0c0cf5;
     font-size: 1.3rem;
 }
 
@@ -152,8 +152,6 @@ section {
     box-shadow: 0 4px 20px #b60000;
     
 }
-
-
 
 .feature-icon {
     font-size: 2rem;
