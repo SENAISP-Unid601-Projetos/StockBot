@@ -1,4 +1,22 @@
 package com.example.Back.DTO;
 
-public class MatriculaDTO {
-}
+import com.example.Back.Entity.MatriculaStatus;
+import org.antlr.v4.runtime.misc.NotNull;
+
+import java.time.LocalDate;
+
+public record MatriculaDTO(
+
+        @NotNull
+        Integer alunoId,
+
+        @NotNull
+        Integer cursoId,
+
+        @NotNull
+        LocalDate dataMatricula,
+
+        @NotNull
+        MatriculaStatus status
+
+) {}
