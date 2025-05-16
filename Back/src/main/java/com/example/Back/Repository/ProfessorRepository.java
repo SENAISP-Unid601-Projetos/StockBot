@@ -1,4 +1,7 @@
 package com.example.Back.Repository;
 
-public interface ProfessorRepository {
+import com.example.Back.Entity.Professor;
+import org.springframework.data.jpa.repository.JpaRepository;
+
+public interface ProfessorRepository extends JpaRepository<Long, Professor> {
 }
