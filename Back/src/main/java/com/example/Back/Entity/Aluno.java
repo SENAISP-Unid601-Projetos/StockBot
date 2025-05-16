@@ -19,5 +19,4 @@ public class Aluno extends Usuario {
     @Column(nullable = false)
     private Date data_ingresso;
     private Date data_evasao;
-
 }
