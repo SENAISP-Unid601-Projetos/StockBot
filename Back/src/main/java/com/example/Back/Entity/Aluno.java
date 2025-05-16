@@ -14,9 +14,10 @@ import java.util.Date;
 @Table(name = "aluno")
 public class Aluno extends Usuario {
     @OneToOne(mappedBy = "aluno", cascade = CascadeType.ALL)
-    @Column(nullable = false, length = 20)
+    @Column(name = "matricula", nullable = false, length = 20)
     private Matricula matricula;
-    @Column(nullable = false)
+    @Column(name = "data_ingresso", nullable = false)
     private Date data_ingresso;
+    @Column(name = "data_evasao")
     private Date data_evasao;
 }

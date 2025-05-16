@@ -15,9 +15,12 @@ import java.util.Date;
 @AllArgsConstructor
 @Table(name = "professor")
 public class Professor extends Usuario{
-    @Column(nullable = false, unique = true, length = 11)
+    @Column(name = "cpf", nullable = false, unique = true, length = 11)
     private String cpf;
+    @Column(name = "titulacao")
     private String titulacao;
+    @Column(name = "area_especializacao")
     private String area_especializacao;
+    @Column(name = "data_nascimento")
     private Date data_nascimento;
 }
