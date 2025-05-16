@@ -1,7 +1,8 @@
 package com.example.Back.DTO;
 
 import com.example.Back.Entity.MatriculaStatus;
-import org.antlr.v4.runtime.misc.NotNull;
+import org.jetbrains.annotations.NotNull;
+
 
 import java.time.LocalDate;
 
