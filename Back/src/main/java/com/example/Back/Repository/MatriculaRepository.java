@@ -1,4 +1,12 @@
 package com.example.Back.Repository;
 
-public interface MatriculaRepository {
+import com.example.Back.Entity.Matricula;
+import com.example.Back.Entity.MatriculaId;
+import org.springframework.data.jpa.repository.JpaRepository;
+
+import java.util.List;
+
+public interface MatriculaRepository extends JpaRepository<Matricula, MatriculaId> {
+    List<Matricula> findByAlunoId(Integer alunoId);
+    List<Matricula> findByCursoId(Integer cursoId);
 }
