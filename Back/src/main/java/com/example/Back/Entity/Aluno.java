@@ -1,6 +1,7 @@
 package com.example.Back.Entity;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -13,9 +14,10 @@ import java.util.Date;
 @AllArgsConstructor
 @Table(name = "aluno")
 public class Aluno extends Usuario {
+    @NotNull
     @OneToOne(mappedBy = "aluno", cascade = CascadeType.ALL)
-    @Column(name = "matricula", nullable = false, length = 20)
     private Matricula matricula;
+    @NotNull
     @Column(name = "data_ingresso", nullable = false)
     private Date data_ingresso;
     @Column(name = "data_evasao")
