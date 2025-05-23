@@ -1,7 +1,7 @@
 package com.example.Back.Service;
 
 import com.example.Back.DTO.UsuarioDTO;
-import com.example.Back.DTO.UsuarioMapper;
+import com.example.Back.Mapper.UsuarioMapper;
 import com.example.Back.Entity.Usuario;
 import com.example.Back.Repository.UsuarioRepository;
 import org.springframework.stereotype.Service;

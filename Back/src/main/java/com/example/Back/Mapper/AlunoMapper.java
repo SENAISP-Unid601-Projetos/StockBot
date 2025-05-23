@@ -1,5 +1,6 @@
-package com.example.Back.DTO;
+package com.example.Back.Mapper;
 
+import com.example.Back.DTO.AlunoDTO;
 import com.example.Back.Entity.Aluno;
 import org.mapstruct.Mapper;
 import org.mapstruct.factory.Mappers;
