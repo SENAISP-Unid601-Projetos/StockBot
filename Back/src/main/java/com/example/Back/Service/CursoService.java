@@ -1,17 +1,13 @@
 package com.example.Back.Service;
 
 import com.example.Back.DTO.CursoDTO;
-import com.example.Back.Entity.Aluno;
 import com.example.Back.Entity.Curso;
-import com.example.Back.Entity.Professor;
-import com.example.Back.Repository.AlunoRepository;
 import com.example.Back.Repository.CursoRepository;
-import com.example.Back.Repository.ProfessorRepository;
-import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
@@ -20,9 +16,60 @@ import java.util.stream.Collectors;
 @Service
 public class CursoService {
 
-    @Autowired
-    private CursoRepository cursoRepository;
+    private final CursoRepository cursoRepository;
 
+    @Autowired
+    public CursoService(CursoRepository cursoRepository) {
+        this.cursoRepository = cursoRepository;
+    }
+
+    @Transactional
+    public CursoDTO criarCurso(CursoDTO cursoDTO) {
+        Curso curso = toEntity(cursoDTO);
+        Curso cursoSalvo = cursoRepository.save(curso);
+        return toDTO(cursoSalvo);
+    }
+
+    public List<CursoDTO> listarTodosCursos() {
+        return cursoRepository.findAll()
+                .stream()
+                .map(this::toDTO)
+                .collect(Collectors.toList());
+    }
+
+    public CursoDTO buscarCursoPorId(Long id) {
+        Optional<Curso> cursoOptional = cursoRepository.findById(id);
+        return cursoOptional.map(this::toDTO)
+                .orElseThrow(() -> new RuntimeException("Curso não encontrado com o ID: " + id));
+    }
+
+    @Transactional
+    public CursoDTO atualizarCurso(Long id, CursoDTO cursoDTO) {
+        return cursoRepository.findById(id)
+                .map(cursoExistente -> {
+                    cursoExistente.setCodigo(cursoDTO.getCodigo());
+                    cursoExistente.setNome(cursoDTO.getNome());
+                    cursoExistente.setCargaHoraria(cursoDTO.getCargaHoraria());
+                    cursoExistente.setDataInicio(cursoDTO.getDataInicio());
+                    cursoExistente.setDataTermino(cursoDTO.getDataTermino());
+
+                    Curso cursoAtualizado = cursoRepository.save(cursoExistente);
+                    return toDTO(cursoAtualizado);
+                })
+                .orElseThrow(() -> new RuntimeException("Curso não encontrado com o ID: " + id));
+    }
+
+    @Transactional
+    public void deletarCurso(Long id) {
+        cursoRepository.deleteById(id);
+    }
+
+    public List<CursoDTO> buscarCursosPorNome(String nome) {
+        return cursoRepository.findByNomeContainingIgnoreCase(nome)
+                .stream()
+                .map(this::toDTO)
+                .collect(Collectors.toList());
+    }
 
     private CursoDTO toDTO(Curso curso) {
         CursoDTO dto = new CursoDTO();
@@ -40,44 +87,9 @@ public class CursoService {
         curso.setIdCurso(dto.getIdCurso());
         curso.setCodigo(dto.getCodigo());
         curso.setNome(dto.getNome());
-        curso.setCargaHoraria( dto.getCargaHoraria());
+        curso.setCargaHoraria(dto.getCargaHoraria());
         curso.setDataInicio(dto.getDataInicio());
         curso.setDataTermino(dto.getDataTermino());
         return curso;
     }
-
-//    @Transactional
-//    public ResponseEntity<CursoDTO> criarCurso (CursoDTO cursoDTO) {
-//        Optional<Aluno> alunoOpt = alunoRepository.findById(cursoDTO.getIdCurso());
-//        if (alunoOpt.isEmpty()) {
-//            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-//        }
-//        Optional<Professor> professorOpt = professorRepository.findById(cursoDTO.getIdCurso());
-//        if (professorOpt.isEmpty()) {
-//            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-//        }
-//
-//        Aluno aluno = alunoOpt.get();
-//        Professor professor = professorOpt.get();
-//
-//        Curso curso = toEntity(CursoDTO);
-//        Curso novoCurso = cursoRepository.save(curso);
-//
-//        aluno.getCursos().add(novoCurso);
-//        professor.getProfessores().add(novoCurso);
-//
-//        alunoRepository.save(aluno);
-//        professorRepository.save(professor);
-//
-//        return new ResponseEntity<>(toDTO(novoCurso), HttpStatus.CREATED);
-//    }
-
-    public ResponseEntity<List<CursoDTO>> listarCursos() {
-        List<CursoDTO> cursos = cursoRepository.findAll()
-                .stream()
-                .map(curso -> toDTO(curso))
-                .collect(Collectors.toList());
-        return new ResponseEntity<>(cursos, HttpStatus.OK);
-    }
-    
 }
