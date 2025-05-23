@@ -1,0 +1,126 @@
+Para o código apresentado, os seguintes padrões de design são pertinentes e podem ser aplicados ou melhorados:
+
+Padrões já aplicados/identificados:
+DTO (Data Transfer Object)
+
+Uso: Transferência de dados entre camadas (ex: MatriculaDTO, AlunoDTO).
+
+Benefício: Isola a estrutura interna das entidades e evita expor detalhes do modelo de domínio.
+
+Service Layer
+
+Uso: Classes como MatriculaService e CursoService encapsulam a lógica de negócio.
+
+Benefício: Separa a lógica de negócio dos controllers e centraliza operações complexas.
+
+Repository (Spring Data JPA)
+
+Uso: Interfaces como MatriculaRepository e CursoRepository abstraem o acesso ao banco de dados.
+
+Benefício: Simplifica operações CRUD e promove desacoplamento.
+
+Dependency Injection (via Spring)
+
+Uso: Injeção de dependências com @Autowired e Lombok (@RequiredArgsConstructor).
+
+Benefício: Facilita testes e mantém o código desacoplado.
+
+Mapper (MapStruct)
+
+Uso: Conversão entre entidades e DTOs em classes como AlunoMapper.
+
+Oportunidade de Melhoria: Aplicar consistentemente em todos os serviços (ex: substituir conversões manuais em MatriculaService por um MatriculaMapper).
+
+Padrões recomendados para implementação/melhoria:
+Global Exception Handler (ControllerAdvice)
+
+Motivo: Centralizar o tratamento de exceções (ex: EntityNotFoundException).
+
+Implementação: Criar uma classe com @ControllerAdvice para uniformizar respostas de erro.
+
+Factory Method (para criação complexa de objetos)
+
+Motivo: No CursoService, o método comentado criarCurso envolve múltiplas validações. Uma fábrica poderia isolar a criação de Curso com suas dependências.
+
+Exemplo:
+
+java
+public class CursoFactory {
+    public static Curso createCurso(CursoDTO dto, Aluno aluno, Professor professor) {
+        // Lógica de validação e construção
+    }
+}
+Strategy (para algoritmos variáveis)
+
+Motivo: Se houver diferentes regras de negócio para matrículas (ex: validação de carga horária), estratégias isolariam essas regras.
+
+Exemplo:
+
+java
+public interface MatriculaValidationStrategy {
+    void validate(MatriculaDTO dto);
+}
+
+@Service
+public class CargaHorariaValidation implements MatriculaValidationStrategy { ... }
+Decorator (para adicionar comportamentos dinâmicos)
+
+Motivo: Adicionar logging, caching ou validações extras em serviços sem modificar o código existente.
+
+Exemplo:
+
+java
+public class LoggingMatriculaServiceDecorator implements MatriculaService {
+    private final MatriculaService delegate;
+    // Implementação com logs antes/depois das chamadas
+}
+Observer (para eventos de domínio)
+
+Motivo: Notificar sistemas externos (ex: enviar e-mail ao criar uma matrícula).
+
+Implementação: Usar ApplicationEventPublisher do Spring para publicar eventos (ex: MatriculaCriadaEvent).
+
+Ajustes Pontuais:
+Mapper Consistente:
+Substituir conversões manuais (ex: em MatriculaService) por mappers do MapStruct, como já feito em AlunoMapper.
+
+Correção de Repositórios:
+As interfaces AlunoRepository e UsuarioRepository estão com os tipos genéricos invertidos. O correto é:
+
+java
+public interface AlunoRepository extends JpaRepository<Aluno, Long> { ... }
+Padronização de DTOs:
+Alguns DTOs (ex: CursoDTO) usam LocalDate, enquanto outros usam Date. Uniformizar para LocalDate (recomendado).
+
+Exemplo de Implementação com MapStruct:
+Criar MatriculaMapper:
+
+java
+@Mapper(componentModel = "spring")
+public interface MatriculaMapper {
+    MatriculaDTO toDto(Matricula matricula);
+    Matricula toEntity(MatriculaDTO dto);
+}
+Refatorar MatriculaService:
+
+java
+@Service
+@RequiredArgsConstructor
+public class MatriculaService {
+    private final MatriculaRepository repository;
+    private final MatriculaMapper mapper; // Injetar o mapper
+
+    public MatriculaDTO criar(MatriculaDTO dto) {
+        Matricula m = mapper.toEntity(dto);
+        return mapper.toDto(repository.save(m));
+    }
+    // Demais métodos usam o mapper
+}
+Conclusão:
+Os padrões mais relevantes para o código atual são: DTO, Service Layer, Repository, Dependency Injection, e Mapper. Para melhorar a manutenibilidade, foque em:
+
+Padronizar o uso de MapStruct.
+
+Implementar tratamento global de exceções.
+
+Considerar Factory ou Strategy para lógicas complexas de criação/validação.
