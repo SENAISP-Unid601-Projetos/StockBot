@@ -27,8 +27,8 @@ public class AlunoService {
     }
 
     @Transactional
-    public AlunoDTO criarAluno(AlunoDTO alunoDTO) {
-        Aluno aluno = toAlunoEntity(alunoDTO);
+    public AlunoDTO criarAluno(AlunoCreatedDTO alunoCreatedDTO) { // Change to AlunoCreatedDTO
+        Aluno aluno = toAlunoEntity(alunoCreatedDTO);
         Aluno alunoSalvo = alunoRepository.save(aluno);
         return AlunoMapper.INSTANCE.toAlunoDTO(alunoSalvo);
     }
@@ -71,18 +71,20 @@ public class AlunoService {
                 .collect(Collectors.toList());
     }
 
-//    private Aluno toAlunoEntity(AlunoDTO dto) {
-//        Aluno aluno = new Aluno();
-//        aluno.setData_ingresso(dto.getData_ingresso());
-//        aluno.setData_evasao(dto.getData_evasao());
-//
-//        Matricula matricula = new Matricula();
-//        matricula.setAlunoId(null); // Will be set after aluno is saved
-//        matricula.setCursoId(dto.getCursoId());
-//        matricula.setDataMatricula(dto.getData_ingresso() != null ? dto.getData_ingresso().toInstant().atZone(java.time.ZoneId.systemDefault()).toLocalDate() : LocalDate.now());
-//        matricula.setStatus(MatriculaStatus.valueOf(dto.getStatus() != null ? dto.getStatus() : "ATIVO"));
-//
-//        aluno.setMatricula(List.of(matricula));
-//        return aluno;
-//    }
+    private Aluno toAlunoEntity(AlunoCreatedDTO dto) { // Change to AlunoCreatedDTO
+        Aluno aluno = new Aluno();
+        aluno.setData_ingresso(dto.getData_ingresso());
+        aluno.setData_evasao(dto.getData_evasao());
+
+        Matricula matricula = new Matricula();
+        matricula.setAlunoId(null); // Will be set after aluno is saved
+        matricula.setCursoId(dto.getCursoId()); // Now works because AlunoCreatedDTO has cursoId
+        matricula.setDataMatricula(dto.getData_ingresso() != null
+                ? dto.getData_ingresso().toInstant().atZone(java.time.ZoneId.systemDefault()).toLocalDate()
+                : LocalDate.now());
+        matricula.setStatus(MatriculaStatus.valueOf(dto.getStatus() != null ? dto.getStatus() : "ATIVO")); // Now works because AlunoCreatedDTO has status
+
+        aluno.setMatricula(matricula); // Corrected to pass a single Matricula object
+        return aluno;
+    }
 }
