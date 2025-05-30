@@ -1,6 +1,5 @@
 package com.example.Back.Mapper;
 
-import com.example.Back.DTO.ProfessorCursoCreatedDTO;
 import com.example.Back.DTO.ProfessorCursoResponseDTO;
 import com.example.Back.Entity.ProfessorCurso;
 import org.mapstruct.Mapper;

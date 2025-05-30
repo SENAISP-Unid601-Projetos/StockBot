@@ -1,6 +1,5 @@
 package com.example.Back.Service;
 
-import com.example.Back.DTO.ProfessorCursoCreatedDTO;
 import com.example.Back.DTO.ProfessorCursoResponseDTO;
 import com.example.Back.Entity.Curso;
 import com.example.Back.Entity.Professor;

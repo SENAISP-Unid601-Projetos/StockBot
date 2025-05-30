@@ -1,6 +1,5 @@
 package com.example.Back.Controller;
 
-import com.example.Back.DTO.ProfessorCursoCreatedDTO;
 import com.example.Back.DTO.ProfessorCursoResponseDTO;
 import com.example.Back.Service.ProfessorCursoService;
 import jakarta.validation.Valid;
