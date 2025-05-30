@@ -37,6 +37,21 @@ label {
   color: #ffffff;
 }
 
+.inputQuant {
+ width: 16%;
+color: #fff;
+}
+
+textarea {
+  width: 65%;
+  padding: 10px;
+  background-color: #2e2e2e;
+  border: 1px solid #555;
+  border-radius: 5px;
+  color: #fff;
+  resize: vertical; 
+}
+
 input, select {
   width: 95%;
   padding: 10px;
