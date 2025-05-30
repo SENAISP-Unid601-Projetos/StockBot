@@ -1,15 +1,19 @@
+// CursoMapper.java
 package com.example.Back.Mapper;
 
-
-import com.example.Back.DTO.CursoDTO;
+import com.example.Back.DTO.CursoCreateDTO;
+import com.example.Back.DTO.CursoResponseDTO;
 import com.example.Back.Entity.Curso;
+import org.mapstruct.BeanMapping;
 import org.mapstruct.Mapper;
-import org.mapstruct.factory.Mappers;
+import org.mapstruct.MappingTarget;
+import org.mapstruct.NullValuePropertyMappingStrategy;
 
 @Mapper(componentModel = "spring")
 public interface CursoMapper {
-    CursoMapper INSTANCE = Mappers.getMapper(CursoMapper.class);
+    CursoResponseDTO toResponseDTO(Curso curso);
+    Curso toEntity(CursoCreateDTO cursoCreateDTO);
 
-    CursoDTO toCursoDTO (Curso curso);
-    Curso fromCursoEntity(CursoDTO cursoDTO);
+    @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
+    void updateCursoFromCreateDTO(CursoCreateDTO dto, @MappingTarget Curso entity);
 }
