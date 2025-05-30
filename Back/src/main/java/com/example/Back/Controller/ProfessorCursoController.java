@@ -3,6 +3,7 @@ package com.example.Back.Controller;
 import com.example.Back.DTO.ProfessorCursoCreatedDTO;
 import com.example.Back.DTO.ProfessorCursoResponseDTO;
 import com.example.Back.Service.ProfessorCursoService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -23,7 +24,7 @@ public class ProfessorCursoController {
 
     @PostMapping
     public ResponseEntity<ProfessorCursoResponseDTO> associarProfessorCurso(
-            @RequestBody ProfessorCursoCreatedDTO dto) {
+            @Valid @RequestBody ProfessorCursoCreatedDTO dto) {
         ProfessorCursoResponseDTO response = professorCursoService.cadastrar(dto);
         return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
