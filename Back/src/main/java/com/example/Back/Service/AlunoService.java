@@ -27,7 +27,7 @@ public class AlunoService {
     }
 
     @Transactional
-    public AlunoDTO criarAluno(AlunoCreatedDTO alunoCreatedDTO) { // Change to AlunoCreatedDTO
+    public AlunoDTO criarAluno(AlunoCreatedDTO alunoCreatedDTO) {
         Aluno aluno = toAlunoEntity(alunoCreatedDTO);
         Aluno alunoSalvo = alunoRepository.save(aluno);
         return AlunoMapper.INSTANCE.toAlunoDTO(alunoSalvo);
@@ -71,20 +71,28 @@ public class AlunoService {
                 .collect(Collectors.toList());
     }
 
-    private Aluno toAlunoEntity(AlunoCreatedDTO dto) { // Change to AlunoCreatedDTO
+    // Updated login method using senha
+    public AlunoDTO login(String email, String senha) {
+        return alunoRepository.findByEmail(email)
+                .filter(aluno -> aluno.getSenha().equals(senha)) // Using senha
+                .map(AlunoMapper.INSTANCE::toAlunoDTO)
+                .orElseThrow(() -> new RuntimeException("Credenciais inválidas"));
+    }
+
+    private Aluno toAlunoEntity(AlunoCreatedDTO dto) {
         Aluno aluno = new Aluno();
         aluno.setData_ingresso(dto.getData_ingresso());
         aluno.setData_evasao(dto.getData_evasao());
 
         Matricula matricula = new Matricula();
         matricula.setAlunoId(null); // Will be set after aluno is saved
-        matricula.setCursoId(dto.getCursoId()); // Now works because AlunoCreatedDTO has cursoId
+        matricula.setCursoId(dto.getCursoId());
         matricula.setDataMatricula(dto.getData_ingresso() != null
                 ? dto.getData_ingresso().toInstant().atZone(java.time.ZoneId.systemDefault()).toLocalDate()
                 : LocalDate.now());
-        matricula.setStatus(MatriculaStatus.valueOf(dto.getStatus() != null ? dto.getStatus() : "ATIVO")); // Now works because AlunoCreatedDTO has status
+        matricula.setStatus(MatriculaStatus.valueOf(dto.getStatus() != null ? dto.getStatus() : "ATIVO"));
 
-        aluno.setMatricula(matricula); // Corrected to pass a single Matricula object
+        aluno.setMatricula(matricula);
         return aluno;
     }
 }
