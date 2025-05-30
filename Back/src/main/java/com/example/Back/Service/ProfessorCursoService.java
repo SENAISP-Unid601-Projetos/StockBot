@@ -11,6 +11,7 @@ import com.example.Back.Repository.ProfessorRepository;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -18,15 +19,20 @@ import java.util.stream.Collectors;
 @Service
 public class ProfessorCursoService {
 
-    @Autowired
-    private ProfessorCursoRepository professorCursoRepository;
+    private final ProfessorCursoRepository professorCursoRepository;
+    private final ProfessorRepository professorRepository;
+    private final CursoRepository cursoRepository;
 
     @Autowired
-    private ProfessorRepository professorRepository;
+    public ProfessorCursoService(ProfessorCursoRepository professorCursoRepository,
+                                 ProfessorRepository professorRepository,
+                                 CursoRepository cursoRepository) {
+        this.professorCursoRepository = professorCursoRepository;
+        this.professorRepository = professorRepository;
+        this.cursoRepository = cursoRepository;
+    }
 
-    @Autowired
-    private CursoRepository cursoRepository;
-
+    @Transactional
     public ProfessorCursoResponseDTO cadastrar(ProfessorCursoCreatedDTO dto) {
         Professor professor = professorRepository.findById(dto.getProfessorId())
                 .orElseThrow(() -> new EntityNotFoundException("Professor não encontrado"));
@@ -52,12 +58,54 @@ public class ProfessorCursoService {
 
     public List<ProfessorCursoResponseDTO> listarTodos() {
         return professorCursoRepository.findAll().stream()
-                .map(pc -> new ProfessorCursoResponseDTO(
-                        pc.getId(),
-                        pc.getProfessor().getNome(),
-                        pc.getCurso().getNome(),
-                        pc.getDisciplina(),
-                        pc.getPeriodo()
-                )).collect(Collectors.toList());
+                .map(this::toResponseDTO)
+                .collect(Collectors.toList());
+    }
+
+    public List<ProfessorCursoResponseDTO> listarPorProfessor(Long professorId) {
+        return professorCursoRepository.findByProfessorId(professorId).stream()
+                .map(this::toResponseDTO)
+                .collect(Collectors.toList());
+    }
+
+    public List<ProfessorCursoResponseDTO> listarPorCurso(Long cursoId) {
+        return professorCursoRepository.findByCursoId(cursoId).stream()
+                .map(this::toResponseDTO)
+                .collect(Collectors.toList());
+    }
+
+    @Transactional
+    public void removerAssociacao(Long id) {
+        professorCursoRepository.deleteById(id);
+    }
+
+    @Transactional
+    public ProfessorCursoResponseDTO atualizarAssociacao(Long id, ProfessorCursoCreatedDTO dto) {
+        ProfessorCurso associacao = professorCursoRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Associação não encontrada"));
+
+        Professor professor = professorRepository.findById(dto.getProfessorId())
+                .orElseThrow(() -> new EntityNotFoundException("Professor não encontrado"));
+        Curso curso = cursoRepository.findById(dto.getCursoId())
+                .orElseThrow(() -> new EntityNotFoundException("Curso não encontrado"));
+
+        associacao.setProfessor(professor);
+        associacao.setCurso(curso);
+        associacao.setDisciplina(dto.getDisciplina());
+        associacao.setPeriodo(dto.getPeriodo());
+
+        ProfessorCurso atualizado = professorCursoRepository.save(associacao);
+
+        return toResponseDTO(atualizado);
+    }
+
+    private ProfessorCursoResponseDTO toResponseDTO(ProfessorCurso pc) {
+        return new ProfessorCursoResponseDTO(
+                pc.getId(),
+                pc.getProfessor().getNome(),
+                pc.getCurso().getNome(),
+                pc.getDisciplina(),
+                pc.getPeriodo()
+        );
     }
 }
