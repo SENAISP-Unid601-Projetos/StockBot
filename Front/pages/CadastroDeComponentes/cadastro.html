@@ -1,39 +1,53 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="pt-BR">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cadastro de Componentes</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Cadastro de Componentes</title>
+  <link rel="stylesheet" href="styles/style.css" />
 </head>
 <body>
-    <h1>Cadastro de Componentes</h1>
-    <label for="entradaComponente">Nome do Componente:</label>
-    <input type="text" id="entradaComponente">
-    <br>
-    <br>
-    <label for="entradaCodigo">Código de Patrimônio:</label>
-    <input type="text" id="entradaCodigo">
-    <br>
-    <br>
-    <label for="entradaQuantidade">Quantidade:</label>
-    <input type="number" id="entradaQuantidade">
-    <br>
-    <br>
-    <label for="entradaLocalizacao">Localização:</label>
-    <input type="text" id="entradaLocalizacao">
-    <br>
-    <br>
-    <label for="entradaCategoria">Categoria:</label>
-    <input type="text" id="entradaCategoria">
-    <br>
-    <br>
-    <label for="entradaObservacao">Observações:</label>
-    <input type="text" id="entradaObservacao">
-    <br>
-    <br>
-    <br>
-    <button id="cancelarBtn">Cancelar</button>
-    <button id="salvarBtn">Salvar</button>
-    <p id="resultado"></p>
+  <div class="container">
+    <div class="card">
+      <h1>Cadastro de Componentes</h1>
+
+      <label for="entradaComponente">Nome do Componente:</label>
+      <input type="text" id="entradaComponente"/>
+
+      <label for="entradaCodigo">Código de Patrimônio:</label>
+      <input type="text" id="entradaCodigo"/>
+
+    <div class="inputQuant">
+      <label for="entradaQuantidade">Quantidade:</label>
+      <input type="number" id="entradaQuantidade"/>
+    </div>
+
+      <label for="entradaLocalizacao">Localização:</label>
+      <div class="campo-interativo">
+        <select id="entradaLocalizacao">
+          <option value="">Selecione uma localização</option>
+        </select>
+        <button type="button" id="novaLocalizacaoBtn">Nova</button>
+      </div>
+
+      <label for="entradaCategoria">Categoria:</label>
+      <div class="campo-interativo">
+        <select id="entradaCategoria">
+          <option value="">Selecione uma categoria</option>
+        </select>
+        <button type="button" id="novaCategoriaBtn">Nova</button>
+      </div>
+    <div class="textarea">
+        <label for="entradaObservacao">Observações:</label>
+        <textarea id="entradaObservacao" rows="4" ></textarea>
+    </div>
+      <div class="botoes">
+        <button id="cancelarBtn">Cancelar</button>
+        <button id="salvarBtn">Salvar</button>
+      </div>
+
+      <p id="resultado"></p>
+    </div>
+  </div>
 </body>
 </html>
