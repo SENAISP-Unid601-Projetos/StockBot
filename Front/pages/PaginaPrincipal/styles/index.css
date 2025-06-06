@@ -22,7 +22,7 @@
   }
 
   .sidebar h2 {
-    color: #4fc3f7;
+    color: #00ffff;
     margin-bottom: 30px;
     text-align: center;
   }
@@ -64,7 +64,7 @@
 
   .btn {
     padding: 12px 24px;
-    background-color: #4fc3f7;
+    background-color: #00ffff;
     color: #12181f;
     border: none;
     border-radius: 6px;
@@ -76,5 +76,18 @@
   }
 
   .btn:hover {
-    background-color: #29b6f6;
+    background-color: #00ffff;
   }
+
+  .nav-link {
+  display: flex;
+  align-items: center;
+  gap: 10px; /* espaço entre ícone e texto */
+  color: #ddd;
+  padding: 12px;
+  margin: 6px 0;
+  text-decoration: none;
+  border-radius: 6px;
+  transition: background 0.2s;
+}
+
