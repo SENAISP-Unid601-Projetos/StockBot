@@ -7,9 +7,7 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class ProfessorCursoCreatedDTO {
-    private Long professorId;
-    private Long cursoId;
-    private String disciplina;
-    private String periodo;
+public class LoginRequestDTO {
+    private String email;
+    private String senha; // Changed from password to senha
 }

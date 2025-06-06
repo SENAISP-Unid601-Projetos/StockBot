@@ -22,4 +22,5 @@ public class Aluno extends Usuario {
     private Date data_ingresso;
     @Column(name = "data_evasao")
     private Date data_evasao;
+
 }

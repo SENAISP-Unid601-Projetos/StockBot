@@ -23,6 +23,8 @@ public class Usuario {
     @NotBlank
     @Column(name = "email", nullable = false, length = 100)
     private String email;
+    @Column(name = "senha", nullable = false, length = 16)
+    private String senha;
     @Enumerated(EnumType.STRING)
     @Column(name = "tipo", nullable = false)
     private UserType tipo;
