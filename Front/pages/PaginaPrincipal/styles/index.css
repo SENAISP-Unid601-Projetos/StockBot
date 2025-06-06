@@ -1,3 +1,4 @@
+@import url(../../../assets/colors/colors.css);
 /* Reset básico */
 * {
   margin: 0;
@@ -7,8 +8,8 @@
 
 body {
   display: flex;
-  background-color: #0d1117;
-  color: #c9d1d9;
+  background-color: var(--azulbarao);
+  color: var(--brancov1);
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   min-height: 100vh;
 }
