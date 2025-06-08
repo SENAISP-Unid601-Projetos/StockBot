@@ -11,4 +11,14 @@ public interface UsuarioMapper {
 
     UsuarioDTO toUsuarioDTO(Usuario usuario);
     Usuario fromUsuarioEntity(UsuarioDTO usuarioDTO);
+
+    // Método para converter id em Usuario (para uso em outros mappers)
+    default Usuario fromId(Long id) {
+        if (id == null) {
+            return null;
+        }
+        Usuario usuario = new Usuario();
+        usuario.setId(id);
+        return usuario;
+    }
 }

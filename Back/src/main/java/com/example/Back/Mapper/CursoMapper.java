@@ -16,4 +16,14 @@ public interface CursoMapper {
 
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
     void updateCursoFromCreateDTO(CursoCreateDTO dto, @MappingTarget Curso entity);
+
+    // Método para converter id em Curso (usado pelo ProfessorCursoMapper)
+    default Curso fromId(Long id) {
+        if (id == null) {
+            return null;
+        }
+        Curso curso = new Curso();
+        curso.setIdCurso(id);
+        return curso;
+    }
 }

@@ -13,4 +13,14 @@ public interface AlunoMapper {
     AlunoDTO toAlunoDTO(Aluno aluno);
 
     Aluno fromAlunoEntity(AlunoDTO alunoDTO);
+
+    // Método para converter id em Aluno (para uso em outros mappers)
+    default Aluno fromId(Long id) {
+        if (id == null) {
+            return null;
+        }
+        Aluno aluno = new Aluno();
+        aluno.setId(id);
+        return aluno;
+    }
 }
