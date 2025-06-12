@@ -4,5 +4,5 @@ public enum MatriculaStatus {
     ATIVA,
     INATIVA,
     TRANCADA,
-    CANCELADA
+    ATIVO, CANCELADA
 }
