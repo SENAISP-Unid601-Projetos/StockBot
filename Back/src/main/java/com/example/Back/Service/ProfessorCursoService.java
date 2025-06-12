@@ -69,7 +69,8 @@ public class ProfessorCursoService {
     }
 
     public List<ProfessorCursoResponseDTO> listarPorCurso(Long cursoId) {
-        return professorCursoRepository.findByCursoId(cursoId).stream()
+        // --- AQUI É ONDE VOCÊ PRECISA FAZER A MUDANÇA ---
+        return professorCursoRepository.findByCurso_IdCurso(cursoId).stream() // <<--- MUDAR PARA findByCurso_IdCurso
                 .map(this::toResponseDTO)
                 .collect(Collectors.toList());
     }
