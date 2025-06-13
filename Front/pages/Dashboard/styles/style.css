@@ -1,0 +1,211 @@
+/* No seu Dashboard/styles/dashboard.css */
+
+/* Importe suas variáveis de cores (ajuste o caminho se necessário) */
+@import url('../../../assets/colors/colors.css');
+
+/* Reset Básico */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: var(--azulbarao); /* Fundo mais escuro */
+    color: var(--brancov1); /* Cor de texto padrão branca */
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+header {
+    background-color: var(--cinzav1); /* Cor mais escura para o header */
+    color: var(--azuleletricov2); /* Cor de destaque para o texto do header */
+    padding: 25px 20px;
+    text-align: center;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+}
+
+header h1 {
+    font-size: 2.2em;
+    margin: 0;
+}
+
+.container {
+    flex-grow: 1;
+    padding: 30px;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 25px;
+    align-items: start;
+}
+
+.card {
+    background-color: var(--cinzaEscuroc4); /* Fundo mais escuro para os cards */
+    padding: 25px;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    display: flex;
+    flex-direction: column;
+}
+
+.card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.4);
+}
+
+.card h3 {
+    margin: 0 0 15px;
+    font-size: 1.3em;
+    color: var(--azuleletricov2); /* Cor de destaque para os títulos dos cards */
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    padding-bottom: 10px;
+}
+
+.card p {
+    font-size: 1.8em;
+    margin: 0;
+    font-weight: bold;
+    color: var(--verdeClarov4); /* Cor de destaque para os valores principais */
+}
+
+/* Estilos específicos para tipos de cards */
+.card.alert {
+    border-left: 6px solid var(--vermelhoPrejuizo, #e74c3c); 
+}
+
+.card.success {
+    border-left: 6px solid var(--verdeLimaov3);
+}
+
+.card.info {
+    border-left: 6px solid var(--azulClarov5);
+}
+
+.history {
+    grid-column: 1 / -1; /* Ocupa todas as colunas */
+}
+
+.history ul {
+    list-style: none;
+    padding-left: 0;
+    margin-top: 15px;
+}
+
+.history li {
+    margin-bottom: 10px;
+    padding-left: 0;
+    color: var(--brancov1);
+}
+
+/* NOVO ESTILO PARA O CARD DO GRÁFICO (AGORA COM DIMENSÕES FIXAS) */
+.chart-card {
+    grid-column: 1 / -1; /* Ocupa todas as colunas */
+    width: 700px; /* Largura FIXA para o CARD (AJUSTE SE PRECISAR PARA SUA TELA) */
+    height: 450px; /* Altura FIXA para o CARD */
+    min-height: auto; /* Remove min-height conflitante */
+    position: relative;
+    padding-bottom: 25px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden; /* Garante que nada transborde */
+    margin: 20px auto; /* Centraliza o card na página, adiciona margem */
+}
+
+/* NOVO ESTILO PARA O CANVAS DENTRO DO CARD (DIMENSÕES FIXAS E CRUCIAIS) */
+.chart-card canvas {
+    width: 100% !important; /* FORÇA o canvas a ter 100% da largura do seu pai (700px) */
+    height: 100% !important; /* FORÇA o canvas a ter 100% da altura do seu pai (450px) */
+    max-width: none !important; /* Remove qualquer limite de max-width */
+    max-height: none !important; /* Remove qualquer limite de max-height */
+    display: block;
+    box-sizing: border-box; /* Garante que padding/border sejam incluídos na largura/altura */
+}
+
+/* Estilos para o Card da Listagem de Componentes */
+.componentes-list-card {
+    grid-column: 1 / -1; /* Para ocupar a largura total */
+    margin-top: 20px;
+    padding: 0;
+    border-radius: 12px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+}
+
+.componentes-list-card h2 {
+    font-size: 1.3em;
+    color: var(--azuleletricov2);
+    padding: 25px 25px 15px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.componentes-list-card table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 0;
+    background-color: var(--cinzaEscuroc4);
+    border-radius: 0;
+}
+
+.componentes-list-card th, 
+.componentes-list-card td {
+    border: none;
+    border-bottom: 1px solid var(--cinzaMedioc2);
+    padding: 12px 25px;
+    text-align: left;
+    color: var(--brancov1);
+}
+
+.componentes-list-card th {
+    background-color: var(--azulbarao);
+    color: var(--verdeLimaov3); /* MANTENHO ESTE VERDE PARA DISTINÇÃO VISUAL DO HEADER */
+    font-weight: bold;
+    text-transform: uppercase;
+    font-size: 0.85em;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+}
+
+.componentes-list-card tr:nth-child(even) {
+    background-color: var(--cinzaEscuroc3);
+}
+
+.componentes-list-card tr:hover {
+    background-color: var(--cinzaMedioc2);
+}
+
+/* Responsividade Básica */
+@media (max-width: 768px) {
+    .container {
+        grid-template-columns: 1fr;
+        padding: 15px;
+        gap: 20px;
+    }
+    .chart-card, .history, .componentes-list-card {
+        grid-column: auto;
+    }
+    /* Ajuste para o card do gráfico em telas menores */
+    .chart-card {
+        width: 100%; /* Ocupa 100% da largura em telas menores */
+        height: 350px; /* Altura ajustada para telas menores */
+        margin: 20px 0; /* Remove margem lateral em telas pequenas */
+    }
+    .chart-card canvas {
+        height: 300px !important; /* Altura do canvas em telas menores */
+    }
+    header {
+        padding: 15px 10px;
+    }
+    header h1 {
+        font-size: 1.8em;
+    }
+}

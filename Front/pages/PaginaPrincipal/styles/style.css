@@ -1,0 +1,134 @@
+/* No seu PaginaPrincipal/styles/index.css */
+
+/* Importe suas variáveis de cores (ajuste o caminho se necessário) */
+@import url('../../../assets/colors/colors.css');
+
+/* Reset Básico */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  display: flex; /* Essencial para ter a sidebar ao lado */
+  background-color: var(--azulbarao); /* Fundo escuro principal */
+  color: var(--brancov1); /* Cor de texto padrão */
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  min-height: 100vh; /* Garante que o body ocupa a altura total da tela */
+}
+
+/* Sidebar */
+.sidebar {
+  width: 250px; /* Largura um pouco maior para a sidebar */
+  background-color: var(--cinzav1); /* Cor de fundo da sidebar */
+  padding: 25px; /* Mais padding */
+  display: flex;
+  flex-direction: column;
+  box-shadow: 4px 0 15px rgba(0, 0, 0, 0.4); /* Sombra à direita da sidebar */
+  position: sticky; /* Para que a sidebar fique fixa ao rolar a página */
+  top: 0;
+  height: 100vh; /* Garante que a sidebar ocupe toda a altura da viewport */
+  z-index: 100;
+}
+
+.sidebar h2 {
+  color: var(--azuleletricov2); /* Cor do título StockBot */
+  margin-bottom: 40px; /* Mais espaço abaixo do título */
+  text-align: center;
+  font-size: 1.8em;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.nav-link {
+  display: flex;
+  align-items: center;
+  gap: 12px; /* Espaço entre ícone e texto */
+  color: var(--brancov1); /* Cor do texto do link */
+  text-decoration: none;
+  padding: 15px 10px; /* Padding interno maior */
+  margin: 8px 0; /* Margem entre os links */
+  border-radius: 8px; /* Cantos arredondados */
+  transition: background-color 0.3s ease, color 0.3s ease, transform 0.2s ease; /* Transições suaves */
+  font-weight: 500;
+}
+
+.nav-link:hover {
+  background-color: var(--cinzaEscuroc3); /* Fundo no hover */
+  color: var(--azuleletricov2); /* Cor de destaque no hover */
+  transform: translateX(5px); /* Efeito sutil ao passar o mouse */
+}
+
+/* Estilo para ícones Lucide */
+.nav-link i {
+  width: 20px;
+  height: 20px;
+  stroke-width: 2; /* Espessura do traço do ícone */
+}
+
+/* Para empurrar os últimos links para o final da sidebar */
+.sidebar > div[style="flex-grow: 1;"] {
+    flex-grow: 1;
+}
+
+/* Conteúdo principal */
+.main {
+  flex: 1; /* Ocupa todo o espaço restante */
+  padding: 60px; /* Padding geral do conteúdo */
+  display: flex;
+  flex-direction: column;
+  justify-content: center; /* Centraliza verticalmente */
+  align-items: flex-start; /* Alinha o texto à esquerda */
+  text-align: left; /* Garante o alinhamento do texto */
+}
+
+.main h1 {
+  font-size: 3.2rem; /* Título maior */
+  color: var(--verdeLimaov3); /* Cor de destaque */
+  margin-bottom: 20px;
+  line-height: 1.2;
+}
+
+.main p {
+  font-size: 1.1em;
+  line-height: 1.6;
+  max-width: 600px; /* Limita a largura do parágrafo */
+  color: var(--brancov1);
+  margin-bottom: 30px;
+}
+
+.btn {
+  padding: 15px 30px; /* Mais padding para o botão */
+  background-color: var(--azuleletricov2); /* Azul elétrico da sua paleta */
+  color: var(--pretov2); /* Texto preto */
+  border: none;
+  border-radius: 8px; /* Cantos mais arredondados */
+  font-weight: bold;
+  font-size: 1.1em;
+  cursor: pointer;
+  transition: background-color 0.3s ease, transform 0.2s ease;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.btn:hover {
+  background-color: var(--azulClarov5); /* Azul mais claro no hover */
+  transform: translateY(-3px); /* Efeito de elevação */
+}
+
+/* Responsividade Básica */
+@media (max-width: 768px) {
+    .sidebar {
+        width: 100%; /* Sidebar ocupa toda a largura em telas pequenas */
+        height: auto; /* Altura automática */
+        position: relative; /* Deixa de ser sticky */
+        flex-direction: row; /* Links em linha */
+        justify-content: space-around; /* Distribui os links */
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
+        padding: 15px 10px;
+        flex-wrap: wrap; /* Permite que os links quebrem linha */
+    }
+  }
+    .sidebar h2 {
+        display: none; /* Esconde o título em telas pequenas */
+    }
