@@ -1,6 +1,9 @@
 # StockBot
  Inventario de materiais Escolares(Elétrica)
 
+## Novo Banco
+https://dbdiagram.io/d/6861bf81f413ba35086b59b6
+
 ## ExcaliDraw
 
 https://excalidraw.com/#room=5b0e2adb7520a5a2fec1,fgHGXLSlJwx7vptKWMn1mg
