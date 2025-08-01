@@ -10,7 +10,7 @@ import java.util.Objects;
 @AllArgsConstructor
 public class MatriculaId implements Serializable {
 
-    private Integer alunoId;
+    private Long alunoId;
     private Integer cursoId;
 
     @Override

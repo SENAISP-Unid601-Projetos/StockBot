@@ -14,7 +14,7 @@ public class Matricula {
 
     @Id
     @Column(name = "aluno_id")
-    private Integer alunoId;
+    private Long alunoId;
 
     @Id
     @Column(name = "curso_id")

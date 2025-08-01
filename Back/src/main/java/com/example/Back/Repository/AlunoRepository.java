@@ -9,5 +9,7 @@ import java.util.Optional;
 public interface AlunoRepository extends JpaRepository<Aluno, Long> {
     List<Aluno> findByNomeContainingIgnoreCase(String nome);
     Optional<Aluno> findByEmail(String email);
+
+
 }
 

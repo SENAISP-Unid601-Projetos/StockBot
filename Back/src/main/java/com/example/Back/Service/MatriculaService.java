@@ -1,87 +1,104 @@
 package com.example.Back.Service;
 
 import com.example.Back.DTO.MatriculaDTO;
+import com.example.Back.Entity.Aluno;
 import com.example.Back.Entity.Matricula;
 import com.example.Back.Entity.MatriculaId;
-import com.example.Back.Entity.Aluno;
-import com.example.Back.Repository.MatriculaRepository;
 import com.example.Back.Repository.AlunoRepository;
+import com.example.Back.Repository.MatriculaRepository;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
-@RequiredArgsConstructor
+@RequiredArgsConstructor // Injeta os repositórios via construtor, uma ótima prática.
 public class MatriculaService {
 
-    private final MatriculaRepository repository;
+    private final MatriculaRepository matriculaRepository;
     private final AlunoRepository alunoRepository;
 
-    // --- ADICIONE ESTE MÉTODO DE VOLTA ---
+    @Transactional(readOnly = true)
     public List<MatriculaDTO> listarTodas() {
-        return repository.findAll()
+        return matriculaRepository.findAll()
                 .stream()
                 .map(this::toDTO)
                 .collect(Collectors.toList());
     }
 
-    // --- Adicione/Mantenha seus outros métodos aqui ---
-    public MatriculaDTO buscarPorId(Integer alunoId, Integer cursoId) {
+    @Transactional(readOnly = true)
+    public MatriculaDTO buscarPorId(Long alunoId, Integer cursoId) { // <-- CORRIGIDO para Long
         MatriculaId id = new MatriculaId(alunoId, cursoId);
-        return repository.findById(id)
+        return matriculaRepository.findById(id)
                 .map(this::toDTO)
-                .orElseThrow(() -> new EntityNotFoundException("Matrícula não encontrada"));
+                .orElseThrow(() -> new EntityNotFoundException("Matrícula não encontrada para o ID: " + id));
     }
 
+    @Transactional
     public MatriculaDTO criar(MatriculaDTO dto) {
-        Matricula m = toEntity(dto); // toEntity usa o novo construtor com Aluno
-        return toDTO(repository.save(m));
-    }
-
-    public MatriculaDTO atualizar(MatriculaDTO dto) {
+        // Validação para evitar matricular o mesmo aluno no mesmo curso duas vezes.
         MatriculaId id = new MatriculaId(dto.alunoId(), dto.cursoId());
-        Matricula existente = repository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("Matrícula não encontrada"));
+        if (matriculaRepository.existsById(id)) {
+            throw new IllegalArgumentException("Esta matrícula já existe.");
+        }
 
-        existente.setDataMatricula(dto.dataMatricula());
-        existente.setStatus(dto.status());
-
-        // Se você precisar atualizar o Aluno referenciado na Matrícula, precisaria de mais lógica aqui.
-        // Por exemplo, se Aluno fosse atualizável via DTO da Matricula.
-
-        return toDTO(repository.save(existente));
+        Matricula novaMatricula = toEntity(dto);
+        Matricula matriculaSalva = matriculaRepository.save(novaMatricula);
+        return toDTO(matriculaSalva);
     }
 
-    public void deletar(Integer alunoId, Integer cursoId) {
-        repository.deleteById(new MatriculaId(alunoId, cursoId));
+    @Transactional
+    public MatriculaDTO atualizar(Long alunoId, Integer cursoId, MatriculaDTO dto) { // <-- Assinatura mais clara
+        MatriculaId id = new MatriculaId(alunoId, cursoId);
+        Matricula matriculaExistente = matriculaRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Matrícula não encontrada para o ID: " + id));
+
+        // Atualiza apenas os campos permitidos
+        matriculaExistente.setDataMatricula(dto.dataMatricula());
+        matriculaExistente.setStatus(dto.status());
+
+        Matricula matriculaAtualizada = matriculaRepository.save(matriculaExistente);
+        return toDTO(matriculaAtualizada);
     }
 
-    private MatriculaDTO toDTO(Matricula m) {
-        // Assegure-se de que MatriculaDTO tem os campos corretos e é um record ou tem construtor.
-        // Se AlunoDTO tem String 'matricula' (que é combinada de AlunoId-CursoId),
-        // este DTO é para listar, então os IDs separados estão OK.
+    @Transactional
+    public void deletar(Long alunoId, Integer cursoId) { // <-- CORRIGIDO para Long
+        MatriculaId id = new MatriculaId(alunoId, cursoId);
+        if (!matriculaRepository.existsById(id)) {
+            throw new EntityNotFoundException("Matrícula não encontrada para o ID: " + id);
+        }
+        matriculaRepository.deleteById(id);
+    }
+
+    // --- MÉTODOS DE CONVERSÃO PRIVADOS ---
+
+    private MatriculaDTO toDTO(Matricula matricula) {
         return new MatriculaDTO(
-                m.getAlunoId(),
-                m.getCursoId(),
-                m.getDataMatricula(),
-                m.getStatus()
+                matricula.getAlunoId(),
+                matricula.getCursoId(),
+                matricula.getDataMatricula(),
+                matricula.getStatus()
         );
     }
 
     private Matricula toEntity(MatriculaDTO dto) {
-        // Busque a entidade Aluno correspondente ao alunoId do DTO.
-        Aluno aluno = alunoRepository.findById(Long.valueOf(dto.alunoId()))
-                .orElseThrow(() -> new EntityNotFoundException("Aluno não encontrado para a matrícula: " + dto.alunoId()));
+        // Busca a entidade Aluno para garantir que ela exista antes de criar a relação.
+        Aluno aluno = alunoRepository.findById(dto.alunoId()) // <-- Simplificado, sem Long.valueOf()
+                .orElseThrow(() -> new EntityNotFoundException("Aluno com ID " + dto.alunoId() + " não encontrado."));
 
-        return new Matricula(
-                dto.alunoId(),
-                dto.cursoId(),
-                aluno, // Passe o objeto Aluno aqui
-                dto.dataMatricula(),
-                dto.status()
-        );
+        // Assume que a entidade Curso também seria validada aqui em um cenário real.
+        // new Curso(dto.cursoId()) ...
+
+        Matricula matricula = new Matricula();
+        matricula.setAlunoId(dto.alunoId());
+        matricula.setCursoId(dto.cursoId());
+        matricula.setAluno(aluno); // Associa a entidade Aluno encontrada
+        matricula.setDataMatricula(dto.dataMatricula());
+        matricula.setStatus(dto.status());
+
+        return matricula;
     }
 }
