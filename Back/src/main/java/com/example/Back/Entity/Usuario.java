@@ -1,31 +1,34 @@
+// src/main/java/com/example/Back/Entity/Usuario.java
 package com.example.Back.Entity;
 
 import jakarta.persistence.*;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
-import lombok.AllArgsConstructor;
+import jakarta.validation.constraints.*;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 
 @Entity
 @Data
-@NoArgsConstructor
-@AllArgsConstructor
-@Table(name = "tipo_usuario")
-@Inheritance(strategy = InheritanceType.JOINED)
+@Table(name = "usuarios")
 public class Usuario {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    @NotBlank
-    @Column(name = "nome", length = 100)
+
+    @NotBlank(message = "Nome é obrigatório")
     private String nome;
-    @NotBlank
-    @Column(name = "email", nullable = false, length = 100)
+
+    @NotBlank(message = "Email é obrigatório")
+    @Email(message = "Email deve ser válido")
+    @Column(unique = true)
     private String email;
-    @Column(name = "senha", nullable = false, length = 16)
+
+    @NotBlank(message = "Senha é obrigatória")
     private String senha;
+
     @Enumerated(EnumType.STRING)
-    @Column(name = "tipo", nullable = false)
-    private UserType tipo;
+    @Column(nullable = false)
+    private TipoUsuario tipo = TipoUsuario.PADRAO;
+
+    public enum TipoUsuario {
+        ADMIN, COORDENADOR, PROFESSOR, PADRAO
+    }
 }

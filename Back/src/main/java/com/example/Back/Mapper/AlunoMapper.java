@@ -79,7 +79,7 @@ public interface AlunoMapper {
                 matricula.setDataMatricula(LocalDate.now()); // Data atual como padrão
             }
             if (matricula.getStatus() == null) {
-                matricula.setStatus(MatriculaStatus.ATIVO); // Exemplo de status padrão, use o seu ENUM
+                matricula.setStatus(MatriculaStatus.ATIVA); // Exemplo de status padrão, use o seu ENUM
             }
 
 
