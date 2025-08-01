@@ -2,30 +2,27 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
-  <title>StockBot - Início</title>
+  <title>StockBot - Dashboard</title>
   <link rel="stylesheet" href="styles/style.css">
-  <script src="https://unpkg.com/lucide@latest"></script> </head>
+  <script src="https://unpkg.com/lucide@latest"></script>
+</head>
 <body>
   <nav class="sidebar">
     <h2>StockBot</h2>
-
     <a href="#" class="nav-link">
-      <i data-lucide="home"></i> <span>Início</span>
+      <i data-lucide="layout-dashboard"></i> <span>Dashboard</span>
     </a>
-
     <a href="../CadastroDeComponentes/index.html" class="nav-link">
       <i data-lucide="wrench"></i>
       <span>Componentes</span>
     </a>
-
     <a href="#" class="nav-link">
       <i data-lucide="history"></i> <span>Histórico</span>
     </a>
-
-    <div style="flex-grow: 1;"></div> <a href="#" class="nav-link">
+    <div style="flex-grow: 1;"></div>
+    <a href="#" class="nav-link">
       <i data-lucide="settings"></i> <span>Configurações</span>
     </a>
-
     <a href="#" class="nav-link">
       <i data-lucide="circle-user-round"></i>
       <span>Sair/Entrar</span>
@@ -33,14 +30,53 @@
   </nav>
 
   <main class="main">
-    <h1>Bem-vindo ao StockBot!</h1>
-    <p>Gerencie os componentes da sala de elétrica com praticidade, controle e organização.</p>
-    <br>
-    <button class="btn" onclick="location.href='../Dashboard/index.html'">Acessar Dashboard</button>
-  </main>
+    <div class="header-dashboard">
+      <h1>Dashboard</h1>
+      <p>Olá, Usuário! Aqui está um resumo do seu estoque de componentes.</p>
+    </div>
+  
+    <div class="dashboard-grid">
+
+      <div class="kpi-card">
+        <div class="card-header">
+          <span>Total de Componentes</span>
+          <i data-lucide="package"></i>
+        </div>
+        <span class="number">150</span>
+        <span class="description">+5 na última semana</span>
+      </div>
+  
+      <div class="kpi-card">
+        <div class="card-header">
+          <span>Itens em Estoque</span>
+          <i data-lucide="archive"></i>
+        </div>
+        <span class="number">1.250</span>
+        <span class="description">Unidades totais</span>
+      </div>
+  
+      <div class="kpi-card" style="border-left-color: #FF6347;"> <div class="card-header">
+          <span>Itens em Falta</span>
+          <i data-lucide="alert-circle"></i>
+        </div>
+        <span class="number">10</span>
+        <span class="description">Requer atenção imediata</span>
+      </div>
+  
+      <div class="kpi-card" style="border-left-color: #32CD32;"> <div class="card-header">
+          <span>Valor do Estoque</span>
+          <i data-lucide="dollar-sign"></i>
+        </div>
+        <span class="number">R$ 25.000</span>
+        <span class="description">Valor de custo estimado</span>
+      </div>
+
+    </div>
+    
+    </main>
 
   <script> 
-    lucide.createIcons(); // inicializa os ícones
+    lucide.createIcons();
   </script> 
 </body>
 </html>
