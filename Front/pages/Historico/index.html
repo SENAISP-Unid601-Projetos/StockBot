@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <title>Histórico de Movimentações - StockBot</title>
+    <link rel="stylesheet" href="../Historico/style/style.css"> 
+    <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body>
+
+    <nav class="sidebar">
+        <a href="../PaginaPrincipal/index.html" class="nav-link"><i data-lucide="home"></i> <span>Início</span></a>
+        <a href="../CadastroDeComponentes/index.html" class="nav-link"><i data-lucide="wrench"></i> <span>Componentes</span></a>
+        <a href="../Historico/index.html" class="nav-link"><i data-lucide="history"></i> <span>Histórico</span></a>
+        <a href="../Inventario/index.html" class="nav-link"><i data-lucide="box"></i> <span>Inventário</span></a>
+        <div style="flex-grow: 1;"></div>
+        <a href="#" class="nav-link"><i data-lucide="settings"></i> <span>Configurações</span></a>
+        <a href="#" class="nav-link"><i data-lucide="circle-user-round"></i> <span>Sair/Entrar</span></a>
+    </nav>
+
+    <div class="main-content">
+        <header>
+            <h1>Histórico de Movimentações</h1>
+        </header>
+
+        <main class="container">
+            <div class="card componentes-list-card">
+                <h2>Registro Detalhado de Movimentações</h2>
+                <table id="historicoTable">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Data e Hora</th>
+                            <th>Tipo</th>
+                            <th>Componente</th>
+                            <th>Quantidade</th>
+                            <th>Usuário</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>MOV-1024</td>
+                            <td>01/08/2025 14:30</td>
+                            <td>🔧 Saída</td>
+                            <td>Cabo USB-C</td>
+                            <td>2</td>
+                            <td>João Silva</td>
+                        </tr>
+                        </tbody>
+                </table>
+            </div>
+        </main>
+    </div>
+    
+    <script>
+      lucide.createIcons();
+    </script>
+</body>
+</html>
