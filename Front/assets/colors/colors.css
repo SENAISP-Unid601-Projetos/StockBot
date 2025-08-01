@@ -1,0 +1,33 @@
+:root{
+    /* cores primarias */
+    --cinzav1:      #1e1e1e;
+    --azulbarao: #0d1117;
+    --azuleletricov2: #00ffff;
+    --verdeLimaov3: #adff2f;
+    --verdeClarov4: #ccff66;
+    --azulClarov5:  #33ffff;
+
+    /* cores secundarias */
+    --brancov1: #ffffff;
+    --pretov2: #000;
+    --cinzaClaroc1: #666;
+    --cinzaMedioc2: #555;
+    --cinzaEscuroc3: #444;
+    --cinzaEscuroc4: #2e2e2e;
+/* prejuizo */
+    
+   
+}
+
+
+/*
+  EXEMPLO DE USO
+
+  Importando root de colors.css no seu arquivo css
+@import url('../../../assets/colors/colors.css');
+
+body {
+  background-color: var(--color-background);
+  color: var(--color-text);
+}
+*/

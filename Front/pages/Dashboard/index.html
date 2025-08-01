@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>Dashboard - StockBot</title>
+  <link rel="stylesheet" href="styles/style.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+  <header>
+    <h1>Dashboard - StockBot</h1>
+  </header>
+
+  <main class="container">
+    <div class="card success">
+      <h3>Componentes Cadastrados</h3>
+      <p>324</p>
+    </div>
+
+    <div class="card alert">
+      <h3>Componentes com Estoque Baixo</h3>
+      <p>12</p>
+    </div>
+
+    <div class="card info">
+      <h3>Entradas no Mês</h3>
+      <p>27</p>
+    </div>
+
+    <div class="card info">
+      <h3>Saídas no Mês</h3>
+      <p>19</p>
+    </div>
+
+    <div class="card history">
+      <h3>Últimas Movimentações</h3>
+      <ul>
+        <li>🔧 João retirou 2 cabos</li>
+        <li>🔌 Maria devolveu 1 multímetro</li>
+        <li>📦 Rafael adicionou 10 resistores</li>
+      </ul>
+    </div>
+
+    <div class="card chart-card">
+        <h3>Produtos com Mais Saídas (Mês)</h3>
+        <canvas id="saidasChart"></canvas>
+    </div>
+
+    <div class="card componentes-list-card">
+        <h2>Componentes Cadastrados em Detalhe</h2>
+        <div id="loadingMessage" class="loading"></div>
+        <div id="errorMessage" class="error"></div>
+
+        <table id="componentesTable">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Nome</th>
+                    <th>Código</th>
+                    <th>Quantidade</th>
+                    <th>Localização</th>
+                    <th>Categoria</th>
+                </tr>
+            </thead>
+            <tbody>
+                </tbody>
+        </table>
+    </div>
+
+  </main>
+
+  <script src="js/script.js" type="module"></script>
+</body>
+</html>
