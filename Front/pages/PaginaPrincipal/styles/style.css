@@ -200,3 +200,42 @@ body {
     grid-template-columns: 1fr; /* 1 coluna */
   }
 }
+
+/* --- Estilos para os Gráficos --- */
+
+/* ADICIONADO: Grid para os gráficos */
+
+.charts-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr); /* 2 colunas por padrão */
+  gap: 25px;
+  margin-top: 30px; /* Espaço entre os KPIs e os gráficos */
+}
+
+/* ADICIONADO: Estilo para o card do gráfico */
+
+.chart-card {
+  background-color: var(--cinzav1);
+  padding: 25px;
+  border-radius: 12px;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+  position: relative; /* Essencial para o Chart.js calcular o tamanho corretamente */
+  height: 350px;     /* Define uma altura fixa para o card, quebrando o loop */
+}
+
+.chart-card h3 {
+  margin-bottom: 20px;
+  font-size: 1.1em;
+  font-weight: 600;
+  color: var(--cinzaClaroc1);
+}
+
+/* --- Responsividade para os Gráficos --- */
+@media (max-width: 1024px) {
+  /* ... (regras existentes) ... */
+
+  /* ADICIONADO */
+  .charts-grid {
+    grid-template-columns: 1fr; /* 1 coluna em tablets */
+  }
+}
