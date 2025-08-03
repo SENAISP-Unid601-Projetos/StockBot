@@ -15,8 +15,11 @@
     --cinzaEscuroc3: #444;
     --cinzaEscuroc4: #2e2e2e;
 /* prejuizo */
-    
-   
+  /* ...suas cores primárias e secundárias... */
+  /* Cores de Status e Alertas */
+  --vermelho-alerta: #ff4d4d; /* Para erros críticos ou itens em falta */
+  --laranja-aviso:  #ff9f43; /* Para avisos, como estoque baixo */
+  --verde-sucesso:  #2ecc71; /* Para ações bem-sucedidas ou valores positivos */
 }
 
 
