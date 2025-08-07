@@ -14,11 +14,11 @@ public class Matricula {
 
     @Id
     @Column(name = "aluno_id")
-    private Integer alunoId;
+    private Long alunoId;
 
     @Id
     @Column(name = "curso_id")
-    private Integer cursoId;
+    private Long cursoId;
 
     // --- NOVO CAMPO PARA O RELACIONAMENTO BIDIRECIONAL COM ALUNO ---
     // Este é o lado "proprietário" do relacionamento @OneToOne.

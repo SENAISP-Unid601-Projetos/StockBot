@@ -14,6 +14,6 @@ public class AlunoCreatedDTO {
     private String matricula;
     private Date data_ingresso;
     private Date data_evasao;
-    private Integer cursoId;
+    private Long cursoId;
     private String status;
 }

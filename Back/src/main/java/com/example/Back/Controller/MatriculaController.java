@@ -21,7 +21,7 @@ public class MatriculaController {
     }
 
     @GetMapping("/{alunoId}/{cursoId}")
-    public MatriculaDTO buscarPorId(@PathVariable Integer alunoId, @PathVariable Integer cursoId) {
+    public MatriculaDTO buscarPorId(@PathVariable Long alunoId, @PathVariable Long cursoId) {
         return matriculaService.buscarPorId(alunoId, cursoId);
     }
 
@@ -36,7 +36,7 @@ public class MatriculaController {
     }
 
     @DeleteMapping("/{alunoId}/{cursoId}")
-    public void deletar(@PathVariable Integer alunoId, @PathVariable Integer cursoId) {
+    public void deletar(@PathVariable Long alunoId, @PathVariable Long cursoId) {
         matriculaService.deletar(alunoId, cursoId);
     }
 }

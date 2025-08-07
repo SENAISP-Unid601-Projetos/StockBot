@@ -10,8 +10,8 @@ import java.util.Objects;
 @AllArgsConstructor
 public class MatriculaId implements Serializable {
 
-    private Integer alunoId;
-    private Integer cursoId;
+    private Long alunoId;
+    private Long cursoId;
 
     @Override
     public boolean equals(Object o) {

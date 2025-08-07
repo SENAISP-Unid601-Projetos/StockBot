@@ -9,10 +9,10 @@ import java.time.LocalDate;
 public record MatriculaDTO(
 
         @NotNull
-        Integer alunoId,
+        Long alunoId,
 
         @NotNull
-        Integer cursoId,
+        Long cursoId,
 
         @NotNull
         LocalDate dataMatricula,

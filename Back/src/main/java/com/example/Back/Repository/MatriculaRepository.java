@@ -7,6 +7,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.List;
 
 public interface MatriculaRepository extends JpaRepository<Matricula, MatriculaId> {
-    List<Matricula> findByAlunoId(Integer alunoId);
-    List<Matricula> findByCursoId(Integer cursoId);
+    List<Matricula> findByAlunoId(Long alunoId);
+    List<Matricula> findByCursoId(Long cursoId);
 }
