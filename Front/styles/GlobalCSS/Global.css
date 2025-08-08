@@ -1,9 +1,9 @@
-/* No seu PaginaPrincipal/styles/index.css */
+/* Import de váriaveís de cores */
+@import url('../../assets/colors/colors.css');
 
-/* Importe suas variáveis de cores (ajuste o caminho se necessário) */
-@import url('../../../assets/colors/colors.css');
 
-/* Reset Básico */
+
+/* Estrutura da Página */
 * {
   margin: 0;
   padding: 0;
@@ -17,6 +17,8 @@ body {
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   min-height: 100vh; /* Garante que o body ocupa a altura total da tela */
 }
+
+
 
 /* Sidebar */
 .sidebar {
@@ -71,64 +73,3 @@ body {
 .sidebar > div[style="flex-grow: 1;"] {
     flex-grow: 1;
 }
-
-/* Conteúdo principal */
-.main {
-  flex: 1; /* Ocupa todo o espaço restante */
-  padding: 60px; /* Padding geral do conteúdo */
-  display: flex;
-  flex-direction: column;
-  justify-content: center; /* Centraliza verticalmente */
-  align-items: flex-start; /* Alinha o texto à esquerda */
-  text-align: left; /* Garante o alinhamento do texto */
-}
-
-.main h1 {
-  font-size: 3.2rem; /* Título maior */
-  color: var(--verdeLimaov3); /* Cor de destaque */
-  margin-bottom: 20px;
-  line-height: 1.2;
-}
-
-.main p {
-  font-size: 1.1em;
-  line-height: 1.6;
-  max-width: 600px; /* Limita a largura do parágrafo */
-  color: var(--brancov1);
-  margin-bottom: 30px;
-}
-
-.btn {
-  padding: 15px 30px; /* Mais padding para o botão */
-  background-color: var(--azuleletricov2); /* Azul elétrico da sua paleta */
-  color: var(--pretov2); /* Texto preto */
-  border: none;
-  border-radius: 8px; /* Cantos mais arredondados */
-  font-weight: bold;
-  font-size: 1.1em;
-  cursor: pointer;
-  transition: background-color 0.3s ease, transform 0.2s ease;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-}
-
-.btn:hover {
-  background-color: var(--azulClarov5); /* Azul mais claro no hover */
-  transform: translateY(-3px); /* Efeito de elevação */
-}
-
-/* Responsividade Básica */
-@media (max-width: 768px) {
-    .sidebar {
-        width: 100%; /* Sidebar ocupa toda a largura em telas pequenas */
-        height: auto; /* Altura automática */
-        position: relative; /* Deixa de ser sticky */
-        flex-direction: row; /* Links em linha */
-        justify-content: space-around; /* Distribui os links */
-        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
-        padding: 15px 10px;
-        flex-wrap: wrap; /* Permite que os links quebrem linha */
-    }
-  }
-    .sidebar h2 {
-        display: none; /* Esconde o título em telas pequenas */
-    }

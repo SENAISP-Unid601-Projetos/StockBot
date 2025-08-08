@@ -1,0 +1,170 @@
+/* Conteúdo principal */
+.main {
+  flex: 1; /* Ocupa todo o espaço restante */
+  padding: 60px; /* Padding geral do conteúdo */
+  display: flex;
+  flex-direction: column;
+  /* Alinhamento alterado para o topo para formulários */
+  justify-content: flex-start; 
+  align-items: flex-start; 
+  text-align: left; 
+}
+
+.main h1 {
+  font-size: 3.2rem; /* Título maior */
+  color: var(--verdeLimaov3); /* Cor de destaque */
+  margin-bottom: 10px; /* Margem ajustada */
+  line-height: 1.2;
+}
+
+.main p {
+  font-size: 1.1em;
+  line-height: 1.6;
+  max-width: 600px; /* Limita a largura do parágrafo */
+  color: var(--brancov1);
+  margin-bottom: 40px; /* Espaçamento aumentado */
+}
+
+.btn {
+  padding: 15px 30px; /* Mais padding para o botão */
+  background-color: var(--azuleletricov2); /* Azul elétrico da sua paleta */
+  color: var(--pretov2); /* Texto preto */
+  border: none;
+  border-radius: 8px; /* Cantos mais arredondados */
+  font-weight: bold;
+  font-size: 1.1em;
+  cursor: pointer;
+  transition: background-color 0.3s ease, transform 0.2s ease;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  margin-top: 20px; /* Espaço acima do botão */
+}
+
+.btn:hover {
+  background-color: var(--azulClarov5); /* Azul mais claro no hover */
+  transform: translateY(-3px); /* Efeito de elevação */
+}
+
+/* Responsividade Básica */
+@media (max-width: 768px) {
+    .sidebar {
+        width: 100%; /* Sidebar ocupa toda a largura em telas pequenas */
+        height: auto; /* Altura automática */
+        position: relative; /* Deixa de ser sticky */
+        flex-direction: row; /* Links em linha */
+        justify-content: space-around; /* Distribui os links */
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
+        padding: 15px 10px;
+        flex-wrap: wrap; /* Permite que os links quebrem linha */
+    }
+    .sidebar h2 {
+        display: none; /* Esconde o título em telas pequenas */
+    }
+}
+
+/* =========== NOVOS ESTILOS PARA A PÁGINA DE CONFIGURAÇÕES =========== */
+
+/* Estilo para o link ativo na sidebar */
+.nav-link.active {
+  background-color: var(--cinzaEscuroc3);
+  color: var(--azuleletricov2);
+  font-weight: bold;
+}
+
+/* Estilo para as seções de configuração */
+.settings-section {
+  width: 100%;
+  max-width: 700px; /* Largura máxima para melhor leitura */
+  margin-bottom: 35px;
+  background-color: var(--cinzav1); /* Fundo sutil para a seção */
+  padding: 25px;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+}
+
+/* Títulos dentro das seções (h2) */
+.settings-section h2 {
+  color: var(--brancov1);
+  border-bottom: 2px solid var(--azuleletricov2);
+  padding-bottom: 15px;
+  margin-bottom: 20px;
+  font-size: 1.4em;
+}
+
+/* Container para cada item de configuração (label + controle) */
+.setting-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px 5px;
+}
+
+/* Adiciona uma borda sutil entre os itens */
+.setting-item:not(:last-child) {
+    border-bottom: 1px solid var(--cinzaEscuroc3);
+}
+
+.setting-item label {
+  font-size: 1em;
+  color: var(--brancov1);
+}
+
+/* Estilo para o <select> */
+.setting-item select {
+  padding: 8px 12px;
+  background-color: var(--azulbarao);
+  color: var(--brancov1);
+  border: 1px solid var(--cinzaEscuroc3);
+  border-radius: 5px;
+  font-size: 0.9em;
+  min-width: 150px;
+}
+
+/* Estilo para o Toggle Switch (Interruptor) */
+.toggle-switch {
+  position: relative;
+  display: inline-block;
+  width: 50px;
+  height: 28px;
+}
+
+/* Esconde o checkbox padrão */
+.toggle-switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+/* O corpo do interruptor */
+.slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: var(--cinzaEscuroc3);
+  transition: .4s;
+  border-radius: 28px;
+}
+
+/* O círculo que desliza */
+.slider:before {
+  position: absolute;
+  content: "";
+  height: 20px;
+  width: 20px;
+  left: 4px;
+  bottom: 4px;
+  background-color: white;
+  transition: .4s;
+  border-radius: 50%;
+}
+
+/* Muda a cor e a posição quando o checkbox está marcado (ativo) */
+input:checked + .slider {
+  background-color: var(--azuleletricov2);
+}
+
+input:checked + .slider:before {
+  transform: translateX(22px);
+}
