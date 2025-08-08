@@ -12,8 +12,8 @@
 
 body {
   display: flex; /* Essencial para ter a sidebar ao lado */
-  background-color: var(--azulbarao); /* Fundo escuro principal */
-  color: var(--brancov1); /* Cor de texto padrão */
+  background-color: var(--branco); /* Fundo escuro principal */
+  color: var(--preto); /* Cor de texto padrão */
   font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
   min-height: 100vh; /* Garante que o body ocupa a altura total da tela */
 }
@@ -21,7 +21,7 @@ body {
 /* Sidebar */
 .sidebar {
   width: 250px;
-  background-color: var(--cinzav1);
+  background-color: var(--branco);
   padding: 25px;
   display: flex;
   flex-direction: column;
@@ -33,7 +33,7 @@ body {
 }
 
 .sidebar h2 {
-  color: var(--azuleletricov2);
+  color: var(--vermelhoSenai);
   margin-bottom: 40px;
   text-align: center;
   font-size: 1.8em;
@@ -45,7 +45,7 @@ body {
   display: flex;
   align-items: center;
   gap: 12px;
-  color: var(--brancov1);
+  color: var(--preto);
   text-decoration: none;
   padding: 15px 10px;
   margin: 8px 0;
@@ -55,8 +55,8 @@ body {
 }
 
 .nav-link:hover {
-  background-color: var(--cinzaEscuroc3);
-  color: var(--azuleletricov2);
+  background-color: var(--cinzaClaro);
+  color: var(--vermelhoSenai);
   transform: translateX(5px);
 }
 
@@ -85,14 +85,14 @@ body {
 
 .header-dashboard h1 {
   font-size: 2.5rem;
-  color: var(--brancov1);
+  color: var(--vermelhoSenai);
   font-weight: 600;
 }
 
 .header-dashboard p {
   font-size: 1rem;
   color: var(
-    --cinzaClaroc1
+    --preto
   ); /* CORRIGIDO: Usando uma variável que existe na sua paleta */
 }
 
@@ -106,26 +106,26 @@ body {
 
 /* Estilo para os cartões de KPI */
 .kpi-card {
-  background-color: var(--cinzav1);
+  background-color: var(--cinzaClaro);
   padding: 25px;
   border-radius: 12px;
   display: flex;
   flex-direction: column;
   gap: 10px;
-  border-left: 4px solid var(--azuleletricov2); /* Cor padrão da borda */
+  border-left: 4px solid var(--vermelhoSenai); /* Cor padrão da borda */
   transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
 .kpi-card:hover {
   transform: translateY(-5px);
-  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+  box-shadow: var(--preto);
 }
 
 .card-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  color: var(--cinzaClaroc1); /* Cor mais sutil para o título */
+  color: var(--preto); /* Cor mais sutil para o título */
   font-size: 0.9em;
   font-weight: 500;
 }
@@ -138,12 +138,12 @@ body {
 .kpi-card .number {
   font-size: 2.2rem;
   font-weight: bold;
-  color: var(--brancov1);
+  color: var(--azulEscuro);
 }
 
 .kpi-card .description {
   font-size: 0.8em;
-  color: var(--verdeLimaov3);
+  color: var(--preto);
 }
 
 /* ADICIONADO: Modificadores de cor para os cartões de status */
@@ -220,7 +220,7 @@ body {
   border-radius: 12px;
   box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
   position: relative; /* Essencial para o Chart.js calcular o tamanho corretamente */
-  height: 350px;     /* Define uma altura fixa para o card, quebrando o loop */
+  height: 350px; /* Define uma altura fixa para o card, quebrando o loop */
 }
 
 .chart-card h3 {

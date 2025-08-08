@@ -20,12 +20,13 @@ body {
   margin: 0;
   padding: 0;
   background-size: cover;
+  background-color: var(--cinzaClaro);
   font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
   display: flex;
   justify-content: center;
   align-items: center;
   min-height: 100vh;
-  color: var(--brancov1);
+  color: var(--preto);
 }
 
 .card {
