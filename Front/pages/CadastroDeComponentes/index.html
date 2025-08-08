@@ -8,65 +8,75 @@
     <script src="https://unpkg.com/lucide@latest"></script>
   </head>
   <body>
-    <div class="container">
-      <div class="card">
-        <h1>Cadastro de Componentes</h1>
+    <header class="main-header">
+      <h2>Cadastro de Componentes</h2>
+    </header>
 
-        <form id="componentForm">
-          <label for="entradaComponente">Nome do Componente:</label>
-          <input type="text" id="entradaComponente" />
-          <span class="validation-message" id="error-entradaComponente"></span>
-
-          <label for="entradaCodigo">Código de Patrimônio:</label>
-          <input type="text" id="entradaCodigo" />
-          <span class="validation-message" id="error-entradaCodigo"></span>
-
-          <div class="inputQuant">
-            <label for="entradaQuantidade">Quantidade:</label>
-            <input type="number" id="entradaQuantidade" />
+    <main class="main-content">
+      <div class="container">
+        <div class="card">
+          <form id="componentForm">
+            <label for="entradaComponente">Nome do Componente:</label>
+            <input type="text" id="entradaComponente" />
             <span
               class="validation-message"
-              id="error-entradaQuantidade"
+              id="error-entradaComponente"
             ></span>
-          </div>
 
-          <label for="entradaLocalizacao">Localização:</label>
-          <div class="campo-interativo">
-            <select id="entradaLocalizacao">
-              <option value="">Selecione uma localização</option>
-              <option value="Armario A">Armário A</option>
-              <option value="Gaveta B">Gaveta B</option>
-              <option value="Prateleira C">Prateleira C</option>
-            </select>
-            <button type="button" id="novaLocalizacaoBtn">Nova</button>
-          </div>
-          <span class="validation-message" id="error-entradaLocalizacao"></span>
+            <label for="entradaCodigo">Código de Patrimônio:</label>
+            <input type="text" id="entradaCodigo" />
+            <span class="validation-message" id="error-entradaCodigo"></span>
 
-          <label for="entradaCategoria">Categoria:</label>
-          <div class="campo-interativo">
-            <select id="entradaCategoria">
-              <option value="">Selecione uma categoria</option>
-              <option value="Resistores">Resistores</option>
-              <option value="Capacitores">Capacitores</option>
-              <option value="Semicondutores">Semicondutores</option>
-            </select>
-            <button type="button" id="novaCategoriaBtn">Nova</button>
-          </div>
-          <span class="validation-message" id="error-entradaCategoria"></span>
+            <div class="inputQuant">
+              <label for="entradaQuantidade">Quantidade:</label>
+              <input type="number" id="entradaQuantidade" />
+              <span
+                class="validation-message"
+                id="error-entradaQuantidade"
+              ></span>
+            </div>
 
-          <div class="textarea">
-            <label for="entradaObservacao">Observações:</label>
-            <textarea id="entradaObservacao" rows="4"></textarea>
-          </div>
+            <label for="entradaLocalizacao">Localização:</label>
+            <div class="campo-interativo">
+              <select id="entradaLocalizacao">
+                <option value="">Selecione uma localização</option>
+                <option value="Armario A">Armário A</option>
+                <option value="Gaveta B">Gaveta B</option>
+                <option value="Prateleira C">Prateleira C</option>
+              </select>
+              <button type="button" id="novaLocalizacaoBtn">Nova</button>
+            </div>
+            <span
+              class="validation-message"
+              id="error-entradaLocalizacao"
+            ></span>
 
-          <div class="botoes">
-            <button type="button" id="cancelarBtn">Cancelar</button>
-            <button type="submit" id="salvarBtn">Salvar</button>
-          </div>
-        </form>
-        <p id="resultado" style="display: none"></p>
+            <label for="entradaCategoria">Categoria:</label>
+            <div class="campo-interativo">
+              <select id="entradaCategoria">
+                <option value="">Selecione uma categoria</option>
+                <option value="Resistores">Resistores</option>
+                <option value="Capacitores">Capacitores</option>
+                <option value="Semicondutores">Semicondutores</option>
+              </select>
+              <button type="button" id="novaCategoriaBtn">Nova</button>
+            </div>
+            <span class="validation-message" id="error-entradaCategoria"></span>
+
+            <div class="textarea">
+              <label for="entradaObservacao">Observações:</label>
+              <textarea id="entradaObservacao" rows="4"></textarea>
+            </div>
+
+            <div class="botoes">
+              <button type="button" id="cancelarBtn">Cancelar</button>
+              <button type="submit" id="salvarBtn">Salvar</button>
+            </div>
+          </form>
+          <p id="resultado" style="display: none"></p>
+        </div>
       </div>
-    </div>
+    </main>
 
     <div id="successMessage" class="success-message">
       <p>✅ Componente Cadastrado com Sucesso!</p>
