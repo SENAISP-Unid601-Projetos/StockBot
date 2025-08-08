@@ -1,0 +1,241 @@
+/* No seu PaginaPrincipal/styles/index.css */
+
+/* Importe suas variáveis de cores (ajuste o caminho se necessário) */
+@import url("../../../assets/colors/colors.css");
+
+/* Reset Básico */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  display: flex; /* Essencial para ter a sidebar ao lado */
+  background-color: var(--azulbarao); /* Fundo escuro principal */
+  color: var(--brancov1); /* Cor de texto padrão */
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  min-height: 100vh; /* Garante que o body ocupa a altura total da tela */
+}
+
+/* Sidebar */
+.sidebar {
+  width: 250px;
+  background-color: var(--cinzav1);
+  padding: 25px;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 4px 0 15px rgba(0, 0, 0, 0.4);
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  z-index: 100;
+}
+
+.sidebar h2 {
+  color: var(--azuleletricov2);
+  margin-bottom: 40px;
+  text-align: center;
+  font-size: 1.8em;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.nav-link {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: var(--brancov1);
+  text-decoration: none;
+  padding: 15px 10px;
+  margin: 8px 0;
+  border-radius: 8px;
+  transition: background-color 0.3s ease, color 0.3s ease, transform 0.2s ease;
+  font-weight: 500;
+}
+
+.nav-link:hover {
+  background-color: var(--cinzaEscuroc3);
+  color: var(--azuleletricov2);
+  transform: translateX(5px);
+}
+
+.nav-link i {
+  width: 20px;
+  height: 20px;
+  stroke-width: 2;
+}
+
+/* Para empurrar os últimos links para o final da sidebar */
+.sidebar > div[style="flex-grow: 1;"] {
+  flex-grow: 1;
+}
+
+/* --- Conteúdo Principal do Dashboard --- */
+.main {
+  flex: 1;
+  padding: 40px;
+  overflow-y: auto; /* Permite scroll apenas no conteúdo principal */
+}
+
+/* Cabeçalho do Dashboard */
+.header-dashboard {
+  margin-bottom: 30px;
+}
+
+.header-dashboard h1 {
+  font-size: 2.5rem;
+  color: var(--brancov1);
+  font-weight: 600;
+}
+
+.header-dashboard p {
+  font-size: 1rem;
+  color: var(
+    --cinzaClaroc1
+  ); /* CORRIGIDO: Usando uma variável que existe na sua paleta */
+}
+
+/* Grid para os cartões do dashboard */
+.dashboard-grid {
+  display: grid;
+  /* Por padrão, 4 colunas em telas grandes */
+  grid-template-columns: repeat(4, 1fr);
+  gap: 25px;
+}
+
+/* Estilo para os cartões de KPI */
+.kpi-card {
+  background-color: var(--cinzav1);
+  padding: 25px;
+  border-radius: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  border-left: 4px solid var(--azuleletricov2); /* Cor padrão da borda */
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.kpi-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+}
+
+.card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  color: var(--cinzaClaroc1); /* Cor mais sutil para o título */
+  font-size: 0.9em;
+  font-weight: 500;
+}
+
+.card-header i {
+  width: 24px;
+  height: 24px;
+}
+
+.kpi-card .number {
+  font-size: 2.2rem;
+  font-weight: bold;
+  color: var(--brancov1);
+}
+
+.kpi-card .description {
+  font-size: 0.8em;
+  color: var(--verdeLimaov3);
+}
+
+/* ADICIONADO: Modificadores de cor para os cartões de status */
+.kpi-card.alert {
+  border-left-color: var(
+    --vermelho-alerta,
+    #ff4d4d
+  ); /* Usa a variável, com fallback */
+}
+
+.kpi-card.warning {
+  border-left-color: var(--laranja-aviso, #ff9f43);
+}
+
+.kpi-card.success {
+  border-left-color: var(--verde-sucesso, #2ecc71);
+}
+
+/* --- Responsividade --- */
+
+/* Telas de tablet */
+@media (max-width: 1024px) {
+  .dashboard-grid {
+    grid-template-columns: repeat(2, 1fr); /* 2 colunas */
+  }
+}
+
+/* Telas de celular */
+@media (max-width: 768px) {
+  body {
+    flex-direction: column; /* Empilha a sidebar e o conteúdo */
+  }
+
+  .sidebar {
+    width: 100%;
+    height: auto;
+    position: relative;
+    flex-direction: row;
+    justify-content: space-around;
+    flex-wrap: wrap;
+    padding: 10px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+  }
+
+  .sidebar h2 {
+    display: none; /* Esconde o título "StockBot" em telas pequenas */
+  }
+
+  .main {
+    padding: 25px;
+  }
+
+  .dashboard-grid {
+    grid-template-columns: 1fr; /* 1 coluna */
+  }
+}
+
+/* --- Estilos para os Gráficos --- */
+
+/* ADICIONADO: Grid para os gráficos */
+
+.charts-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr); /* 2 colunas por padrão */
+  gap: 25px;
+  margin-top: 30px; /* Espaço entre os KPIs e os gráficos */
+}
+
+/* ADICIONADO: Estilo para o card do gráfico */
+
+.chart-card {
+  background-color: var(--cinzav1);
+  padding: 25px;
+  border-radius: 12px;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+  position: relative; /* Essencial para o Chart.js calcular o tamanho corretamente */
+  height: 350px;     /* Define uma altura fixa para o card, quebrando o loop */
+}
+
+.chart-card h3 {
+  margin-bottom: 20px;
+  font-size: 1.1em;
+  font-weight: 600;
+  color: var(--cinzaClaroc1);
+}
+
+/* --- Responsividade para os Gráficos --- */
+@media (max-width: 1024px) {
+  /* ... (regras existentes) ... */
+
+  /* ADICIONADO */
+  .charts-grid {
+    grid-template-columns: 1fr; /* 1 coluna em tablets */
+  }
+}

@@ -7,8 +7,9 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
 // ProfessorCursoMapper.java
-@Mapper(componentModel = "spring", uses = {ProfessorMapper.class, CursoMapper.class})
+@Mapper(componentModel = "spring", uses = { ProfessorMapper.class, CursoMapper.class })
 public interface ProfessorCursoMapper {
+
     ProfessorCursoResponseDTO toResponseDTO(ProfessorCurso entity);
 
     @Mapping(target = "id", ignore = true)
