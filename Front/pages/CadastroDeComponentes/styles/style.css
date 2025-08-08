@@ -1,13 +1,26 @@
-/* No seu CadastroDeComponentes/styles/style.css */
+@import url("../../../assets/colors/colors.css");
 
-@import url('../../../assets/colors/colors.css'); 
+/* Adicione este código no topo do seu style.css */
+
+@font-face {
+  font-family: "Montserrat";
+  src: url("../fonts/Montserrat-Regular.ttf") format("truetype");
+  font-weight: normal; /* ou 400 */
+}
+
+@font-face {
+  font-family: "Montserrat";
+  src: url("../fonts/Montserrat-Bold.ttf") format("truetype");
+  font-weight: bold; /* ou 700 */
+}
+
+/* No seu CadastroDeComponentes/styles/style.css */
 
 body {
   margin: 0;
   padding: 0;
-  background: url("../fotos/fundoTelaCadastroComponente.jpg") no-repeat center center fixed;
   background-size: cover;
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -25,8 +38,10 @@ body {
 }
 
 h1 {
+  font-family: "Montserrat-Bold", sans-serif;
+  font-weight: 700;
   text-align: center;
-  color: var(--azuleletricov2);
+  color: var(--vermelhoSenai);
   margin-bottom: 20px;
 }
 
@@ -43,16 +58,17 @@ label {
 }
 
 textarea {
-  width: 95%; 
+  width: 95%;
   padding: 10px;
   background-color: var(--cinzaEscuroc4);
   border: 1px solid var(--cinzaMedioc2);
   border-radius: 5px;
   color: var(--brancov1);
-  resize: vertical; 
+  resize: vertical;
 }
 
-input, select {
+input,
+select {
   width: 95%;
   padding: 10px;
   margin-top: 5px;
@@ -62,7 +78,9 @@ input, select {
   color: var(--brancov1);
 }
 
-input:focus, select:focus, textarea:focus {
+input:focus,
+select:focus,
+textarea:focus {
   border-color: var(--azuleletricov2);
   outline: none;
 }
@@ -74,8 +92,8 @@ input:focus, select:focus, textarea:focus {
   margin-top: 5px;
 }
 
-.campo-interativo select { 
-  width: calc(95% - 70px); 
+.campo-interativo select {
+  width: calc(95% - 70px);
 }
 
 .campo-interativo button {
@@ -126,7 +144,7 @@ input:focus, select:focus, textarea:focus {
   background-color: var(--azulClarov5);
 }
 
-#resultado { 
+#resultado {
   margin-top: 15px;
   text-align: center;
   font-size: 14px;
@@ -137,49 +155,50 @@ input:focus, select:focus, textarea:focus {
 /* Mensagens de Validação (Avisos de Campo) */
 .validation-message {
   color: var(--vermelhoErro, #dc3545); /* Cor vermelha para erro */
-  background-color: rgba(220, 53, 69, 0.1); 
-  border-left: 4px solid var(--vermelhoErro, #dc3545); 
+  background-color: rgba(220, 53, 69, 0.1);
+  border-left: 4px solid var(--vermelhoErro, #dc3545);
   padding: 8px 12px;
-  margin-top: 8px; 
-  margin-bottom: 12px; 
-  font-size: 0.95em; 
+  margin-top: 8px;
+  margin-bottom: 12px;
+  font-size: 0.95em;
   font-weight: bold;
   border-radius: 4px;
-  display: block; 
-  opacity: 0; 
-  max-height: 0; 
-  overflow: hidden; 
-  transition: opacity 0.4s ease-in-out, max-height 0.4s ease-in-out, padding 0.4s ease-in-out; 
+  display: block;
+  opacity: 0;
+  max-height: 0;
+  overflow: hidden;
+  transition: opacity 0.4s ease-in-out, max-height 0.4s ease-in-out,
+    padding 0.4s ease-in-out;
 }
 
 /* Estado visível da mensagem de validação */
 .validation-message.show {
   opacity: 1;
-  max-height: 50px; 
-  padding: 8px 12px; 
+  max-height: 50px;
+  padding: 8px 12px;
 }
 
 /* Mensagem de Sucesso (Aquela "bonita" na tela) */
 .success-message {
-  position: fixed; 
-  top: 30px; 
-  left: 50%; 
-  transform: translateX(-50%); 
-  background-color: var(--verdeLimaov3); 
-  color: var(--pretov2); 
-  padding: 20px 40px; 
-  border-radius: 10px; 
-  box-shadow: 0 6px 12px rgba(0,0,0,0.3); 
-  z-index: 1000; 
-  opacity: 0; 
-  visibility: hidden; 
-  transition: opacity 0.8s ease-in-out, visibility 0.8s ease-in-out; 
+  position: fixed;
+  top: 30px;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: var(--verdeLimaov3);
+  color: var(--pretov2);
+  padding: 20px 40px;
+  border-radius: 10px;
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+  z-index: 1000;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.8s ease-in-out, visibility 0.8s ease-in-out;
   text-align: center;
   font-weight: bold;
   display: flex; /* Essencial para o layout do texto e botão OK */
   flex-direction: column;
   align-items: center;
-  gap: 10px; 
+  gap: 10px;
 }
 
 .success-message.show {
@@ -189,37 +208,39 @@ input:focus, select:focus, textarea:focus {
 
 /* Estilo para o botão OK dentro da mensagem de sucesso */
 .success-ok-btn {
-    background-color: var(--brancov1);
-    color: var(--verdeLimaov3);
-    border: none;
-    padding: 8px 15px;
-    border-radius: 5px;
-    cursor: pointer;
-    font-weight: bold;
-    font-size: 0.9em;
-    transition: background-color 0.2s ease;
-    display: inline-block; /* Garante que o botão renderize corretamente */
+  background-color: var(--brancov1);
+  color: var(--verdeLimaov3);
+  border: none;
+  padding: 8px 15px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-weight: bold;
+  font-size: 0.9em;
+  transition: background-color 0.2s ease;
+  display: inline-block; /* Garante que o botão renderize corretamente */
 }
 
 .success-ok-btn:hover {
-    background-color: var(--cinzaClaroc1);
+  background-color: var(--cinzaClaroc1);
 }
 
 .card {
-  overflow-x: auto; 
+  overflow-x: auto;
 }
 
 @media (max-width: 600px) {
   .card {
-    margin: 20px; 
+    margin: 20px;
   }
-  input, select, textarea {
-    width: 100%; 
+  input,
+  select,
+  textarea {
+    width: 100%;
   }
   .campo-interativo select {
     width: calc(100% - 70px);
   }
   .inputQuant {
-    width: 25%; 
+    width: 25%;
   }
 }
