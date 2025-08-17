@@ -2,30 +2,27 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
-  <title>StockBot - Início</title>
+  <title>StockBot - Dashboard</title>
   <link rel="stylesheet" href="styles/style.css">
-  <script src="https://unpkg.com/lucide@latest"></script> </head>
+  <script src="https://unpkg.com/lucide@latest"></script>
+</head>
 <body>
   <nav class="sidebar">
     <h2>StockBot</h2>
-
     <a href="#" class="nav-link">
-      <i data-lucide="home"></i> <span>Início</span>
+      <i data-lucide="layout-dashboard"></i> <span>Dashboard</span>
     </a>
-
     <a href="../CadastroDeComponentes/index.html" class="nav-link">
       <i data-lucide="wrench"></i>
       <span>Componentes</span>
     </a>
-
     <a href="#" class="nav-link">
       <i data-lucide="history"></i> <span>Histórico</span>
     </a>
-
-    <div style="flex-grow: 1;"></div> <a href="#" class="nav-link">
+    <div style="flex-grow: 1;"></div>
+    <a href="#" class="nav-link">
       <i data-lucide="settings"></i> <span>Configurações</span>
     </a>
-
     <a href="#" class="nav-link">
       <i data-lucide="circle-user-round"></i>
       <span>Sair/Entrar</span>
@@ -33,14 +30,145 @@
   </nav>
 
   <main class="main">
-    <h1>Bem-vindo ao StockBot!</h1>
-    <p>Gerencie os componentes da sala de elétrica com praticidade, controle e organização.</p>
-    <br>
-    <button class="btn" onclick="location.href='../Dashboard/index.html'">Acessar Dashboard</button>
-  </main>
+    <div class="header-dashboard">
+      <h1>Dashboard</h1>
+      <p>Olá, Usuário! Aqui está um resumo do seu estoque de componentes.</p>
+    </div>
+  
+    <div class="dashboard-grid">
 
+      <div class="kpi-card">
+        <div class="card-header">
+          <span>Total de Componentes</span>
+          <i data-lucide="package"></i>
+        </div>
+        <span class="number">150</span>
+        <span class="description">+5 na última semana</span>
+      </div>
+  
+      <div class="kpi-card">
+        <div class="card-header">
+          <span>Itens em Estoque</span>
+          <i data-lucide="archive"></i>
+        </div>
+        <span class="number">1.250</span>
+        <span class="description">Unidades totais</span>
+      </div>
+  
+      <div class="kpi-card" style="border-left-color: #FF6347;"> <div class="card-header">
+          <span>Itens em Falta</span>
+          <i data-lucide="alert-circle"></i>
+        </div>
+        <span class="number">10</span>
+        <span class="description">Requer atenção imediata</span>
+      </div>
+  
+      <div class="kpi-card" style="border-left-color: #32CD32;"> <div class="card-header">
+          <span>Valor do Estoque</span>
+          <i data-lucide="dollar-sign"></i>
+        </div>
+        <span class="number">R$ 25.000</span>
+        <span class="description">Valor de custo estimado</span>
+      </div>
+
+    </div>
+    
+  <div class="charts-grid">
+    <div class="chart-card">
+      <h3>Evolução do Estoque (Últimos 6 meses)</h3>
+      <canvas id="graficoEvolucao"></canvas>
+    </div>
+    <div class="chart-card">
+      <h3>Componentes por Categoria</h3>
+      <canvas id="graficoCategorias"></canvas>
+    </div>
+  </div>
+    </main>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script> 
-    lucide.createIcons(); // inicializa os ícones
+    lucide.createIcons();
   </script> 
+
+  <script>
+    // Espera o conteúdo da página carregar antes de executar o script
+    document.addEventListener('DOMContentLoaded', () => {
+
+      // --- GRÁFICO 1: EVOLUÇÃO DO ESTOQUE (LINHA) ---
+
+      // Pega o elemento canvas pelo ID
+      const ctxEvolucao = document.getElementById('graficoEvolucao');
+
+      new Chart(ctxEvolucao, {
+        type: 'line', // Tipo do gráfico
+        data: {
+          // Rótulos do eixo X (ex: meses)
+          labels: ['Março', 'Abril', 'Maio', 'Junho', 'Julho', 'Agosto'],
+          datasets: [{
+            label: 'Total de Itens',
+            // Dados do eixo Y (substitua com seus dados reais)
+            data: [1100, 1150, 1250, 1200, 1220, 1250],
+            borderColor: 'var(--azuleletricov2)', // Cor da linha
+            backgroundColor: 'rgba(54, 162, 235, 0.2)', // Cor do preenchimento sob a linha
+            tension: 0.3, // Deixa a linha um pouco curva
+            fill: true
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          scales: {
+            y: {
+              beginAtZero: false, // O eixo Y não precisa começar do zero
+              ticks: { color: 'var(--cinzaClaroc1)' } // Cor dos números do eixo Y
+            },
+            x: {
+              ticks: { color: 'var(--cinzaClaroc1)' } // Cor dos rótulos do eixo X
+            }
+          },
+          plugins: {
+            legend: {
+              labels: { color: 'var(--brancov1)' } // Cor da legenda
+            }
+          }
+        }
+      });
+
+      // --- GRÁFICO 2: COMPONENTES POR CATEGORIA (ROSCA/DOUGHNUT) ---
+      const ctxCategorias = document.getElementById('graficoCategorias');
+
+      new Chart(ctxCategorias, {
+        type: 'doughnut', // Tipo de gráfico 'Rosca', que é um 'Pie' com um buraco
+        data: {
+          // Rótulos para cada fatia
+          labels: ['Resistores', 'Capacitores', 'Transistores', 'LEDs', 'Outros'],
+          datasets: [{
+            label: 'Quantidade por Categoria',
+            // Dados para cada fatia (substitua com seus dados reais)
+            data: [350, 400, 150, 250, 100],
+            // Cores para cada fatia
+            backgroundColor: [
+              'rgba(54, 162, 235, 0.8)',
+              'rgba(75, 192, 192, 0.8)',
+              'rgba(255, 206, 86, 0.8)',
+              'rgba(255, 99, 132, 0.8)',
+              'rgba(153, 102, 255, 0.8)'
+            ],
+            hoverOffset: 4
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: {
+              position: 'top',
+              labels: { color: 'var(--brancov1)' } // Cor da legenda
+            }
+          }
+        }
+      });
+
+    });
+  </script>
 </body>
 </html>
