@@ -1,88 +1,285 @@
-/* Container geral */
-.componentes-container {
-  display: flex;
-  height: 100vh;
-  background-color: #0d1117; /* fundo escuro igual dashboard */
-  color: #e6edf3;
-  font-family: Arial, sans-serif;
+/* ==============================================
+   VARIÁVEIS DE CORES E RESET
+   ============================================== */
+:root {
+  --branco: #ffffff;
+  --preto: #2c3e50;
+  --cinzaClaro: #f4f6f9; 
+  --cinzaMedio: #e9ecef;
+  --vermelhoSenai: #e74c3c;
+  --azulPrincipal: #3498db;
+  --textoLegivel: #34495e;
+  --verde: #2ecc71;
+  --laranja: #f39c12;
 }
 
-/* Sidebar */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  background-color: var(--cinzaClaro);
+  color: var(--textoLegivel);
+  font-family: "Segoe UI", "Roboto", "Helvetica Neue", Arial, sans-serif;
+  min-height: 100vh;
+  position: relative;
+  display: flex;
+}
+
+/* ==============================================
+   SIDEBAR E NAVEGAÇÃO
+   ============================================== */
 .sidebar {
-  width: 260px;
-  background-color: #161b22;
+  width: 250px;
+  background-color: var(--cinzaClaro); 
   padding: 20px;
   display: flex;
   flex-direction: column;
+  box-shadow: 4px 0 15px rgba(0, 0, 0, 0.05);
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 100vh;
+  z-index: 100;
+  transition: width 0.3s ease;
+  overflow-x: hidden;
 }
 
-.sidebar .logo {
+.sidebar h2 {
+  color: var(--vermelhoSenai); 
+  margin-bottom: 30px;
+  text-align: center; 
+  font-size: 1.8em;
+  text-transform: uppercase; 
+  letter-spacing: 1px;
+  white-space: nowrap; 
+  overflow: hidden; 
+  padding: 0 5px;
+  transition: opacity 0.3s ease;
+}
+
+.nav-link {
+  display: flex; 
+  align-items: center; 
+  gap: 12px;
+  color: var(--textoLegivel); 
+  text-decoration: none;
+  padding: 15px; 
+  margin: 4px 0; 
+  border-radius: 8px;
+  transition: all 0.3s ease;
+  font-weight: 500;
+  white-space: nowrap; 
+}
+
+.nav-link.active,
+.nav-link:hover {
+  background-color: var(--vermelhoSenai);
+  color: var(--branco);
+}
+
+.nav-link.active {
+    transform: translateX(0px);
+}
+
+.nav-link:hover {
+    transform: translateX(5px);
+}
+
+.nav-link i { 
+  width: 20px; 
+  height: 20px; 
+  stroke-width: 2; 
+}
+
+.sidebar-toggle {
+  position: absolute; 
+  top: 20px; 
+  right: 0;
+  transform: translateX(50%);
+  z-index: 101; 
+  width: 45px; 
+  height: 45px;
+  background-color: var(--cinzaClaro);
+  color: var(--vermelhoSenai);
+  border: 3px solid var(--branco);
+  border-radius: 50%; 
+  font-size: 1.5em;
+  font-weight: bold; 
+  cursor: pointer;
+  display: flex; 
+  align-items: center; 
+  justify-content: center;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s ease;
+}
+
+.sidebar-toggle:hover { 
+  transform: translateX(50%) scale(1.1); 
+}
+
+.sidebar.retracted { 
+  width: 60px;
+}
+
+.sidebar.retracted h2,
+.sidebar.retracted span {
+  opacity: 0;
+  width: 0;
+  transition: opacity 0.3s ease, width 0.3s ease;
+}
+
+.sidebar.retracted .nav-link {
+  padding: 15px;
+}
+
+/* ==============================================
+   CONTEÚDO PRINCIPAL E LAYOUT
+   ============================================== */
+.main-content {
+  flex-grow: 1;
+  padding: 30px 40px;
+  margin-left: 250px;
+  width: calc(100% - 250px);
+  transition: margin-left 0.3s ease, width 0.3s ease;
+}
+
+.main-content.expanded {
+  margin-left: 60px;
+  width: calc(100% - 60px);
+}
+
+.header-dashboard {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
+    flex-wrap: wrap;
+    gap: 20px;
+}
+
+.header-dashboard h1 {
+    font-size: 2em;
+    font-weight: bold;
+    color: var(--preto);
+}
+
+.header-dashboard p {
+    font-size: 1em;
+    opacity: 0.8;
+}
+
+.container {
+  width: 100%;
+  max-width: 100%; 
+}
+
+.card {
+  background-color: var(--branco);
+  padding: 30px;
+  border-radius: 12px;
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+}
+
+/* ==============================================
+   ESTILOS DO FORMULÁRIO (ADAPTADO)
+   ============================================== */
+form label {
+  display: block;
+  margin-top: 15px;
+  margin-bottom: 5px;
+  font-weight: 600;
+  color: var(--textoLegivel);
+}
+
+form input[type="text"],
+form input[type="number"],
+form select,
+form textarea {
+  width: 100%;
+  padding: 12px;
+  margin-top: 5px;
+  background-color: var(--cinzaClaro);
+  border: 1px solid var(--cinzaMedio);
+  border-radius: 6px;
+  color: var(--preto);
+  font-size: 1em;
+}
+
+form textarea {
+  resize: vertical;
+}
+
+/* Estilos de foco */
+form input:focus,
+form select:focus,
+form textarea:focus {
+  border-color: var(--azulPrincipal);
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.2);
+}
+
+.campo-interativo {
   display: flex;
   align-items: center;
   gap: 10px;
-  color: #fff;
-  font-size: 18px;
-  margin-bottom: 30px;
 }
 
-.sidebar .logo i {
-  width: 24px;
-  height: 24px;
+.campo-interativo select {
+  flex-grow: 1;
 }
 
-/* Menu */
-.menu {
-  display: flex;
-  flex-direction: column;
-  gap: 15px;
-}
-
-.menu-item {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  text-decoration: none;
-  color: #c9d1d9;
-  font-size: 16px;
+.campo-interativo button {
   padding: 10px 15px;
-  border-radius: 8px;
-  transition: background 0.3s, color 0.3s;
+  background-color: var(--azulPrincipal);
+  color: var(--branco);
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: background-color 0.3s ease;
 }
 
-.menu-item:hover {
-  background: #238636;
-  color: #fff;
+.campo-interativo button:hover {
+  background-color: #2980b9;
 }
 
-.menu-item.active {
-  background: #238636;
-  color: #fff;
+/* ==============================================
+   BOTÕES E MENSAGENS (ADAPTADO)
+   ============================================== */
+.botoes {
+  display: flex;
+  justify-content: flex-end;
+  gap: 15px;
+  margin-top: 30px;
 }
 
-.menu-item i {
-  width: 20px;
-  height: 20px;
+.botoes button {
+  padding: 12px 25px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: bold;
+  font-size: 1em;
+  transition: background-color 0.3s ease;
 }
 
-/* Conteúdo */
-.content {
-  flex: 1;
-  padding: 30px;
-  overflow-y: auto;
+#cancelarBtn {
+  background-color: var(--cinzaMedio);
+  color: var(--textoLegivel);
 }
 
-.content header {
-  margin-bottom: 20px;
+#cancelarBtn:hover {
+  background-color: #d8dee3;
 }
 
-.content h1 {
-  font-size: 24px;
-  margin-bottom: 10px;
+#salvarBtn {
+  background-color: var(--verde);
+  color: var(--branco);
 }
 
-.content-section {
-  background: #161b22;
-  padding: 20px;
-  border-radius: 12px;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+#salvarBtn:hover {
+  background-color: #27ae60;
 }

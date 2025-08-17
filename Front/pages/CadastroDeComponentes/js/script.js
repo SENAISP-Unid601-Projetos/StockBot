@@ -1,6 +1,6 @@
 document.addEventListener('DOMContentLoaded', () => {
 
-  // Lógica do Sidebar Retrátil
+  // --- Lógica do Sidebar Retrátil ---
   if (typeof lucide !== 'undefined') {
     lucide.createIcons();
   }
@@ -14,7 +14,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // Lógica de Submissão do Formulário
+  // --- Lógica de Submissão do Formulário ---
   const componentForm = document.getElementById('componentForm');
   componentForm.addEventListener('submit', async (event) => {
     event.preventDefault();
@@ -40,11 +40,11 @@ document.addEventListener('DOMContentLoaded', () => {
       const data = await response.json();
 
       if (response.ok) {
-        console.log('Sucesso:', data.message);
+        console.log('Sucesso:', data);
         alert("✅ Componente Cadastrado com Sucesso!");
         componentForm.reset();
       } else {
-        console.error('Erro:', data.error);
+        console.error('Erro:', data);
         alert('❌ Erro ao cadastrar componente: ' + (data.message || 'Erro desconhecido.'));
       }
     } catch (error) {
@@ -53,12 +53,18 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 
-  // Lógica para os botões "Nova"
-  document.getElementById('novaLocalizacaoBtn').addEventListener('click', () => {
-    alert("Funcionalidade de 'Nova Localização' não implementada.");
-  });
+  // --- Lógica para os botões "Nova" ---
+  const novaLocalizacaoBtn = document.getElementById('novaLocalizacaoBtn');
+  if (novaLocalizacaoBtn) {
+    novaLocalizacaoBtn.addEventListener('click', () => {
+      alert("Funcionalidade de 'Nova Localização' não implementada.");
+    });
+  }
 
-  document.getElementById('novaCategoriaBtn').addEventListener('click', () => {
-    alert("Funcionalidade de 'Nova Categoria' não implementada.");
-  });
+  const novaCategoriaBtn = document.getElementById('novaCategoriaBtn');
+  if (novaCategoriaBtn) {
+    novaCategoriaBtn.addEventListener('click', () => {
+      alert("Funcionalidade de 'Nova Categoria' não implementada.");
+    });
+  }
 });
