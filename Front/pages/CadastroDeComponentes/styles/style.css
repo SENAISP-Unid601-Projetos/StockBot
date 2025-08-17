@@ -1,247 +1,285 @@
-@import url("../../../assets/colors/colors.css");
-
-/* Adicione este código no topo do seu style.css */
-
-@font-face {
-  font-family: "Montserrat";
-  src: url("../fonts/Montserrat-Regular.ttf") format("truetype");
-  font-weight: normal; /* ou 400 */
+/* ==============================================
+   VARIÁVEIS DE CORES E RESET
+   ============================================== */
+:root {
+  --branco: #ffffff;
+  --preto: #2c3e50;
+  --cinzaClaro: #f4f6f9; 
+  --cinzaMedio: #e9ecef;
+  --vermelhoSenai: #e74c3c;
+  --azulPrincipal: #3498db;
+  --textoLegivel: #34495e;
+  --verde: #2ecc71;
+  --laranja: #f39c12;
 }
 
-@font-face {
-  font-family: "Montserrat";
-  src: url("../fonts/Montserrat-Bold.ttf") format("truetype");
-  font-weight: bold; /* ou 700 */
-}
-
-/* No seu CadastroDeComponentes/styles/style.css */
-
-body {
+* {
   margin: 0;
   padding: 0;
-  background-size: cover;
+  box-sizing: border-box;
+}
+
+body {
   background-color: var(--cinzaClaro);
-  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
-  display: flex;
-  justify-content: center;
-  align-items: center;
+  color: var(--textoLegivel);
+  font-family: "Segoe UI", "Roboto", "Helvetica Neue", Arial, sans-serif;
   min-height: 100vh;
-  color: var(--preto);
+  position: relative;
+  display: flex;
+}
+
+/* ==============================================
+   SIDEBAR E NAVEGAÇÃO
+   ============================================== */
+.sidebar {
+  width: 250px;
+  background-color: var(--cinzaClaro); 
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 4px 0 15px rgba(0, 0, 0, 0.05);
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 100vh;
+  z-index: 100;
+  transition: width 0.3s ease;
+  overflow-x: hidden;
+}
+
+.sidebar h2 {
+  color: var(--vermelhoSenai); 
+  margin-bottom: 30px;
+  text-align: center; 
+  font-size: 1.8em;
+  text-transform: uppercase; 
+  letter-spacing: 1px;
+  white-space: nowrap; 
+  overflow: hidden; 
+  padding: 0 5px;
+  transition: opacity 0.3s ease;
+}
+
+.nav-link {
+  display: flex; 
+  align-items: center; 
+  gap: 12px;
+  color: var(--textoLegivel); 
+  text-decoration: none;
+  padding: 15px; 
+  margin: 4px 0; 
+  border-radius: 8px;
+  transition: all 0.3s ease;
+  font-weight: 500;
+  white-space: nowrap; 
+}
+
+.nav-link.active,
+.nav-link:hover {
+  background-color: var(--vermelhoSenai);
+  color: var(--branco);
+}
+
+.nav-link.active {
+    transform: translateX(0px);
+}
+
+.nav-link:hover {
+    transform: translateX(5px);
+}
+
+.nav-link i { 
+  width: 20px; 
+  height: 20px; 
+  stroke-width: 2; 
+}
+
+.sidebar-toggle {
+  position: absolute; 
+  top: 20px; 
+  right: 0;
+  transform: translateX(50%);
+  z-index: 101; 
+  width: 45px; 
+  height: 45px;
+  background-color: var(--cinzaClaro);
+  color: var(--vermelhoSenai);
+  border: 3px solid var(--branco);
+  border-radius: 50%; 
+  font-size: 1.5em;
+  font-weight: bold; 
+  cursor: pointer;
+  display: flex; 
+  align-items: center; 
+  justify-content: center;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s ease;
+}
+
+.sidebar-toggle:hover { 
+  transform: translateX(50%) scale(1.1); 
+}
+
+.sidebar.retracted { 
+  width: 60px;
+}
+
+.sidebar.retracted h2,
+.sidebar.retracted span {
+  opacity: 0;
+  width: 0;
+  transition: opacity 0.3s ease, width 0.3s ease;
+}
+
+.sidebar.retracted .nav-link {
+  padding: 15px;
+}
+
+/* ==============================================
+   CONTEÚDO PRINCIPAL E LAYOUT
+   ============================================== */
+.main-content {
+  flex-grow: 1;
+  padding: 30px 40px;
+  margin-left: 250px;
+  width: calc(100% - 250px);
+  transition: margin-left 0.3s ease, width 0.3s ease;
+}
+
+.main-content.expanded {
+  margin-left: 60px;
+  width: calc(100% - 60px);
+}
+
+.header-dashboard {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
+    flex-wrap: wrap;
+    gap: 20px;
+}
+
+.header-dashboard h1 {
+    font-size: 2em;
+    font-weight: bold;
+    color: var(--preto);
+}
+
+.header-dashboard p {
+    font-size: 1em;
+    opacity: 0.8;
+}
+
+.container {
+  width: 100%;
+  max-width: 100%; 
 }
 
 .card {
-  max-width: 500px;
-  width: 100%;
-  background-color: var(--cinzav1);
+  background-color: var(--branco);
   padding: 30px;
   border-radius: 12px;
-  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.6);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
 }
 
-h1 {
-  font-family: "Montserrat-Bold", sans-serif;
-  font-weight: 700;
-  text-align: center;
-  color: var(--vermelhoSenai);
-  margin-bottom: 20px;
-}
-
-label {
+/* ==============================================
+   ESTILOS DO FORMULÁRIO (ADAPTADO)
+   ============================================== */
+form label {
   display: block;
-  margin-top: 10px;
-  font-weight: bold;
-  color: var(--brancov1);
+  margin-top: 15px;
+  margin-bottom: 5px;
+  font-weight: 600;
+  color: var(--textoLegivel);
 }
 
-.inputQuant {
-  width: 16%;
-  color: var(--brancov1);
+form input[type="text"],
+form input[type="number"],
+form select,
+form textarea {
+  width: 100%;
+  padding: 12px;
+  margin-top: 5px;
+  background-color: var(--cinzaClaro);
+  border: 1px solid var(--cinzaMedio);
+  border-radius: 6px;
+  color: var(--preto);
+  font-size: 1em;
 }
 
-textarea {
-  width: 95%;
-  padding: 10px;
-  background-color: var(--cinzaEscuroc4);
-  border: 1px solid var(--cinzaMedioc2);
-  border-radius: 5px;
-  color: var(--brancov1);
+form textarea {
   resize: vertical;
 }
 
-input,
-select {
-  width: 95%;
-  padding: 10px;
-  margin-top: 5px;
-  background-color: var(--cinzaEscuroc4);
-  border: 1px solid var(--cinzaMedioc2);
-  border-radius: 5px;
-  color: var(--brancov1);
-}
-
-input:focus,
-select:focus,
-textarea:focus {
-  border-color: var(--azuleletricov2);
+/* Estilos de foco */
+form input:focus,
+form select:focus,
+form textarea:focus {
+  border-color: var(--azulPrincipal);
   outline: none;
+  box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.2);
 }
 
 .campo-interativo {
   display: flex;
   align-items: center;
   gap: 10px;
-  margin-top: 5px;
 }
 
 .campo-interativo select {
-  width: calc(95% - 70px);
+  flex-grow: 1;
 }
 
 .campo-interativo button {
-  padding: 8px 12px;
-  background-color: var(--verdeLimaov3);
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-  color: var(--pretov2);
-  font-weight: bold;
-  transition: background 0.3s;
-}
-
-.campo-interativo button:hover {
-  background-color: var(--verdeClarov4);
-}
-
-.botoes {
-  display: flex;
-  justify-content: space-between;
-  margin-top: 20px;
-}
-
-.botoes button {
-  padding: 10px 20px;
+  padding: 10px 15px;
+  background-color: var(--azulPrincipal);
+  color: var(--branco);
   border: none;
   border-radius: 6px;
   cursor: pointer;
   font-weight: bold;
-  transition: background 0.3s;
+  transition: background-color 0.3s ease;
+}
+
+.campo-interativo button:hover {
+  background-color: #2980b9;
+}
+
+/* ==============================================
+   BOTÕES E MENSAGENS (ADAPTADO)
+   ============================================== */
+.botoes {
+  display: flex;
+  justify-content: flex-end;
+  gap: 15px;
+  margin-top: 30px;
+}
+
+.botoes button {
+  padding: 12px 25px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: bold;
+  font-size: 1em;
+  transition: background-color 0.3s ease;
 }
 
 #cancelarBtn {
-  background-color: var(--cinzaEscuroc3);
-  color: var(--brancov1);
+  background-color: var(--cinzaMedio);
+  color: var(--textoLegivel);
 }
 
 #cancelarBtn:hover {
-  background-color: var(--cinzaMedioc2);
+  background-color: #d8dee3;
 }
 
 #salvarBtn {
-  background-color: var(--azuleletricov2);
-  color: var(--pretov2);
+  background-color: var(--verde);
+  color: var(--branco);
 }
 
 #salvarBtn:hover {
-  background-color: var(--azulClarov5);
-}
-
-#resultado {
-  margin-top: 15px;
-  text-align: center;
-  font-size: 14px;
-}
-
-/* --- ESTILOS PARA VALIDAÇÃO E MENSAGEM DE SUCESSO --- */
-
-/* Mensagens de Validação (Avisos de Campo) */
-.validation-message {
-  color: var(--vermelhoErro, #dc3545); /* Cor vermelha para erro */
-  background-color: rgba(220, 53, 69, 0.1);
-  border-left: 4px solid var(--vermelhoErro, #dc3545);
-  padding: 8px 12px;
-  margin-top: 8px;
-  margin-bottom: 12px;
-  font-size: 0.95em;
-  font-weight: bold;
-  border-radius: 4px;
-  display: block;
-  opacity: 0;
-  max-height: 0;
-  overflow: hidden;
-  transition: opacity 0.4s ease-in-out, max-height 0.4s ease-in-out,
-    padding 0.4s ease-in-out;
-}
-
-/* Estado visível da mensagem de validação */
-.validation-message.show {
-  opacity: 1;
-  max-height: 50px;
-  padding: 8px 12px;
-}
-
-/* Mensagem de Sucesso (Aquela "bonita" na tela) */
-.success-message {
-  position: fixed;
-  top: 30px;
-  left: 50%;
-  transform: translateX(-50%);
-  background-color: var(--verdeLimaov3);
-  color: var(--pretov2);
-  padding: 20px 40px;
-  border-radius: 10px;
-  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
-  z-index: 1000;
-  opacity: 0;
-  visibility: hidden;
-  transition: opacity 0.8s ease-in-out, visibility 0.8s ease-in-out;
-  text-align: center;
-  font-weight: bold;
-  display: flex; /* Essencial para o layout do texto e botão OK */
-  flex-direction: column;
-  align-items: center;
-  gap: 10px;
-}
-
-.success-message.show {
-  opacity: 1;
-  visibility: visible;
-}
-
-/* Estilo para o botão OK dentro da mensagem de sucesso */
-.success-ok-btn {
-  background-color: var(--brancov1);
-  color: var(--verdeLimaov3);
-  border: none;
-  padding: 8px 15px;
-  border-radius: 5px;
-  cursor: pointer;
-  font-weight: bold;
-  font-size: 0.9em;
-  transition: background-color 0.2s ease;
-  display: inline-block; /* Garante que o botão renderize corretamente */
-}
-
-.success-ok-btn:hover {
-  background-color: var(--cinzaClaroc1);
-}
-
-.card {
-  overflow-x: auto;
-}
-
-@media (max-width: 600px) {
-  .card {
-    margin: 20px;
-  }
-  input,
-  select,
-  textarea {
-    width: 100%;
-  }
-  .campo-interativo select {
-    width: calc(100% - 70px);
-  }
-  .inputQuant {
-    width: 25%;
-  }
+  background-color: #27ae60;
 }

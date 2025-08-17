@@ -8,11 +8,40 @@
     <script src="https://unpkg.com/lucide@latest"></script>
   </head>
   <body>
-    <header class="main-header">
-      <h2>Cadastro de Componentes</h2>
-    </header>
+    <nav class="sidebar">
+      <button id="sidebar-toggle" class="sidebar-toggle">S</button>
+      <h2>StockBot</h2>
+      <a href="../PaginaPrincipal/index.html" class="nav-link">
+        <i data-lucide="layout-dashboard"></i>
+        <span>Dashboard</span>
+      </a>
+      <a href="#" class="nav-link active">
+        <i data-lucide="wrench"></i>
+        <span>Componentes</span>
+      </a>
+      <a href="#" class="nav-link">
+        <i data-lucide="history"></i>
+        <span>Histórico</span>
+      </a>
+      <div style="flex-grow: 1;"></div>
+      <a href="#" class="nav-link">
+        <i data-lucide="settings"></i>
+        <span>Configurações</span>
+      </a>
+      <a href="#" class="nav-link">
+        <i data-lucide="circle-user-round"></i>
+        <span>Sair/Entrar</span>
+      </a>
+    </nav>
 
     <main class="main-content">
+      <div class="header-dashboard">
+        <div class="header-title">
+          <h1>Cadastro de Componentes</h1>
+          <p>Preencha os campos para adicionar um novo item ao estoque.</p>
+        </div>
+      </div>
+
       <div class="container">
         <div class="card">
           <form id="componentForm">
@@ -73,24 +102,10 @@
               <button type="submit" id="salvarBtn">Salvar</button>
             </div>
           </form>
-          <p id="resultado" style="display: none"></p>
         </div>
       </div>
     </main>
 
-    <div id="successMessage" class="success-message">
-      <p>✅ Componente Cadastrado com Sucesso!</p>
-      <p style="font-size: 0.9em; margin-top: 5px">
-        (Apenas para demonstração do protótipo)
-      </p>
-      <button id="okSuccessBtn" class="success-ok-btn">OK</button>
-    </div>
-
-    <script>
-      if (typeof lucide !== "undefined") {
-        lucide.createIcons();
-      }
-    </script>
     <script src="js/script.js"></script>
   </body>
 </html>
