@@ -1,6 +1,6 @@
 package com.example.Back.Controller;
 
-import com.example.Back.Entity.Historico;
+import com.example.Back.Dto.HistoricoDTO;
 import com.example.Back.Service.HistoricoService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -16,37 +16,32 @@ public class HistoricoController {
     @Autowired
     private HistoricoService historicoService;
 
-    // Endpoint para buscar todos os registros de histórico
     @GetMapping
-    public ResponseEntity<List<Historico>> getAllHistorico() {
-        List<Historico> historicos = historicoService.getAllHistorico();
+    public ResponseEntity<List<HistoricoDTO>> getAllHistorico() {
+        List<HistoricoDTO> historicos = historicoService.getAllHistorico();
         return ResponseEntity.ok(historicos);
     }
 
-    // Endpoint para buscar um registro por ID
     @GetMapping("/{id}")
-    public ResponseEntity<Historico> getHistoricoById(@PathVariable Long id) {
+    public ResponseEntity<HistoricoDTO> getHistoricoById(@PathVariable Long id) {
         return historicoService.getHistoricoById(id)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }
 
-    // Endpoint para criar um novo registro
     @PostMapping
-    public ResponseEntity<Historico> createHistorico(@RequestBody Historico historico) {
-        Historico novoHistorico = historicoService.saveHistorico(historico);
+    public ResponseEntity<HistoricoDTO> createHistorico(@RequestBody HistoricoDTO historicoDto) {
+        HistoricoDTO novoHistorico = historicoService.createHistorico(historicoDto);
         return new ResponseEntity<>(novoHistorico, HttpStatus.CREATED);
     }
 
-    // Endpoint para atualizar um registro existente
     @PutMapping("/{id}")
-    public ResponseEntity<Historico> updateHistorico(@PathVariable Long id, @RequestBody Historico historicoDetails) {
-        return historicoService.updateHistorico(id, historicoDetails)
+    public ResponseEntity<HistoricoDTO> updateHistorico(@PathVariable Long id, @RequestBody HistoricoDTO historicoDetailsDto) {
+        return historicoService.updateHistorico(id, historicoDetailsDto)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }
 
-    // Endpoint para deletar um registro por ID
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteHistorico(@PathVariable Long id) {
         if (historicoService.deleteHistorico(id)) {
@@ -54,4 +49,5 @@ public class HistoricoController {
         }
         return ResponseEntity.notFound().build();
     }
+
 }

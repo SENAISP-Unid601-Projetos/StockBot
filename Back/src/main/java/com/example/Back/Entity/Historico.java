@@ -1,5 +1,6 @@
 package com.example.Back.Entity;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -15,26 +16,25 @@ public class Historico {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id; // ID padronizado para ser gerado pelo banco
+    private Long id;
 
     @Column(nullable = false, unique = true)
-    private String codigoMovimentacao; // Campo para o seu ID "MOV-1024"
+    private String codigoMovimentacao;
 
     @Column(nullable = false)
+    @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss") // Adicione esta linha
     private LocalDateTime dataHora;
 
-    @Enumerated(EnumType.STRING) // Armazena "ENTRADA" ou "SAIDA" no banco
+    @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private TipoMovimentacao tipo;
 
-    @ManyToOne // Define o relacionamento: Muitos históricos para UM componente
-    @JoinColumn(name = "componente_id", nullable = false) // Chave estrangeira no banco
+    @ManyToOne
+    @JoinColumn(name = "componente_id", nullable = false)
     private Componente componente;
 
     @Column(nullable = false)
     private int quantidade;
 
-    // Sugestão: No futuro, este campo pode se tornar um relacionamento
-    // @ManyToOne com uma entidade Usuario.
     private String usuario;
 }

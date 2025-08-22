@@ -1,11 +1,16 @@
 package com.example.Back.Service;
 
+import com.example.Back.Dto.HistoricoDTO;
 import com.example.Back.Entity.Historico;
+import com.example.Back.Repository.ComponenteRepository;
 import com.example.Back.Repository.HistoricoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class HistoricoService {
@@ -13,61 +18,83 @@ public class HistoricoService {
     @Autowired
     private HistoricoRepository historicoRepository;
 
-    /**
-     * Retorna uma lista com todos os registros de histórico.
-     * @return Uma lista de objetos Historico.
-     */
-    public List<Historico> getAllHistorico() {
-        return historicoRepository.findAll();
+    @Autowired
+    private ComponenteRepository componenteRepository;
+
+    public List<HistoricoDTO> getAllHistorico() {
+        return historicoRepository.findAll().stream()
+                .map(this::convertToDto)
+                .collect(Collectors.toList());
     }
 
-    /**
-     * Busca um registro de histórico pelo seu ID.
-     * @param id O ID do registro de histórico.
-     * @return Um Optional contendo o Historico, se encontrado.
-     */
-    public Optional<Historico> getHistoricoById(Long id) {
-        return historicoRepository.findById(id);
+    public Optional<HistoricoDTO> getHistoricoById(Long id) {
+        return historicoRepository.findById(id)
+                .map(this::convertToDto);
     }
 
-    /**
-     * Salva um novo registro de histórico no banco de dados.
-     * @param historico O objeto Historico a ser salvo.
-     * @return O Historico salvo, incluindo o ID gerado.
-     */
-    public Historico saveHistorico(Historico historico) {
-        // Validações adicionais, se necessário (ex: verificar se o componente existe)
-        return historicoRepository.save(historico);
+    @Transactional
+    public HistoricoDTO createHistorico(HistoricoDTO historicoDto) {
+        // Converte o DTO para a Entidade, buscando o Componente pelo ID
+        Historico historico = convertToEntity(historicoDto);
+        Historico novoHistorico = historicoRepository.save(historico);
+        return convertToDto(novoHistorico);
     }
 
-    /**
-     * Atualiza um registro de histórico existente.
-     * @param id O ID do registro a ser atualizado.
-     * @param historicoDetails O objeto Historico com as informações atualizadas.
-     * @return Um Optional contendo o Historico atualizado, ou vazio se não encontrado.
-     */
-    public Optional<Historico> updateHistorico(Long id, Historico historicoDetails) {
+    @Transactional
+    public Optional<HistoricoDTO> updateHistorico(Long id, HistoricoDTO historicoDetailsDto) {
         return historicoRepository.findById(id).map(historico -> {
-            historico.setCodigoMovimentacao(historicoDetails.getCodigoMovimentacao());
-            historico.setDataHora(historicoDetails.getDataHora());
-            historico.setTipo(historicoDetails.getTipo());
-            historico.setComponente(historicoDetails.getComponente());
-            historico.setQuantidade(historicoDetails.getQuantidade());
-            historico.setUsuario(historicoDetails.getUsuario());
-            return historicoRepository.save(historico);
+            historico.setCodigoMovimentacao(historicoDetailsDto.getCodigoMovimentacao());
+            historico.setDataHora(historicoDetailsDto.getDataHora());
+            historico.setTipo(historicoDetailsDto.getTipo());
+            historico.setQuantidade(historicoDetailsDto.getQuantidade());
+            historico.setUsuario(historicoDetailsDto.getUsuario());
+
+            // Se o ID do componente foi alterado, busca e atualiza o componente
+            if (historicoDetailsDto.getComponenteId() != null) {
+                componenteRepository.findById(historicoDetailsDto.getComponenteId())
+                        .ifPresent(historico::setComponente);
+            }
+
+            Historico updatedHistorico = historicoRepository.save(historico);
+            return convertToDto(updatedHistorico);
         });
     }
 
-    /**
-     * Deleta um registro de histórico pelo seu ID.
-     * @param id O ID do registro de histórico a ser deletado.
-     * @return true se o registro foi deletado, false caso contrário.
-     */
     public boolean deleteHistorico(Long id) {
         if (historicoRepository.existsById(id)) {
             historicoRepository.deleteById(id);
             return true;
         }
         return false;
+    }
+
+    // --- Métodos de Conversão ---
+
+    private HistoricoDTO convertToDto(Historico historico) {
+        HistoricoDTO dto = new HistoricoDTO();
+        dto.setId(historico.getId());
+        dto.setCodigoMovimentacao(historico.getCodigoMovimentacao());
+        dto.setDataHora(historico.getDataHora());
+        dto.setTipo(historico.getTipo());
+        // Garante que o ID do componente seja definido no DTO
+        if (historico.getComponente() != null) {
+            dto.setComponenteId(historico.getComponente().getId());
+        }
+        dto.setQuantidade(historico.getQuantidade());
+        dto.setUsuario(historico.getUsuario());
+        return dto;
+    }
+
+    private Historico convertToEntity(HistoricoDTO dto) {
+        Historico historico = new Historico();
+        historico.setCodigoMovimentacao(dto.getCodigoMovimentacao());
+        historico.setDataHora(dto.getDataHora());
+        historico.setTipo(dto.getTipo());
+        historico.setQuantidade(dto.getQuantidade());
+        historico.setUsuario(dto.getUsuario());
+        // Busca e associa o Componente pelo ID do DTO
+        componenteRepository.findById(dto.getComponenteId())
+                .ifPresent(historico::setComponente);
+        return historico;
     }
 }
