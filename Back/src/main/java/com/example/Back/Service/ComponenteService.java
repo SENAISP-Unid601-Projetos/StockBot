@@ -1,6 +1,6 @@
-
 package com.example.Back.Service;
 
+import com.example.Back.Dto.ComponenteDTO;
 import com.example.Back.Entity.Componente;
 import com.example.Back.Entity.Historico;
 import com.example.Back.Entity.TipoMovimentacao;
@@ -13,8 +13,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 public class ComponenteService {
@@ -25,57 +25,78 @@ public class ComponenteService {
     @Autowired
     private HistoricoRepository historicoRepository;
 
-    public List<Componente> listarTodosComponentes() {
-        return componenteRepository.findAll();
+    // Nome correto: findAll() | Retorno correto: List<ComponenteDTO>
+    @Transactional(readOnly = true)
+    public List<ComponenteDTO> findAll() {
+        List<Componente> componentes = componenteRepository.findAll();
+        // Converte a lista de Entidades para uma lista de DTOs
+        return componentes.stream()
+                .map(ComponenteDTO::new)
+                .collect(Collectors.toList());
     }
 
-    public Optional<Componente> encontrarPorId(Long id) {
-        return componenteRepository.findById(id);
-    }
-
+    // Nome correto: create() | Parâmetro correto: ComponenteDTO
     @Transactional
-    public Componente salvarComponente(Componente componente) {
-        if (componente.getId() != null) {
-            // É uma ATUALIZAÇÃO
-            Componente componenteExistente = componenteRepository.findById(componente.getId())
-                    .orElseThrow(() -> new RuntimeException("Componente não encontrado"));
+    public ComponenteDTO create(ComponenteDTO dto) {
+        // Converte o DTO recebido para uma Entidade
+        Componente componente = new Componente();
+        componente.setNome(dto.getNome());
+        componente.setCodigoPatrimonio(dto.getCodigoPatrimonio());
+        componente.setQuantidade(dto.getQuantidade());
+        componente.setLocalizacao(dto.getLocalizacao());
+        componente.setCategoria(dto.getCategoria());
+        componente.setObservacoes(dto.getObservacoes());
 
-            int quantidadeAntiga = componenteExistente.getQuantidade();
+        Componente componenteSalvo = componenteRepository.save(componente);
 
-            componenteExistente.setNome(componente.getNome());
-            componenteExistente.setCodigoPatrimonio(componente.getCodigoPatrimonio());
-            componenteExistente.setQuantidade(componente.getQuantidade());
-            componenteExistente.setLocalizacao(componente.getLocalizacao());
-            componenteExistente.setCategoria(componente.getCategoria());
-            componenteExistente.setObservacoes(componente.getObservacoes());
+        // Mantém a sua lógica de criar histórico para novos itens
+        criarRegistroHistorico(componenteSalvo, TipoMovimentacao.ENTRADA, componenteSalvo.getQuantidade());
 
-            Componente componenteSalvo = componenteRepository.save(componenteExistente);
-
-            int quantidadeNova = componenteSalvo.getQuantidade();
-            int diferenca = quantidadeNova - quantidadeAntiga;
-
-            if (diferenca > 0) {
-                criarRegistroHistorico(componenteSalvo, TipoMovimentacao.ENTRADA, diferenca);
-            } else if (diferenca < 0) {
-                criarRegistroHistorico(componenteSalvo, TipoMovimentacao.SAIDA, Math.abs(diferenca));
-            }
-            return componenteSalvo;
-        } else {
-            // É uma CRIAÇÃO
-            Componente componenteSalvo = componenteRepository.save(componente);
-            criarRegistroHistorico(componenteSalvo, TipoMovimentacao.ENTRADA, componenteSalvo.getQuantidade());
-            return componenteSalvo;
-        }
+        // Retorna um DTO do objeto salvo
+        return new ComponenteDTO(componenteSalvo);
     }
 
-    public void deletarComponente(Long id) {
+    // Nome correto: update() | Parâmetros corretos: Long id, ComponenteDTO
+    @Transactional
+    public ComponenteDTO update(Long id, ComponenteDTO dto) {
+        Componente componenteExistente = componenteRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Componente não encontrado"));
+
+        int quantidadeAntiga = componenteExistente.getQuantidade();
+
+        // Atualiza a Entidade com os dados do DTO
+        componenteExistente.setNome(dto.getNome());
+        componenteExistente.setCodigoPatrimonio(dto.getCodigoPatrimonio());
+        componenteExistente.setQuantidade(dto.getQuantidade());
+        componenteExistente.setLocalizacao(dto.getLocalizacao());
+        componenteExistente.setCategoria(dto.getCategoria());
+        componenteExistente.setObservacoes(dto.getObservacoes());
+
+        Componente componenteSalvo = componenteRepository.save(componenteExistente);
+
+        // Mantém a sua lógica de criar histórico para atualizações
+        int quantidadeNova = componenteSalvo.getQuantidade();
+        int diferenca = quantidadeNova - quantidadeAntiga;
+
+        if (diferenca > 0) {
+            criarRegistroHistorico(componenteSalvo, TipoMovimentacao.ENTRADA, diferenca);
+        } else if (diferenca < 0) {
+            criarRegistroHistorico(componenteSalvo, TipoMovimentacao.SAIDA, Math.abs(diferenca));
+        }
+
+        return new ComponenteDTO(componenteSalvo);
+    }
+
+    // Nome correto: delete()
+    @Transactional
+    public void delete(Long id) {
         if (!componenteRepository.existsById(id)) {
             throw new RuntimeException("Componente não encontrado com o id: " + id);
         }
         componenteRepository.deleteById(id);
     }
 
-    // MÉTODO QUE ESTAVA EM FALTA
+    // A sua função de histórico permanece intacta
     private void criarRegistroHistorico(Componente componente, TipoMovimentacao tipo, int quantidade) {
         String emailUsuario = SecurityContextHolder.getContext().getAuthentication().getName();
 

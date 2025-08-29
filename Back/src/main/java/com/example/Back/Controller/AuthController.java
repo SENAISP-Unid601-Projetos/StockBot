@@ -1,16 +1,20 @@
 package com.example.Back.Controller;
 
 import com.example.Back.Dto.AuthDTO;
+import com.example.Back.Dto.PasswordVerificationDTO;
 import com.example.Back.Entity.UserRole;
 import com.example.Back.Entity.Usuario;
 import com.example.Back.Repository.UsuarioRepository;
 import com.example.Back.Service.TokenService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
+import java.util.Optional; // Importe o Optional se ainda não estiver
 
 @RestController
 @RequestMapping("/api/auth")
@@ -27,38 +31,52 @@ public class AuthController {
 
     @PostMapping("/register")
     public ResponseEntity<?> registerUser(@RequestBody Usuario novoUsuario) {
-        if (usuarioRepository.findByEmail(novoUsuario.getEmail()) != null) {
-            return ResponseEntity.badRequest().body("Erro: E-mail já está em uso!");
+        // CORREÇÃO AQUI: Usamos .isPresent() para verificar se a "caixa" tem algo dentro
+        if (usuarioRepository.findByEmail(novoUsuario.getEmail()).isPresent()) {
+            return ResponseEntity.badRequest().body(Map.of("message", "Erro: E-mail já está em uso!"));
         }
 
-        // Define o cargo padrão para qualquer novo registo
         novoUsuario.setRole(UserRole.USER);
-
         novoUsuario.setSenha(passwordEncoder.encode(novoUsuario.getSenha()));
         usuarioRepository.save(novoUsuario);
 
         return ResponseEntity.ok(Map.of("message", "Utilizador registado com sucesso!"));
     }
 
-    // --- LÓGICA DE LOGIN ---
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody AuthDTO authDTO) {
-        // 1. Encontra o utilizador pelo e-mail
-        Usuario usuario = usuarioRepository.findByEmail(authDTO.email());
-        if (usuario == null) {
+        // CORREÇÃO AQUI: Primeiro, pegamos a "caixa" (Optional)
+        Optional<Usuario> usuarioOpt = usuarioRepository.findByEmail(authDTO.email());
+
+        // Verificamos se a "caixa" está vazia
+        if (usuarioOpt.isEmpty()) {
             return ResponseEntity.status(401).body("E-mail ou senha inválidos.");
         }
 
-        // 2. Verifica se a senha enviada (authDTO.senha()) bate com a senha criptografada no banco (usuario.getSenha())
-        if (passwordEncoder.matches(authDTO.senha(), usuario.getSenha())) {
-            // 3. Se as senhas correspondem, gera o token
-            String token = tokenService.gerarToken(usuario);
+        // Se não está vazia, abrimos a "caixa" para pegar o utilizador
+        Usuario usuario = usuarioOpt.get();
 
-            // 4. Retorna o token em um objeto JSON: { "token": "seu-token-jwt-aqui" }
+        if (passwordEncoder.matches(authDTO.senha(), usuario.getSenha())) {
+            String token = tokenService.gerarToken(usuario);
             return ResponseEntity.ok(Map.of("token", token));
         }
 
-        // 5. Se as senhas não correspondem, retorna erro de não autorizado
         return ResponseEntity.status(401).body("E-mail ou senha inválidos.");
+    }
+
+    @PostMapping("/verify-password")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<Void> verifyPassword(@RequestBody PasswordVerificationDTO dto) {
+        String username = SecurityContextHolder.getContext().getAuthentication().getName();
+
+        // Este método já estava correto
+        Usuario usuario = usuarioRepository.findByEmail(username)
+                .orElseThrow(() -> new RuntimeException("Usuário não encontrado"));
+
+        if (passwordEncoder.matches(dto.getPassword(), usuario.getSenha())) {
+            return ResponseEntity.ok().build();
+        } else {
+            return ResponseEntity.status(401).build();
+        }
     }
 }
