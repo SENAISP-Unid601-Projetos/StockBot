@@ -1,6 +1,6 @@
-
 package com.example.Back.config;
 
+import com.example.Back.Entity.Usuario;
 import com.example.Back.Repository.UsuarioRepository;
 import com.example.Back.Service.TokenService;
 import jakarta.servlet.FilterChain;
@@ -15,6 +15,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
+import java.util.Optional;
 
 @Component
 public class SecurityFilter extends OncePerRequestFilter {
@@ -46,11 +47,13 @@ public class SecurityFilter extends OncePerRequestFilter {
                 // LOG 3: Mostra o e-mail que foi extraído do token
                 System.out.println("[DEBUG] Subject (email) extraído do token: " + subject);
 
-                UserDetails usuario = usuarioRepository.findByEmail(subject);
-                // LOG 4: Mostra o resultado da busca no banco de dados
-                System.out.println("[DEBUG] Resultado da busca no banco: " + (usuario != null ? usuario.getUsername() : "NULO"));
+                Optional<Usuario> usuarioOptional = usuarioRepository.findByEmail(subject);
 
-                if (usuario != null) {
+                if (usuarioOptional.isPresent()) {
+                    UserDetails usuario = usuarioOptional.get();
+                    // LOG 4: Mostra o resultado da busca no banco de dados
+                    System.out.println("[DEBUG] Usuário encontrado no banco: " + usuario.getUsername());
+
                     var authentication = new UsernamePasswordAuthenticationToken(usuario, null, usuario.getAuthorities());
                     SecurityContextHolder.getContext().setAuthentication(authentication);
                     // LOG 5: Confirma que o usuário foi autenticado com sucesso

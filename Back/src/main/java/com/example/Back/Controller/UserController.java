@@ -23,7 +23,13 @@ public class UserController {
     @GetMapping
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<List<Usuario>> listarUsuarios() {
+        System.out.println("=== [DEBUG] UserController.listarUsuarios() chamado ===");
+        System.out.println("[DEBUG] Verificando permissões ADMIN...");
+
         List<Usuario> usuarios = userService.listarTodosUsuarios();
+
+        System.out.println("[DEBUG] Número de usuários encontrados: " + usuarios.size());
+        System.out.println("[DEBUG] Retornando lista de usuários com status 200");
         return ResponseEntity.ok(usuarios);
     }
 
@@ -31,7 +37,14 @@ public class UserController {
     @DeleteMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Void> deletarUsuario(@PathVariable Long id) {
+        System.out.println("=== [DEBUG] UserController.deletarUsuario() chamado ===");
+        System.out.println("[DEBUG] ID do usuário a ser deletado: " + id);
+        System.out.println("[DEBUG] Verificando permissões ADMIN...");
+
         userService.deletarUsuario(id);
+
+        System.out.println("[DEBUG] Usuário com ID " + id + " deletado com sucesso");
+        System.out.println("[DEBUG] Retornando status 204 No Content");
         return ResponseEntity.noContent().build();
     }
 
@@ -39,8 +52,16 @@ public class UserController {
     @PostMapping
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Usuario> criarUsuario(@RequestBody @Valid CreateUserDTO createUserDTO) {
+        System.out.println("=== [DEBUG] UserController.criarUsuario() chamado ===");
+        System.out.println("[DEBUG] DTO recebido: " + createUserDTO.toString());
+        System.out.println("[DEBUG] Verificando permissões ADMIN...");
+        System.out.println("[DEBUG] Validando DTO com @Valid...");
+
         // A anotação @Valid aqui garante que as regras do DTO sejam verificadas.
         Usuario novoUsuario = userService.criarUsuario(createUserDTO);
+
+        System.out.println("[DEBUG] Usuário criado com ID: " + novoUsuario.getId());
+        System.out.println("[DEBUG] Retornando usuário criado com status 201 Created");
         return new ResponseEntity<>(novoUsuario, HttpStatus.CREATED);
     }
 }
