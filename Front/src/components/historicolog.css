@@ -1,68 +1,84 @@
 .historico-container {
   margin-top: 2rem;
+  background-color: var(--branco);
+  border-radius: var(--border-radius-padrao);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  padding: 1.5rem;
 }
 
 .timeline {
-  list-style-type: none;
-  padding-left: 20px;
-  border-left: 3px solid var(--cinzaMedio);
+  list-style: none;
+  padding: 0;
 }
 
 .timeline-item {
-  position: relative;
-  margin-bottom: 2rem;
   display: flex;
   align-items: flex-start;
+  position: relative;
+  padding-bottom: 1.5rem;
+}
+
+.timeline-item:not(:last-child)::before {
+  content: '';
+  position: absolute;
+  left: 19px;
+  top: 40px;
+  width: 2px;
+  height: calc(100% - 20px);
+  background-color: var(--cinzaMedio);
 }
 
 .timeline-icon {
-  position: absolute;
-  left: -34px;
-  top: 0;
   width: 40px;
   height: 40px;
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-  color: var(--branco);
-  border: 3px solid var(--cinzaClaro);
+  margin-right: 1.5rem;
+  z-index: 1;
+  background-color: var(--cinzaClaro);
 }
 
 .timeline-icon.entrada {
   background-color: var(--verde-sucesso);
+  color: var(--branco);
 }
 
 .timeline-icon.saida {
   background-color: var(--laranja-aviso);
+  color: var(--branco);
 }
 
 .timeline-content {
-  background-color: var(--branco);
-  padding: 1rem 1.5rem;
+  background-color: var(--cinzaClaro);
+  padding: 1rem;
   border-radius: var(--border-radius-padrao);
-  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
-  width: 100%;
-  margin-left: 2rem;
+  flex: 1;
 }
 
 .timeline-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  font-size: 1.1rem;
+  font-size: 1rem;
   margin-bottom: 0.5rem;
 }
 
 .timeline-user {
   font-size: 0.8rem;
-  color: #777;
+  color: var(--textoSecundario, #777);
 }
 
 .timeline-date {
+  font-size: 0.8rem;
+  color: var(--textoSecundario, #777);
   display: block;
   margin-top: 0.5rem;
-  font-size: 0.8rem;
-  color: #999;
-  text-align: right;
+}
+
+.empty-message {
+    text-align: center;
+    padding: 2rem;
+    color: var(--textoSecundario, #777);
 }

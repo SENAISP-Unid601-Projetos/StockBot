@@ -1,42 +1,44 @@
-import { useState, useEffect } from 'react';
-import api from '../services/api';
-import Sidebar from '../components/sidebar';
-import HistoricoLog from '../components/historicolog'; // Importa o nosso novo componente
+import { useState, useEffect } from "react";
+import api from "../services/api";
+import Sidebar from "../components/sidebar";
+import HistoricoLog from "../components/historicolog.jsx";
+import { ClipLoader } from "react-spinners";
 
 function HistoricoPage() {
-  const [historico, setHistorico] = useState([]);
+  const [historicoProcessado, setHistoricoProcessado] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        // 1. Busca os dois conjuntos de dados em paralelo para ser mais rápido
+        // 1. Busca os dois conjuntos de dados em paralelo
         const [historicoResponse, componentesResponse] = await Promise.all([
-          api.get('/api/historico'),
-          api.get('/api/componentes')
+          api.get("/api/historico"),
+          api.get("/api/componentes"),
         ]);
 
         const historicoData = historicoResponse.data;
         const componentesData = componentesResponse.data;
 
-        // 2. Cria um "mapa" para encontrar facilmente o nome de um componente pelo seu ID
+        // 2. Cria um "mapa" para encontrar o nome do componente facilmente
         const mapaComponentes = new Map(
-          componentesData.map(comp => [comp.id, comp.nome])
+          componentesData.map((comp) => [comp.id, comp.nome])
         );
 
-        // 3. Processa a lista de histórico, adicionando o nome do componente a cada item
-        const historicoProcessado = historicoData.map(item => ({
-          ...item,
-          nomeComponente: mapaComponentes.get(item.componenteId) || 'Componente Desconhecido'
-        }));
-        
-        // Ordena o histórico do mais recente para o mais antigo
-        historicoProcessado.sort((a, b) => new Date(b.dataHora) - new Date(a.dataHora));
+        // 3. Junta os dados: adiciona o nome do componente a cada registo de histórico
+        const processado = historicoData
+          .map((item) => ({
+            ...item,
+            nomeComponente:
+              mapaComponentes.get(item.componenteId) ||
+              "Componente Desconhecido",
+          }))
+          // Ordena pela data mais recente primeiro
+          .sort((a, b) => new Date(b.dataHora) - new Date(a.dataHora));
 
-        setHistorico(historicoProcessado);
-
+        setHistoricoProcessado(processado);
       } catch (error) {
-        console.error("Erro ao buscar histórico:", error);
+        console.error("Erro ao buscar dados do histórico:", error);
       } finally {
         setLoading(false);
       }
@@ -51,13 +53,19 @@ function HistoricoPage() {
       <main className="main-content">
         <div className="header-dashboard">
           <h1>Histórico de Movimentações</h1>
-          <p>Veja todas as entradas e saídas do seu estoque.</p>
+          <p>Veja todas as entradas e saídas do seu stock.</p>
         </div>
 
         {loading ? (
-          <p>A carregar histórico...</p>
+          <div className="loading-spinner-container">
+            <ClipLoader
+              color={"var(--vermelhoSenai)"}
+              loading={loading}
+              size={50}
+            />
+          </div>
         ) : (
-          <HistoricoLog historicoProcessado={historico} />
+          <HistoricoLog historicoProcessado={historicoProcessado} />
         )}
       </main>
     </div>
