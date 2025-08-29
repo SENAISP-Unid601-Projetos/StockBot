@@ -1,0 +1,46 @@
+/* Adicione este código ao final do seu arquivo src/index.css */
+
+/* -------------------------------------------------- */
+/* Estilos do Cabeçalho da Página (Reutilizável)      */
+/* -------------------------------------------------- */
+.header-dashboard {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid var(--cinzaMedio);
+}
+
+.header-dashboard h1 {
+  font-size: 2rem;
+  color: var(--azulEscuro);
+}
+
+.header-dashboard p {
+  color: #555;
+  font-size: 1rem;
+}
+
+/* -------------------------------------------------- */
+/* Botão de Ação Principal (Reutilizável)             */
+/* -------------------------------------------------- */
+.action-button {
+  background-color: var(--vermelhoSenai);
+  color: var(--branco);
+  border: none;
+  padding: 0.75rem 1.5rem;
+  border-radius: var(--border-radius-padrao);
+  font-size: 1rem;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background-color 0.2s, transform 0.2s;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.action-button:hover {
+  background-color: #a40000; /* Um tom mais escuro de vermelho */
+  transform: translateY(-2px);
+}
