@@ -1,6 +1,6 @@
 import { useState } from "react";
 import api from "../services/api";
-import "./mudaluser.css";
+import './modaladduser.css'; // Certifique-se de que o ficheiro CSS está corretamente nomeado
 
 function ModalAddUser({ isVisible, onClose, onUserAdded }) {
   const [email, setEmail] = useState("");
