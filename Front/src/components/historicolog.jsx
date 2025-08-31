@@ -1,4 +1,4 @@
-import "./historicolog.css";
+import "../styles/historicolog.css"; // Certifique-se de que o ficheiro CSS está corretamente nomeado
 import { ArrowDownCircle, ArrowUpCircle } from "lucide-react";
 
 // Este componente recebe a lista de histórico já processada

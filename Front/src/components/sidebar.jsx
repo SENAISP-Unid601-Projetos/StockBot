@@ -3,7 +3,7 @@
 import { NavLink, useNavigate } from 'react-router-dom';
 // 1. IMPORTAMOS O NOVO ÍCONE
 import { LayoutDashboard, Wrench, History, ArchiveRestore, Settings, LogOut } from 'lucide-react';
-import './sidebar.css';
+import '../styles/sidebar.css';
 
 function Sidebar() {
   const navigate = useNavigate();

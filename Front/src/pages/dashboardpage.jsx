@@ -8,7 +8,7 @@ import autoTable from 'jspdf-autotable'; // MUDANÇA 1: Importa a função diret
 // Imports dos seus componentes
 import Sidebar from '../components/sidebar';
 import KpiCard from '../components/kpicard';
-import ActionList from '../components/actionlist';
+import ActionList from '../components/actionList';
 import CategoryChart from '../components/categoriachart';
 import { toast } from 'react-toastify';
 import { ClipLoader } from 'react-spinners';

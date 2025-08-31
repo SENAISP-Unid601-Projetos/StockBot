@@ -1,62 +1,103 @@
-  import { useState, useEffect } from 'react';
-  import api from '../services/api';
-  import './modalcomponente.css';
-  import { toast } from 'react-toastify'; 
+import { useState, useEffect } from "react";
+import { jwtDecode } from "jwt-decode";
+import api from "../services/api";
+import Sidebar from "../components/sidebar";
+import ComponentesTable from "../components/componentestable";
+import ModalComponente from "../components/modalcomponente";
+import { toast } from "react-toastify";
+import '../styles/compoenetepages.css';
 
-  function ModalComponente({ isVisible, onClose, onComponenteAdicionado, componenteParaEditar }) {
-    const [nome, setNome] = useState('');
-    const [codigoPatrimonio, setCodigoPatrimonio] = useState('');
-    const [quantidade, setQuantidade] = useState(1);
-  
-    useEffect(() => {
-      if (componenteParaEditar) {
-        setNome(componenteParaEditar.nome);
-        setCodigoPatrimonio(componenteParaEditar.codigoPatrimonio);
-        setQuantidade(componenteParaEditar.quantidade);
-      } else {
-        // Limpa o formulário para o modo de adição
-        setNome('');
-        setCodigoPatrimonio('');
-        setQuantidade(1);
+function ComponentesPage() {
+  const [componentes, setComponentes] = useState([]);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [editingComponente, setEditingComponente] = useState(null);
+  const [isAdmin, setIsAdmin] = useState(false);
+
+  useEffect(() => {
+    const token = localStorage.getItem("jwt-token");
+    if (token) {
+      try {
+        const decodedToken = jwtDecode(token);
+        const userRoles = decodedToken.roles || [];
+        setIsAdmin(userRoles.includes("ROLE_ADMIN"));
+      } catch (error) {
+        console.error("Erro ao decodificar o token:", error);
       }
-    }, [componenteParaEditar, isVisible]);
+    }
+    fetchData();
+  }, []);
 
-    if (!isVisible) return null;
-
-   const handleSubmit = async (event) => {
-    event.preventDefault();
-    const dadosComponente = { nome, codigoPatrimonio, quantidade, localizacao: "Padrão", categoria: "Geral", observacoes: "" };
-
+  const fetchData = async () => {
     try {
-      if (componenteParaEditar) {
-        await api.put(`/api/componentes/${componenteParaEditar.id}`, dadosComponente);
-        toast.success('Componente atualizado com sucesso!');
-      } else {
-        await api.post('/api/componentes', dadosComponente);
-        toast.success('Componente adicionado com sucesso!');
-      }
-      onComponenteAdicionado();
-      onClose();
+      const response = await api.get("/api/componentes");
+      setComponentes(response.data);
     } catch (error) {
-      console.error("Erro ao salvar componente:", error);
-      toast.error('Falha ao salvar componente. Verifique os dados.');
+      console.error("Erro ao buscar componentes:", error);
     }
   };
 
-    return (
-      <div className="modal-overlay" onClick={onClose}>
-        <div className="modal-content" onClick={(e) => e.stopPropagation()}>
-          <button className="close-button" onClick={onClose}>&times;</button>
-          <h2>{componenteParaEditar ? 'Editar Componente' : 'Adicionar Novo Componente'}</h2>
-          <form onSubmit={handleSubmit}>
-            <input type="text" placeholder="Nome" value={nome} onChange={e => setNome(e.target.value)} required />
-            <input type="text" placeholder="Patrimônio" value={codigoPatrimonio} onChange={e => setCodigoPatrimonio(e.target.value)} required />
-            <input type="number" placeholder="Quantidade" value={quantidade} onChange={e => setQuantidade(parseInt(e.target.value))} required />
-            <button type="submit">Salvar</button>
-          </form>
-        </div>
-      </div>
-    );
-  }
+  const handleAdd = () => {
+    setEditingComponente(null);
+    setIsModalOpen(true);
+  };
 
-  export default ModalComponente;
+  const handleEdit = (componente) => {
+    setEditingComponente(componente);
+    setIsModalOpen(true);
+  };
+
+  const handleDelete = async (id) => {
+    if (window.confirm("Tem a certeza que quer excluir este componente?")) {
+      try {
+        await api.delete(`/api/componentes/${id}`);
+        toast.success("Componente excluído com sucesso!");
+        fetchData();
+      } catch (error) {
+        toast.error("Erro ao excluir componente.");
+      }
+    }
+  };
+
+  const handleSave = () => {
+    setIsModalOpen(false);
+    fetchData();
+  };
+
+  return (
+    <div className="app-container">
+      <Sidebar />
+      <main className="main-content">
+        <div className="header-dashboard">
+          <h1>Gestão de Componentes</h1>
+          {isAdmin && (
+            <button 
+              type="button"
+              className="action-button" 
+              onClick={handleAdd}
+            >
+              Adicionar Componente
+            </button>
+          )}
+        </div>
+
+        <ComponentesTable
+          componentes={componentes}
+          onEdit={handleEdit}
+          onDelete={handleDelete}
+          isAdmin={isAdmin}
+        />
+
+        {isModalOpen && (
+          <ModalComponente
+            isVisible={isModalOpen} // <-- CORRIGIDO
+            onClose={() => setIsModalOpen(false)}
+            onSave={handleSave}
+            componente={editingComponente}
+          />
+        )}
+      </main>
+    </div>
+  );
+}
+
+export default ComponentesPage;

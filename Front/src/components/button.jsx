@@ -1,5 +1,5 @@
 import React from 'react';
-import './button.css';
+import '../styles/button.css'; // Certifique-se de que o ficheiro CSS está corretamente nomeados
 
 /**
  * Componente de botão reutilizável e personalizado.

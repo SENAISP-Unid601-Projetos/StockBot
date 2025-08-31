@@ -3,16 +3,15 @@ import ReactDOM from "react-dom/client";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-
 import App from "./App.jsx";
 import LoginPage from "./pages/loginpage.jsx";
 import DashboardPage from "./pages/dashboardpage.jsx";
-import ComponentesPage from './pages/componentepages.jsx';     // NOME CORRIGIDO
+import ComponentesPage from "./pages/componentespage.jsx";
 import HistoricoPage from "./pages/historicopage.jsx";
-import ConfiguracoesPage from './pages/configuracoespage.jsx'; // NOME CORRIGIDO
+import ConfiguracoesPage from "./pages/configuracoespage.jsx";
 import ReposicaoPage from './pages/reposicaopage.jsx'; 
 import { ThemeProvider } from './context/ThemeContext.jsx'; 
-import "./index.css";
+import "./styles/index.css";
 
 const router = createBrowserRouter([
   {

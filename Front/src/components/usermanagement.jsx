@@ -1,4 +1,4 @@
-import './usermanagement.css';
+import '../styles/modaladduser.css';
 
 function UserManagement({ users, onDeleteUser }) {
   return (

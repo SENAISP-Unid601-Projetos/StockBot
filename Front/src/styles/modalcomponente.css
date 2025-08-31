@@ -1,0 +1,64 @@
+/* Fundo escuro que cobre a página inteira */
+.modal-overlay {
+  position: fixed; /* Fica fixo na tela, mesmo com scroll */
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.7); /* Fundo preto semi-transparente */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000; /* Garante que fica por cima de tudo */
+  backdrop-filter: blur(4px);
+}
+
+/* O conteúdo do modal em si */
+.modal-content {
+  background-color: var(--fundo-secundario); /* Usa a cor de fundo do tema */
+  padding: 2rem;
+  border-radius: var(--border-radius-padrao);
+  width: 90%;
+  max-width: 500px; /* Largura máxima */
+  position: relative;
+  box-shadow: 0 5px 25px rgba(0, 0, 0, 0.3);
+}
+
+.close-button {
+  position: absolute;
+  top: 15px;
+  right: 20px;
+  background: none;
+  border: none;
+  font-size: 2rem;
+  cursor: pointer;
+  color: var(--textoSecundario);
+}
+
+.modal-content h2 {
+  margin-top: 0;
+  margin-bottom: 1.5rem;
+  color: var(--textoPrincipal);
+}
+
+.modal-content form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.modal-content input,
+.modal-content textarea {
+  width: 100%;
+  padding: 0.75rem;
+  border: 1px solid var(--borda);
+  border-radius: var(--border-radius-padrao);
+  background-color: var(--fundo-principal);
+  color: var(--textoPrincipal);
+  font-size: 1rem;
+}
+
+.modal-content textarea {
+  resize: vertical;
+  min-height: 80px;
+}

@@ -1,6 +1,6 @@
 import React from 'react';
 import { jwtDecode } from 'jwt-decode';
-import './usertable.css'; 
+import '../styles/usertable.css'; 
 
 function UserTable({ users, onRoleChange, onDelete }) {
   // Pega o email do utilizador logado para não se poder auto-modificar

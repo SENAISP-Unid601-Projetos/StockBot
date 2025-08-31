@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios'; // Usa o axios normal
-import './loginpage.css';
+import '../styles/loginpage.css'; // Importa o ficheiro CSS para estilos
 
 const apiUrl = 'http://localhost:8080/api/auth';
 

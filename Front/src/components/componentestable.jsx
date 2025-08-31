@@ -1,6 +1,6 @@
 // src/components/componentestable.jsx
 import { Edit, Trash2 } from "lucide-react";
-import "./componentestable.css";
+import "../styles/componentestable.css"; // Certifique-se de que o ficheiro CSS está corretamente nomeado
 
 function ComponentesTable({ componentes, onEdit, onDelete, isAdmin }) {
   // Recebe isAdmin como prop

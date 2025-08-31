@@ -2,7 +2,7 @@
 import { useState, useEffect } from 'react';
 import api from '../services/api';
 import Sidebar from '../components/sidebar';
-import ActionList from '../components/actionlist'; // Reutiliza o componente de lista de ação
+import ActionList from '../components/actionList';
 import { ClipLoader } from 'react-spinners';
 import { toast } from 'react-toastify';
 

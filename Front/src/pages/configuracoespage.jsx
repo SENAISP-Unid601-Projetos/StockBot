@@ -3,14 +3,12 @@ import { jwtDecode } from 'jwt-decode';
 import { toast } from 'react-toastify';
 import api from '../services/api';
 import { ThemeContext } from '../context/ThemeContext.jsx';
-
-// Componentes necessários para esta página
 import Sidebar from '../components/sidebar';
 import UserManagement from '../components/usermanagement';
 import ModalAddUser from '../components/modaladduser.jsx';
 import { ClipLoader } from 'react-spinners';
 
-import './configuracoespage.css'; // Certifique-se de que o ficheiro CSS está corretamente nomeado
+import '../styles/configuracoespage.css'; // Certifique-se de que o ficheiro CSS está corretamente nomeado
 function ConfiguracoesPage() {
   const { theme, toggleTheme } = useContext(ThemeContext);
   

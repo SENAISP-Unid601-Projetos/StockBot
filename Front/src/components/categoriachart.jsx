@@ -1,7 +1,7 @@
 // src/components/categoriachart.jsx
 import { Doughnut } from 'react-chartjs-2';
 import { Chart as ChartJS, ArcElement, Tooltip, Legend } from 'chart.js';
-import './categoriachart.css';
+import '../styles/categoriachart.css'; // Certifique-se de que o ficheiro CSS está corretamente nomeado
 
 // Registra os plugins necessários do Chart.js
 ChartJS.register(ArcElement, Tooltip, Legend);

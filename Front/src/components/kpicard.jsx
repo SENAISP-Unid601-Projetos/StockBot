@@ -1,5 +1,5 @@
 // src/components/KpiCard.jsx
-import './KpiCard.css'; // Vamos criar este arquivo de estilo a seguir
+import '../styles/kpicard.css'; // Vamos criar este arquivo de estilo a seguir
 
 // Este componente recebe "props" (propriedades) com os dados a serem exibidos.
 function KpiCard({ title, value, description, isCritical = false }) {
