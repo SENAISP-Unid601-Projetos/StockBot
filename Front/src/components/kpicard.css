@@ -3,6 +3,7 @@
 .kpi-card {
   background-color: var(--branco);
   padding: 1.5rem;
+  margin-bottom: 1rem;
   border-radius: var(--border-radius-padrao);
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
 }

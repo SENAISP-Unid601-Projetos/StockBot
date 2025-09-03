@@ -28,25 +28,20 @@ public class Usuario implements UserDetails {
     @Column(nullable = false)
     private String senha;
 
-    // NOVO CAMPO: Armazena o cargo do utilizador
+    // CORRIGIDO: O tipo do campo agora é o nosso enum oficial UserRole
     @Enumerated(EnumType.STRING)
     private UserRole role;
 
-    // --- MÉTODOS DA INTERFACE UserDetails ---
-
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        // MUDANÇA: As permissões agora dependem do cargo
+        // CORRIGIDO: A verificação agora usa o enum UserRole
         if (this.role == UserRole.ADMIN) {
-            // Se for admin, tem as permissões de ADMIN e de USER
             return List.of(new SimpleGrantedAuthority("ROLE_ADMIN"), new SimpleGrantedAuthority("ROLE_USER"));
         } else {
-            // Se for user, tem apenas as permissões de USER
             return List.of(new SimpleGrantedAuthority("ROLE_USER"));
         }
     }
 
-    // ... (os outros métodos getPassword, getUsername, etc. continuam os mesmos) ...
     @Override
     public String getPassword() { return this.senha; }
 

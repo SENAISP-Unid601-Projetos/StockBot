@@ -8,7 +8,8 @@
 		<groupId>org.springframework.boot</groupId>
 		<artifactId>spring-boot-starter-parent</artifactId>
 		<version>3.3.1</version>
-		<relativePath/> </parent>
+		<relativePath/>
+	</parent>
 
 	<groupId>com.seuprojeto</groupId>
 	<artifactId>BackEnd_Refatore</artifactId>
@@ -70,13 +71,7 @@
 			<version>4.4.0</version>
 		</dependency>
 
-        <dependency>
-            <groupId>jakarta.persistence</groupId>
-            <artifactId>jakarta.persistence-api</artifactId>
-            <version>3.1.0</version>
-        </dependency>
-
-    </dependencies>
+	</dependencies>
 
 	<build>
 		<plugins>

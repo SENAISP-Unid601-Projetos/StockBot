@@ -1,4 +1,3 @@
-
 package com.example.Back.config;
 
 import com.example.Back.Repository.UsuarioRepository;
@@ -15,6 +14,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
+import java.util.Optional;
 
 @Component
 public class SecurityFilter extends OncePerRequestFilter {
@@ -33,39 +33,29 @@ public class SecurityFilter extends OncePerRequestFilter {
                                     @NonNull FilterChain filterChain)
             throws ServletException, IOException {
 
-        // LOG 1: Avisa que o filtro foi acionado
-        System.out.println("\n--- [DEBUG] Filtro de Segurança Ativado para a Rota: " + request.getRequestURI());
-
         var tokenJWT = recuperarToken(request);
 
         if (tokenJWT != null) {
-            // LOG 2: Confirma que um token foi encontrado
-            System.out.println("[DEBUG] Token JWT encontrado no cabeçalho.");
             try {
                 var subject = tokenService.getSubject(tokenJWT);
-                // LOG 3: Mostra o e-mail que foi extraído do token
-                System.out.println("[DEBUG] Subject (email) extraído do token: " + subject);
 
-                UserDetails usuario = usuarioRepository.findByEmail(subject);
-                // LOG 4: Mostra o resultado da busca no banco de dados
-                System.out.println("[DEBUG] Resultado da busca no banco: " + (usuario != null ? usuario.getUsername() : "NULO"));
+                // --- CORREÇÃO APLICADA AQUI ---
+                // 1. Recebemos a "caixa" (Optional) do repositório
+                Optional<UserDetails> optionalUsuario = Optional.ofNullable(usuarioRepository.findUserDetailsByEmail(subject));
 
-                if (usuario != null) {
+                // 2. Verificamos se a "caixa" não está vazia
+                if (optionalUsuario.isPresent()) {
+                    // 3. Se não estiver, pegamos o conteúdo de dentro
+                    UserDetails usuario = optionalUsuario.get();
+
                     var authentication = new UsernamePasswordAuthenticationToken(usuario, null, usuario.getAuthorities());
                     SecurityContextHolder.getContext().setAuthentication(authentication);
-                    // LOG 5: Confirma que o usuário foi autenticado com sucesso
-                    System.out.println("[DEBUG] Usuário AUTENTICADO com sucesso no contexto de segurança.");
-                } else {
-                    // LOG 6: Avisa que o usuário do token não existe mais no banco
-                    System.out.println("[DEBUG] AVISO: Token válido, mas o usuário '" + subject + "' não foi encontrado no banco.");
                 }
+
             } catch (Exception e) {
-                // LOG 7: Captura qualquer erro durante a validação do token
-                System.out.println("[DEBUG] ERRO: Falha ao validar o token. Motivo: " + e.getMessage());
+                // Lida com tokens inválidos ou expirados
+                SecurityContextHolder.clearContext();
             }
-        } else {
-            // LOG 8: Avisa que a requisição veio sem token
-            System.out.println("[DEBUG] Nenhum token JWT encontrado no cabeçalho 'Authorization'.");
         }
 
         filterChain.doFilter(request, response);
