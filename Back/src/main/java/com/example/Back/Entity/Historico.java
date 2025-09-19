@@ -1,6 +1,6 @@
 package com.example.Back.Entity;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -18,23 +18,25 @@ public class Historico {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false, unique = true)
-    private String codigoMovimentacao;
-
-    @Column(nullable = false)
-    @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss") // Adicione esta linha
-    private LocalDateTime dataHora;
-
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private TipoMovimentacao tipo;
 
-    @ManyToOne
-    @JoinColumn(name = "componente_id", nullable = false)
-    private Componente componente;
-
     @Column(nullable = false)
     private int quantidade;
 
+    @Column(nullable = false)
     private String usuario;
+
+    @Column(nullable = false)
+    private LocalDateTime dataHora;
+
+    @Column(nullable = false, unique = true)
+    private String codigoMovimentacao;
+
+
+    @JsonIgnore
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "componente_id", nullable = false)
+    private Componente componente;
 }
