@@ -4,8 +4,7 @@ import lombok.Getter;
 
 @Getter // Adiciona o getter automaticamente com Lombok, resolvendo o aviso
 public enum UserRole {
-    ADMIN("admin"),
-    USER("user");
+    ADMIN("admin");
 
     // Torna o campo final (imutável), que é uma boa prática para Enums
     private final String role;
