@@ -4,8 +4,10 @@ import com.example.Back.Dto.ComponenteDTO;
 import com.example.Back.Entity.Componente;
 import com.example.Back.Entity.Historico;
 import com.example.Back.Entity.TipoMovimentacao;
+import com.example.Back.Entity.Usuario;
 import com.example.Back.Repository.ComponenteRepository;
 import com.example.Back.Repository.HistoricoRepository;
+import com.example.Back.Repository.UsuarioRepository;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -21,14 +23,14 @@ public class ComponenteService {
     private final ComponenteRepository componenteRepository;
     private final HistoricoRepository historicoRepository;
     private final RequisicaoService requisicaoService;
+    private final UsuarioRepository usuarioRepository; // NOVO: Injeção do repositório de usuário
 
-    public ComponenteService(ComponenteRepository componenteRepository, HistoricoRepository historicoRepository, RequisicaoService requisicaoService) {
+    public ComponenteService(ComponenteRepository componenteRepository, HistoricoRepository historicoRepository, RequisicaoService requisicaoService, UsuarioRepository usuarioRepository) {
         this.componenteRepository = componenteRepository;
         this.historicoRepository = historicoRepository;
         this.requisicaoService = requisicaoService;
+        this.usuarioRepository = usuarioRepository;
     }
-
-    // --- MÉTODOS PÚBLICOS DO SERVIÇO ---
 
     @Transactional(readOnly = true)
     public List<ComponenteDTO> findAll(String termoDeBusca) {
@@ -45,15 +47,23 @@ public class ComponenteService {
 
     @Transactional
     public ComponenteDTO create(ComponenteDTO dto) {
-        if (componenteRepository.existsByCodigoPatrimonio(dto.getCodigoPatrimonio())) {
-            throw new IllegalArgumentException("Código de património já está em uso.");
-        }
+        // REMOVIDO: A validação de unicidade do código de patrimônio.
+        // O código agora é gerado automaticamente, então não há necessidade de verificar se já existe.
+
+        // OBTEM o domínio do utilizador logado para a geração do código
+        String usuarioEmail = SecurityContextHolder.getContext().getAuthentication().getName();
+        Usuario usuario = usuarioRepository.findByEmail(usuarioEmail)
+                .orElseThrow(() -> new RuntimeException("Utilizador autenticado não encontrado."));
+        String dominioEmpresa = usuario.getDominioEmpresa();
 
         Componente componente = toEntity(dto);
+
+        // NOVO: Geração automática do código de patrimônio
+        componente.setCodigoPatrimonio(dominioEmpresa + "-" + UUID.randomUUID().toString());
+
         Componente componenteSalvo = componenteRepository.save(componente);
         criarRegistroHistorico(componenteSalvo, TipoMovimentacao.ENTRADA, componenteSalvo.getQuantidade());
 
-        // Verifica se o novo item já está abaixo do nível mínimo
         if (componenteSalvo.getQuantidade() <= componenteSalvo.getNivelMinimoEstoque()) {
             requisicaoService.criarRequisicaoParaItem(componenteSalvo);
         }
@@ -68,7 +78,6 @@ public class ComponenteService {
 
         int quantidadeAntiga = componenteExistente.getQuantidade();
 
-        // Atualiza a entidade com os dados do DTO
         componenteExistente.setNome(dto.getNome());
         componenteExistente.setCodigoPatrimonio(dto.getCodigoPatrimonio());
         componenteExistente.setQuantidade(dto.getQuantidade());
@@ -102,8 +111,6 @@ public class ComponenteService {
 
         componenteRepository.delete(componente);
     }
-
-    // --- MÉTODOS PRIVADOS AUXILIARES ---
 
     private void criarRegistroHistorico(Componente componente, TipoMovimentacao tipo, int quantidade) {
         String emailUsuario = SecurityContextHolder.getContext().getAuthentication().getName();

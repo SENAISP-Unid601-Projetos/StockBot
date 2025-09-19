@@ -3,7 +3,7 @@ package com.example.Back.Service;
 import com.example.Back.Dto.CreateUserDTO;
 import com.example.Back.Dto.PasswordChangeDTO;
 import com.example.Back.Dto.UsuarioDTO;
-import com.example.Back.Entity.UserRole; // Importação correta
+import com.example.Back.Entity.UserRole;
 import com.example.Back.Entity.Usuario;
 import com.example.Back.Repository.UsuarioRepository;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -38,21 +38,16 @@ public class UsuarioService {
         Usuario novoUsuario = new Usuario();
         novoUsuario.setEmail(createUserDTO.getEmail());
         novoUsuario.setSenha(passwordEncoder.encode(createUserDTO.getSenha()));
-        novoUsuario.setRole(createUserDTO.getRole());
+
+        // Altere estas duas linhas para setar a role como ADMIN e pegar o domínio do DTO
+        novoUsuario.setRole(UserRole.ADMIN);
+        novoUsuario.setDominioEmpresa(createUserDTO.getDominioEmpresa());
 
         Usuario usuarioSalvo = usuarioRepository.save(novoUsuario);
         return toDTO(usuarioSalvo);
     }
 
-    // --- MÉTODO CORRIGIDO ---
-    @Transactional
-    public UsuarioDTO changeUserRole(Long userId, UserRole newRole) { // <-- TIPO CORRIGIDO AQUI
-        Usuario usuario = usuarioRepository.findById(userId)
-                .orElseThrow(() -> new RuntimeException("Utilizador não encontrado."));
-        usuario.setRole(newRole); // Agora os tipos são compatíveis
-        Usuario usuarioSalvo = usuarioRepository.save(usuario);
-        return toDTO(usuarioSalvo);
-    }
+    // O método changeUserRole foi removido, pois não há mais a necessidade de alterar a função do usuário.
 
     public void deleteUser(Long id) {
         if (!usuarioRepository.existsById(id)) {
