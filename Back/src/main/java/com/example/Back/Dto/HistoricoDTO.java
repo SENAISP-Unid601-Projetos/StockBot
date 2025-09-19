@@ -12,12 +12,19 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 public class HistoricoDTO {
 
+// A ORDEM DOS CAMPOS AGORA CORRESPONDE À CHAMADA NO SERVICE
+
     private Long id;
-    private String codigoMovimentacao;
-    @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss.SSS")
-    private LocalDateTime dataHora;
+    private Long componenteId;
+    private String componenteNome;
     private TipoMovimentacao tipo;
-    private Long componenteId; // Usamos apenas o ID do componente
     private int quantidade;
     private String usuario;
+
+    @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
+    private LocalDateTime dataHora;
+
+    private String codigoMovimentacao;
+
+
 }

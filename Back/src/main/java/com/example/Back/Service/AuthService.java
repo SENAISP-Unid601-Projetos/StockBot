@@ -3,6 +3,7 @@ package com.example.Back.Service;
 import com.example.Back.Dto.AuthDTO;
 import com.example.Back.Dto.RegisterDTO;
 import com.example.Back.Entity.Usuario;
+import com.example.Back.Entity.UserRole;
 import com.example.Back.Repository.UsuarioRepository;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -42,7 +43,11 @@ public class AuthService {
         Usuario novoUsuario = new Usuario();
         novoUsuario.setEmail(data.email());
         novoUsuario.setSenha(passwordEncoder.encode(data.senha()));
-        novoUsuario.setRole(data.role());
+        novoUsuario.setRole(UserRole.ADMIN);
+
+        // NOVO: Adiciona o domínio da empresa
+        novoUsuario.setDominioEmpresa(data.dominioEmpresa());
+
         this.usuarioRepository.save(novoUsuario);
     }
 }

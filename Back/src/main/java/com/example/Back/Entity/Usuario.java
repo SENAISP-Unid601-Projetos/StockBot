@@ -28,6 +28,9 @@ public class Usuario implements UserDetails {
     @Column(nullable = false)
     private String senha;
 
+    @Column(nullable = false)
+    private String dominioEmpresa;
+
     // CORRIGIDO: O tipo do campo agora é o nosso enum oficial UserRole
     @Enumerated(EnumType.STRING)
     private UserRole role;
@@ -35,12 +38,9 @@ public class Usuario implements UserDetails {
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         // CORRIGIDO: A verificação agora usa o enum UserRole
-        if (this.role == UserRole.ADMIN) {
-            return List.of(new SimpleGrantedAuthority("ROLE_ADMIN"), new SimpleGrantedAuthority("ROLE_USER"));
-        } else {
-            return List.of(new SimpleGrantedAuthority("ROLE_USER"));
+            return List.of(new SimpleGrantedAuthority("ROLE_ADMIN"));
         }
-    }
+
 
     @Override
     public String getPassword() { return this.senha; }

@@ -4,8 +4,10 @@ import com.example.Back.Dto.ComponenteDTO;
 import com.example.Back.Entity.Componente;
 import com.example.Back.Entity.Historico;
 import com.example.Back.Entity.TipoMovimentacao;
+import com.example.Back.Entity.Usuario;
 import com.example.Back.Repository.ComponenteRepository;
 import com.example.Back.Repository.HistoricoRepository;
+import com.example.Back.Repository.UsuarioRepository;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -20,36 +22,55 @@ public class ComponenteService {
 
     private final ComponenteRepository componenteRepository;
     private final HistoricoRepository historicoRepository;
+    private final RequisicaoService requisicaoService;
+    private final UsuarioRepository usuarioRepository; // NOVO: Injeção do repositório de usuário
 
-    // MELHORIA: Injeção de dependências via construtor
-    public ComponenteService(ComponenteRepository componenteRepository, HistoricoRepository historicoRepository) {
+    public ComponenteService(ComponenteRepository componenteRepository, HistoricoRepository historicoRepository, RequisicaoService requisicaoService, UsuarioRepository usuarioRepository) {
         this.componenteRepository = componenteRepository;
         this.historicoRepository = historicoRepository;
+        this.requisicaoService = requisicaoService;
+        this.usuarioRepository = usuarioRepository;
     }
 
-    // Retorna uma lista de DTOs, não de Entidades
     @Transactional(readOnly = true)
-    public List<ComponenteDTO> findAll() {
-        return componenteRepository.findAll().stream()
+    public List<ComponenteDTO> findAll(String termoDeBusca) {
+        List<Componente> componentes;
+        if (termoDeBusca == null || termoDeBusca.trim().isEmpty()) {
+            componentes = componenteRepository.findAll();
+        } else {
+            componentes = componenteRepository.searchByTermo(termoDeBusca);
+        }
+        return componentes.stream()
                 .map(this::toDTO)
                 .collect(Collectors.toList());
     }
 
-    // MELHORIA: Método separado apenas para CRIAR
     @Transactional
     public ComponenteDTO create(ComponenteDTO dto) {
-        // Validação para impedir patrimônio duplicado
-        if (componenteRepository.existsByCodigoPatrimonio(dto.getCodigoPatrimonio())) {
-            throw new IllegalArgumentException("Código de património já está em uso.");
-        }
+        // REMOVIDO: A validação de unicidade do código de patrimônio.
+        // O código agora é gerado automaticamente, então não há necessidade de verificar se já existe.
+
+        // OBTEM o domínio do utilizador logado para a geração do código
+        String usuarioEmail = SecurityContextHolder.getContext().getAuthentication().getName();
+        Usuario usuario = usuarioRepository.findByEmail(usuarioEmail)
+                .orElseThrow(() -> new RuntimeException("Utilizador autenticado não encontrado."));
+        String dominioEmpresa = usuario.getDominioEmpresa();
 
         Componente componente = toEntity(dto);
+
+        // NOVO: Geração automática do código de patrimônio
+        componente.setCodigoPatrimonio(dominioEmpresa + "-" + UUID.randomUUID().toString());
+
         Componente componenteSalvo = componenteRepository.save(componente);
         criarRegistroHistorico(componenteSalvo, TipoMovimentacao.ENTRADA, componenteSalvo.getQuantidade());
+
+        if (componenteSalvo.getQuantidade() <= componenteSalvo.getNivelMinimoEstoque()) {
+            requisicaoService.criarRequisicaoParaItem(componenteSalvo);
+        }
+
         return toDTO(componenteSalvo);
     }
 
-    // MELHORIA: Método separado apenas para ATUALIZAR
     @Transactional
     public ComponenteDTO update(Long id, ComponenteDTO dto) {
         Componente componenteExistente = componenteRepository.findById(id)
@@ -57,42 +78,40 @@ public class ComponenteService {
 
         int quantidadeAntiga = componenteExistente.getQuantidade();
 
-        // Atualiza a entidade com os dados do DTO
         componenteExistente.setNome(dto.getNome());
         componenteExistente.setCodigoPatrimonio(dto.getCodigoPatrimonio());
         componenteExistente.setQuantidade(dto.getQuantidade());
         componenteExistente.setLocalizacao(dto.getLocalizacao());
         componenteExistente.setCategoria(dto.getCategoria());
         componenteExistente.setObservacoes(dto.getObservacoes());
+        componenteExistente.setNivelMinimoEstoque(dto.getNivelMinimoEstoque());
 
         Componente componenteAtualizado = componenteRepository.save(componenteExistente);
         int quantidadeNova = componenteAtualizado.getQuantidade();
         int diferenca = quantidadeNova - quantidadeAntiga;
 
-        if (diferenca > 0) {
-            criarRegistroHistorico(componenteAtualizado, TipoMovimentacao.ENTRADA, diferenca);
-        } else if (diferenca < 0) {
-            criarRegistroHistorico(componenteAtualizado, TipoMovimentacao.SAIDA, Math.abs(diferenca));
+        if (diferenca != 0) {
+            criarRegistroHistorico(componenteAtualizado, diferenca > 0 ? TipoMovimentacao.ENTRADA : TipoMovimentacao.SAIDA, Math.abs(diferenca));
+        }
+
+        if (componenteAtualizado.getQuantidade() <= componenteAtualizado.getNivelMinimoEstoque()) {
+            requisicaoService.criarRequisicaoParaItem(componenteAtualizado);
         }
 
         return toDTO(componenteAtualizado);
     }
 
-    // MELHORIA: Lida com o histórico antes de apagar
     @Transactional
     public void delete(Long id) {
         Componente componente = componenteRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Componente não encontrado com o id: " + id));
 
-        // Apaga o histórico associado primeiro
         List<Historico> historicos = historicoRepository.findByComponenteId(id);
         historicoRepository.deleteAll(historicos);
 
-        // Depois apaga o componente
         componenteRepository.delete(componente);
     }
 
-    // Função privada para criar histórico (perfeita como estava)
     private void criarRegistroHistorico(Componente componente, TipoMovimentacao tipo, int quantidade) {
         String emailUsuario = SecurityContextHolder.getContext().getAuthentication().getName();
         Historico historico = new Historico();
@@ -105,7 +124,6 @@ public class ComponenteService {
         historicoRepository.save(historico);
     }
 
-    // Funções auxiliares para converter entre Entidade e DTO
     private ComponenteDTO toDTO(Componente componente) {
         return new ComponenteDTO(
                 componente.getId(),
@@ -114,7 +132,8 @@ public class ComponenteService {
                 componente.getQuantidade(),
                 componente.getLocalizacao(),
                 componente.getCategoria(),
-                componente.getObservacoes()
+                componente.getObservacoes(),
+                componente.getNivelMinimoEstoque()
         );
     }
 
@@ -126,6 +145,7 @@ public class ComponenteService {
         componente.setLocalizacao(dto.getLocalizacao());
         componente.setCategoria(dto.getCategoria());
         componente.setObservacoes(dto.getObservacoes());
+        componente.setNivelMinimoEstoque(dto.getNivelMinimoEstoque());
         return componente;
     }
 }

@@ -28,6 +28,7 @@ public class Componente {
     private String localizacao;
     private String categoria;
     private String observacoes;
+    private int nivelMinimoEstoque;
 
     @OneToMany(mappedBy = "componente", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Historico> historicos;

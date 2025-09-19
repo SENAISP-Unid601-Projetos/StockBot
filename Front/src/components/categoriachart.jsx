@@ -1,60 +1,82 @@
-// src/components/categoriachart.jsx
+import React from 'react';
 import { Doughnut } from 'react-chartjs-2';
 import { Chart as ChartJS, ArcElement, Tooltip, Legend } from 'chart.js';
-import './categoriachart.css';
+import { Box, Paper, Typography, useTheme } from '@mui/material';
 
 // Registra os plugins necessários do Chart.js
 ChartJS.register(ArcElement, Tooltip, Legend);
 
 function CategoryChart({ componentes }) {
+  // Acessa o tema do MUI
+  const theme = useTheme();
 
-  // MUDANÇA: Agora processamos os dados por NOME do componente, não por categoria.
+  // Processamento de dados para o gráfico
   const dadosGrafico = {};
   componentes.forEach(comp => {
-    // Usamos o nome do componente como chave e somamos a sua quantidade
     dadosGrafico[comp.nome] = (dadosGrafico[comp.nome] || 0) + comp.quantidade;
   });
 
-  // Prepara os dados para o formato que o Chart.js entende
   const chartData = {
-    labels: Object.keys(dadosGrafico), // Os nomes dos componentes
+    labels: Object.keys(dadosGrafico),
     datasets: [
       {
         label: 'Quantidade em Stock',
-        data: Object.values(dadosGrafico), // As quantidades de cada componente
-        backgroundColor: [ // Adicionei mais cores para mais componentes
-          '#002D5B', '#C00000', '#FFD700', '#2ecc71', '#9b59b6',
-          '#3498db', '#e67e22', '#1abc9c', '#e74c3c', '#f1c40f'
+        data: Object.values(dadosGrafico),
+        backgroundColor: [
+          theme.palette.primary.main,
+          theme.palette.secondary.main,
+          '#FFC107', // Amarelo
+          '#28a745', // Verde
+          '#6f42c1', // Roxo
+          '#17a2b8', // Ciano
+          '#fd7e14', // Laranja
+          '#e83e8c', // Rosa
         ],
-        borderColor: '#ffffff',
-        borderWidth: 2,
-        hoverOffset: 8
+        borderColor: theme.palette.background.paper,
+        borderWidth: 3,
+        hoverOffset: 8,
       },
     ],
   };
 
-  // Opções para customizar a aparência do gráfico
+  // Opções do gráfico usando o tema do MUI
   const chartOptions = {
     responsive: true,
     maintainAspectRatio: false,
     plugins: {
       legend: {
-        position: 'top',
+        position: 'right',
+        labels: {
+          color: theme.palette.text.secondary,
+          font: {
+            family: theme.typography.fontFamily,
+          },
+        },
       },
       title: {
-        display: true,
-        text: 'Distribuição de Quantidade por Componente', // Título atualizado
-        font: {
-          size: 18
-        }
+        display: false,
       },
+      tooltip: {
+        titleFont: {
+          family: theme.typography.fontFamily,
+        },
+        bodyFont: {
+          family: theme.typography.fontFamily,
+        },
+      }
     },
+    cutout: '60%',
   };
 
   return (
-    <div className="chart-card">
-      <Doughnut data={chartData} options={chartOptions} />
-    </div>
+    <Paper sx={{ p: 2, height: '100%', display: 'flex', flexDirection: 'column' }}>
+      <Typography variant="h6" component="h3" gutterBottom>
+        Distribuição de Itens
+      </Typography>
+      <Box sx={{ position: 'relative', flexGrow: 1, minHeight: '300px' }}>
+        <Doughnut data={chartData} options={chartOptions} />
+      </Box>
+    </Paper>
   );
 }
 

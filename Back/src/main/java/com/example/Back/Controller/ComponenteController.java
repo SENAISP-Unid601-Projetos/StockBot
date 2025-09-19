@@ -14,44 +14,41 @@ public class ComponenteController {
 
     private final ComponenteService componenteService;
 
-    // Injeção de dependências via construtor
     public ComponenteController(ComponenteService componenteService) {
         this.componenteService = componenteService;
     }
 
-    // --- MÉTODOS ATUALIZADOS PARA USAR OS NOMES CORRETOS DO SERVICE ---
-
-    // TODOS os utilizadores autenticados podem ver a lista
+    // --- MÉTODO GET CORRIGIDO PARA ACEITAR BUSCA ---
     @GetMapping
-    public ResponseEntity<List<ComponenteDTO>> getAllComponentes() {
-        // Correto: chama o método findAll() que retorna uma List<ComponenteDTO>
-        return ResponseEntity.ok(componenteService.findAll());
+    public ResponseEntity<List> getAllComponentes(
+// @RequestParam pega um parâmetro da URL, como "?termo=parafuso"
+// required = false significa que o parâmetro é opcional
+            @RequestParam(value = "termo", required = false) String termoDeBusca) {
+
+// Passa o termo de busca (que pode ser null) para o service
+        List<ComponenteDTO> componentes = componenteService.findAll(termoDeBusca);
+        return ResponseEntity.ok(componentes);
     }
 
-    // APENAS ADMINS podem criar um novo componente
     @PostMapping
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<ComponenteDTO> createComponente(@RequestBody ComponenteDTO componenteDTO) {
-        // Correto: chama o método create(ComponenteDTO)
+    public ResponseEntity createComponente(@RequestBody ComponenteDTO componenteDTO) {
         ComponenteDTO novoComponente = componenteService.create(componenteDTO);
         return ResponseEntity.ok(novoComponente);
     }
 
-    // APENAS ADMINS podem atualizar um componente
     @PutMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<ComponenteDTO> updateComponente(@PathVariable Long id, @RequestBody ComponenteDTO componenteDTO) {
-        // Correto: chama o método update(Long, ComponenteDTO)
+    public ResponseEntity updateComponente(@PathVariable Long id, @RequestBody ComponenteDTO componenteDTO) {
         ComponenteDTO componenteAtualizado = componenteService.update(id, componenteDTO);
         return ResponseEntity.ok(componenteAtualizado);
     }
 
-    // APENAS ADMINS podem apagar um componente
     @DeleteMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<Void> deleteComponente(@PathVariable Long id) {
-        // Correto: chama o método delete(Long)
+    public ResponseEntity deleteComponente(@PathVariable Long id) {
         componenteService.delete(id);
         return ResponseEntity.noContent().build();
     }
+
 }

@@ -3,7 +3,7 @@ package com.example.Back.Controller;
 import com.example.Back.Dto.CreateUserDTO;
 import com.example.Back.Dto.PasswordChangeDTO;
 import com.example.Back.Dto.UsuarioDTO;
-import com.example.Back.Entity.UserRole; // A importação correta
+import com.example.Back.Entity.UserRole;
 import com.example.Back.Service.UsuarioService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
@@ -37,12 +37,14 @@ public class UsuarioController {
         return new ResponseEntity<>(novoUsuario, HttpStatus.CREATED);
     }
 
-    // --- MÉTODO CORRIGIDO ---
+    // REMOVA ESTE BLOCO DE CÓDIGO INTEIRO
+    /*
     @PutMapping("/{id}/role")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<UsuarioDTO> changeUserRole(@PathVariable Long id, @RequestBody UserRole newRole) { // <-- TIPO CORRIGIDO AQUI
+    public ResponseEntity<UsuarioDTO> changeUserRole(@PathVariable Long id, @RequestBody UserRole newRole) {
         return ResponseEntity.ok(usuarioService.changeUserRole(id, newRole));
     }
+    */
 
     @DeleteMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
