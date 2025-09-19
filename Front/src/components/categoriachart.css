@@ -1,0 +1,10 @@
+/* src/components/CategoryChart.css */
+
+.chart-card {
+  background-color: var(--branco);
+  padding: 1.5rem;
+  border-radius: var(--border-radius-padrao);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  /* Definimos uma altura para o gráfico ter onde "crescer" */
+  height: 400px; 
+}
