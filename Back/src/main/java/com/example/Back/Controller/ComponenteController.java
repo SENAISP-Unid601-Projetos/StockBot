@@ -7,6 +7,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/componentes")
@@ -51,4 +52,11 @@ public class ComponenteController {
         return ResponseEntity.noContent().build();
     }
 
+    @PostMapping("/{id}/perda")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity registrarPerda(@PathVariable Long id, @RequestBody Map<String, Integer> payload) {
+        int quantidade = payload.get("quantidade");
+        componenteService.registrarPerda(id, quantidade);
+        return ResponseEntity.ok().build();
+    }
 }
