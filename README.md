@@ -20,3 +20,12 @@ https://www.canva.com/design/DAGqMScxKQY/j3Q8ZttzbAuP0oYw7vH-XA/edit?utm_content
 ## Explicação das novas tarefas
 
 https://docs.google.com/document/d/1qkGhtrSJM8FIXs63-ss4oLTTcXHpVsHmDt-EJ6RjtcA/edit?usp=sharing
+
+## Criar usuário pelo Thunder Client
+
+POST - http://localhost:8080/api/auth/register
+Email
+Senha
+Dominio da empresa
+
+<img width="774" height="461" alt="image" src="https://github.com/user-attachments/assets/29201a31-febc-43a7-abee-6bb7a70ca64e" />
