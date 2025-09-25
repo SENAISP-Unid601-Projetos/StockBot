@@ -1,5 +1,5 @@
 # StockBot
- Inventario de materiais Escolares(Elétrica)
+ Inventario de materiais Para empresas (Almoxirifado)
 
 ## Novo Banco
 https://dbdiagram.io/d/6861bf81f413ba35086b59b6
