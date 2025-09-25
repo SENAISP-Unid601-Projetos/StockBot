@@ -1,0 +1,27 @@
+/* Este CSS pode reutilizar muito do seu modalcomponente.css */
+/* O mais importante é estilizar o <select> e a mensagem de erro */
+
+.modal-content select {
+  width: 100%;
+  padding: 0.75rem;
+  margin-bottom: 1rem;
+  border: 1px solid var(--cinzaMedio);
+  border-radius: var(--border-radius-padrao);
+  background-color: var(--branco);
+  font-size: 1rem;
+}
+
+body.dark .modal-content select {
+  background-color: var(--cinzaMedio);
+  color: var(--cinzaEscuroTexto);
+  border-color: #444;
+}
+
+.error-message {
+  color: var(--vermelho-alerta);
+  background-color: rgba(220, 53, 69, 0.1);
+  padding: 0.75rem;
+  border-radius: var(--border-radius-padrao);
+  margin-top: 1rem;
+  text-align: center;
+}
