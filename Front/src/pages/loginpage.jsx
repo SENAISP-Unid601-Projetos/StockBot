@@ -1,12 +1,9 @@
-/*
-* File: senaisp-unid601-projetos/stockbot/StockBot-19a9513533a1e735515fdc76ec3de9e98b02cee9/Front/src/pages/loginpage.jsx
-*/
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios'; // Usa o axios normal
 import './loginpage.css';
 
-const apiUrl = 'http://localhost:8081/api/auth';
+const apiUrl = 'http://localhost:8080/api/auth';
 
 function LoginPage() {
   const [email, setEmail] = useState('');
@@ -33,12 +30,12 @@ function LoginPage() {
         <form id="login-form" onSubmit={handleLogin}>
           <h2>Acessar o StockBot</h2>
           <label htmlFor="dominio">Domínio da Empresa</label>
-          <input 
-            type="text" 
+          <input
+            type="text"
             id="dominio"
             value={dominioEmpresa}
             onChange={(e) => setDominioEmpresa(e.target.value)}
-            required 
+            required
           />
           <label htmlFor="email">E-mail</label>
           <input 
