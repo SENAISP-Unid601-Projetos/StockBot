@@ -1,6 +1,4 @@
-/*
-* File: senaisp-unid601-projetos/stockbot/StockBot-19a9513533a1e735515fdc76ec3de9e98b02cee9/Front/src/pages/loginpage.jsx
-*/
+
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios'; // Usa o axios normal
