@@ -28,6 +28,12 @@ public class AuthService {
 
     public String login(AuthDTO data) {
         try {
+            Usuario usuario = usuarioRepository.findByEmail(data.email())
+                    .orElseThrow(() -> new RuntimeException("E-mail ou senha inválidos."));
+
+            if (!usuario.getDominioEmpresa().equals(data.dominioEmpresa())) {
+                throw new RuntimeException("Domínio da empresa inválido.");
+            }
             var usernamePassword = new UsernamePasswordAuthenticationToken(data.email(), data.senha());
             var auth = this.authenticationManager.authenticate(usernamePassword);
             return tokenService.gerarToken((Usuario) auth.getPrincipal());
