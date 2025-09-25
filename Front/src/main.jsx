@@ -3,6 +3,7 @@ import ReactDOM from "react-dom/client";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import cadastroUsuariopages from "./pages/cadastroUsuariopages.jsx";
 
 import App from "./App.jsx";
 import LoginPage from "./pages/loginpage.jsx";
