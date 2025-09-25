@@ -1,0 +1,47 @@
+/* src/components/Sidebar.css */
+
+.sidebar {
+  display: flex;
+  flex-direction: column;
+  background-color: var(--azulEscuro);
+  color: var(--branco);
+  width: 250px;
+  height: 100vh; /* Ocupa 100% da altura da tela */
+  padding: 1rem;
+  transition: width 0.3s ease; /* Animação para encolher */
+}
+
+.sidebar h2 {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.sidebar .nav-link {
+  color: var(--cinzaClaro);
+  text-decoration: none;
+  padding: 1rem;
+  border-radius: var(--border-radius-padrao);
+  margin-bottom: 0.5rem;
+  display: flex;
+  align-items: center;
+  gap: 1rem; /* Espaço entre o ícone e o texto */
+}
+
+.sidebar .nav-link:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+.sidebar .nav-link.active {
+  background-color: var(--vermelhoSenai);
+  color: var(--branco);
+  font-weight: bold;
+}
+/* Adicione ao final de src/components/Sidebar.css */
+.logout-button {
+  width: 100%;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: inherit;
+}
