@@ -1,31 +1,62 @@
 package com.example.Back.Entity;
 
 import jakarta.persistence.*;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
-import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.AllArgsConstructor;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
+
+import java.util.Collection;
+import java.util.List;
 
 @Entity
+@Table(name = "usuarios")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "tipo_usuario")
-@Inheritance(strategy = InheritanceType.JOINED)
-public class Usuario {
+public class Usuario implements UserDetails {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    @NotBlank
-    @Column(name = "nome", length = 100)
-    private String nome;
-    @NotBlank
-    @Column(name = "email", nullable = false, length = 100)
+
+    @Column(nullable = false, unique = true)
     private String email;
-    @Column(name = "senha", nullable = false, length = 16)
+
+    @Column(nullable = false)
     private String senha;
+
+    @Column(nullable = false)
+    private String dominioEmpresa;
+
+    // CORRIGIDO: O tipo do campo agora é o nosso enum oficial UserRole
     @Enumerated(EnumType.STRING)
-    @Column(name = "tipo", nullable = false)
-    private UserType tipo;
+    private UserRole role;
+
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        // CORRIGIDO: A verificação agora usa o enum UserRole
+            return List.of(new SimpleGrantedAuthority("ROLE_ADMIN"));
+        }
+
+
+    @Override
+    public String getPassword() { return this.senha; }
+
+    @Override
+    public String getUsername() { return this.email; }
+
+    @Override
+    public boolean isAccountNonExpired() { return true; }
+
+    @Override
+    public boolean isAccountNonLocked() { return true; }
+
+    @Override
+    public boolean isCredentialsNonExpired() { return true; }
+
+    @Override
+    public boolean isEnabled() { return true; }
 }

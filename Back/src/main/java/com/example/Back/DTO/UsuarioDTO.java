@@ -1,6 +1,6 @@
-package com.example.Back.DTO;
+package com.example.Back.Dto;
 
-import com.example.Back.Entity.UserType;
+import com.example.Back.Entity.UserRole;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -10,7 +10,6 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class UsuarioDTO {
     private Long id;
-    private String nome;
     private String email;
-    private UserType tipo;
+    private UserRole role;
 }
