@@ -100,7 +100,7 @@ function DashboardPage() {
 
   return (
     // Box é a `div` do MUI. `display: 'flex'` coloca a sidebar e o conteúdo lado a lado.
-    <Box sx={{ display: 'flex' }}>
+    <>
       {/* O App.jsx já renderiza a Sidebar, então podemos remover daqui */}
       
       {/* O conteúdo principal da página */}
@@ -159,7 +159,7 @@ function DashboardPage() {
           )}
         </Container>
       </Box>
-    </Box>
+    </>
   );
 }
 

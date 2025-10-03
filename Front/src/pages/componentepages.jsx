@@ -82,7 +82,7 @@ setModalVisible(true);
 // 3. A NOVA ESTRUTURA VISUAL COM COMPONENTES MUI
 return (
 // Box: Pense nele como uma div superpoderosa. Usamo-lo para layouts.
-<Box sx={{ display: 'flex' }}>
+<>
 
     {/* O conteúdo principal da página */}
     <Box component="main" sx={{ flexGrow: 1, p: 3, backgroundColor: '#f8f9fa', minHeight: '100vh' }}>
@@ -157,7 +157,7 @@ return (
         onComponenteAdicionado={fetchData}
         componenteParaEditar={componenteEmEdicao}
     />
-</Box>
+</>
 );
 
 
