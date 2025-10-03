@@ -83,10 +83,10 @@ setModalVisible(true);
 return (
 // Box: Pense nele como uma div superpoderosa. Usamo-lo para layouts.
 <>
-
     {/* O conteúdo principal da página */}
     <Box component="main" sx={{ flexGrow: 1, p: 3, backgroundColor: '#f8f9fa', minHeight: '100vh' }}>
         {/* Header da página */}
+        <Container maxWidth="lg">
         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 4 }}>
             {/* Typography: Use sempre para textos. Garante consistência. */}
             <Typography variant="h4" component="h1" fontWeight="bold">
@@ -149,6 +149,7 @@ return (
                 </TableContainer>
             </Paper>
         )}
+        </Container>
     </Box>
 
     <ModalComponente 
