@@ -95,6 +95,7 @@ function ConfiguracoesPage() {
   return (
     <Box sx={{ display: "flex" }}>
       <Sidebar />
+    <>
       <Box
         component="main"
         sx={{ flexGrow: 1, p: 3, backgroundColor: "#f8f9fa" }}
@@ -181,6 +182,7 @@ function ConfiguracoesPage() {
           onUserAdded={fetchUsers}
         />
       </Box>
+    </>
     </Box>
   );
 }
