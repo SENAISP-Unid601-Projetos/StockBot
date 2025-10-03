@@ -101,7 +101,6 @@ function DashboardPage() {
   return (
     // Box é a `div` do MUI. `display: 'flex'` coloca a sidebar e o conteúdo lado a lado.
     <>
-    <Box sx={{ display: 'flex' }}>
       {/* O App.jsx já renderiza a Sidebar, então podemos remover daqui */}
       
       {/* O conteúdo principal da página */}
@@ -147,12 +146,12 @@ function DashboardPage() {
               {/* --- LINHA DAS AÇÕES E GRÁFICO --- */}
               <Grid item xs={12} lg={8}>
                 {/* Paper: Um "pedaço de papel" elevado com sombra. Ótimo para envolver componentes. */}
-                <Paper sx={{ p: 2, height: '100%' }}>
+                <Paper sx={{ p: 2, height: '100%', boxShadow:'none' }}>
                   <CategoryChart componentes={componentes} />
                 </Paper>
               </Grid>
               <Grid item xs={12} lg={4}>
-                <Paper sx={{ p: 2, height: '100%' }}>
+                <Paper sx={{ p: 2, height: '100%', boxShadow: 'none' }}>
                   <ActionList title="Itens com Stock Baixo" items={itensEstoqueBaixo} />
                 </Paper>
               </Grid>
@@ -161,7 +160,6 @@ function DashboardPage() {
         </Container>
       </Box>
     </>
-    </Box>
   );
 }
 

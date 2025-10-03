@@ -93,8 +93,6 @@ function ConfiguracoesPage() {
   };
 
   return (
-    <Box sx={{ display: "flex" }}>
-      <Sidebar />
     <>
       <Box
         component="main"
@@ -183,7 +181,6 @@ function ConfiguracoesPage() {
         />
       </Box>
     </>
-    </Box>
   );
 }
 
