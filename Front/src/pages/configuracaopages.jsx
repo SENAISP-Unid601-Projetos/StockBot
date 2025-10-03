@@ -22,7 +22,7 @@ import ModalAddUser from "../components/modaladduser.jsx";
 
 function ConfiguracoesPage() {
   const { theme, toggleTheme } = useContext(ThemeContext);
-
+  console.log("[ConfiguracoesPage] Recebeu o tema do contexto:", theme);
   const [isAdmin, setIsAdmin] = useState(false);
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -93,93 +93,91 @@ function ConfiguracoesPage() {
   };
 
   return (
-    <Box sx={{ display: "flex" }}>
-      <Box
-        component="main"
-        sx={{ flexGrow: 1, p: 3, backgroundColor: "#f8f9fa" }}
-      >
-        <Container maxWidth="lg">
-          <Typography
-            variant="h4"
-            component="h1"
-            fontWeight="bold"
-            sx={{ mb: 4 }}
-          >
-            Configurações
+    <Box
+      component="main"
+      sx={{ flexGrow: 1, p: 3, backgroundColor: "background.default" }}
+    >
+      <Container maxWidth="lg">
+        <Typography
+          variant="h4"
+          component="h1"
+          fontWeight="bold"
+          sx={{ mb: 4 }}
+        >
+          Configurações
+        </Typography>
+
+        {/* Secção de Aparência com componentes MUI */}
+        <Paper sx={{ p: 3, mb: 4, boxShadow: 3 }}>
+          <Typography variant="h6" gutterBottom>
+            Aparência
           </Typography>
+          <FormControlLabel
+            control={
+              <Switch checked={theme === "dark"} onChange={toggleTheme} />
+            }
+            label="Modo Escuro"
+          />
+        </Paper>
 
-          {/* Secção de Aparência com componentes MUI */}
-          <Paper sx={{ p: 3, mb: 4, boxShadow: 3 }}>
-            <Typography variant="h6" gutterBottom>
-              Aparência
-            </Typography>
-            <FormControlLabel
-              control={
-                <Switch checked={theme === "dark"} onChange={toggleTheme} />
-              }
-              label="Modo Escuro"
-            />
-          </Paper>
-
-          {/* Secção de Gestão de Utilizadores */}
-          {isAdmin && (
-            <Paper sx={{ p: 3, boxShadow: 3 }}>
-              <Box
+        {/* Secção de Gestão de Utilizadores */}
+        {isAdmin && (
+          <Paper sx={{ p: 3, boxShadow: 3 }}>
+            <Box
+              sx={{
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
+                mb: 2,
+              }}
+            >
+              <Typography variant="h6">Gestão de Utilizadores</Typography>
+              <MuiButton
+                variant="contained"
+                onClick={() => setAddUserModalVisible(true)}
                 sx={{
-                  display: "flex",
-                  justifyContent: "space-between",
-                  alignItems: "center",
-                  mb: 2,
+                  backgroundColor: "#ce0000",
+                  "&:hover": { backgroundColor: "#a40000" },
                 }}
               >
-                <Typography variant="h6">Gestão de Utilizadores</Typography>
-                <MuiButton
-                  variant="contained"
-                  onClick={() => setAddUserModalVisible(true)}
-                  sx={{
-                    backgroundColor: "#ce0000",
-                    "&:hover": { backgroundColor: "#a40000" },
-                  }}
-                >
-                  Adicionar Utilizador
+                Adicionar Utilizador
+              </MuiButton>
+            </Box>
+
+            {!isVerified ? (
+              <Box
+                component="form"
+                onSubmit={handleVerifyPassword}
+                sx={{ mt: 2, display: "flex", gap: 2, alignItems: "center" }}
+              >
+                <TextField
+                  type="password"
+                  label="Senha de Administrador"
+                  variant="outlined"
+                  size="small"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  required
+                />
+                <MuiButton type="submit" variant="contained">
+                  Verificar
                 </MuiButton>
               </Box>
-
-              {!isVerified ? (
-                <Box
-                  component="form"
-                  onSubmit={handleVerifyPassword}
-                  sx={{ mt: 2, display: "flex", gap: 2, alignItems: "center" }}
-                >
-                  <TextField
-                    type="password"
-                    label="Senha de Administrador"
-                    variant="outlined"
-                    size="small"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    required
-                  />
-                  <MuiButton type="submit" variant="contained">
-                    Verificar
-                  </MuiButton>
-                </Box>
-              ) : loading ? (
-                <Box sx={{ display: "flex", justifyContent: "center", mt: 4 }}>
-                  <CircularProgress />
-                </Box>
-              ) : (
-                <UserManagement users={users} onDeleteUser={handleDeleteUser} />
-              )}
-            </Paper>
-          )}
-        </Container>
-        <ModalAddUser
-          isVisible={isAddUserModalVisible}
-          onClose={() => setAddUserModalVisible(false)}
-          onUserAdded={fetchUsers}
-        />
-      </Box>
+            ) : loading ? (
+              <Box sx={{ display: "flex", justifyContent: "center", mt: 4 }}>
+                <CircularProgress />
+              </Box>
+            ) : (
+              <UserManagement users={users} onDeleteUser={handleDeleteUser} />
+            )}
+          </Paper>
+        )}
+      </Container>
+      <ModalAddUser
+        isVisible={isAddUserModalVisible}
+        onClose={() => setAddUserModalVisible(false)}
+        onUserAdded={fetchUsers}
+      />
     </Box>
   );
 }
