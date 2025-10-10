@@ -1,6 +1,4 @@
 import React from 'react';
-
-// 1. IMPORTAÇÕES DE COMPONENTES DO MUI
 import { Card, CardContent, Typography } from '@mui/material';
 
 // O componente recebe as mesmas props de antes
