@@ -50,34 +50,38 @@ setLoading(false);
 }
 };
 
-useEffect(() => {
-setIsUserAdmin(isAdmin());
-fetchData();
-}, []);
+  useEffect(() => {
+    setIsUserAdmin(isAdmin());
+    fetchData();
+  }, []);
 
-const handleEdit = (componente) => {
-setComponenteEmEdicao(componente);
-setModalVisible(true);
-};
+  const handleEdit = (componente) => {
+    setComponenteEmEdicao(componente);
+    setModalVisible(true);
+  };
 
-const handleDelete = async (id) => {
-// ... (a sua função handleDelete continua exatamente igual)
-if (window.confirm("Você tem certeza que deseja excluir este componente?")) {
-try {
-await api.delete(`/api/componentes/${id}`);
-toast.success('Componente excluído com sucesso!');
-setComponentes(listaAtual => listaAtual.filter(componente => componente.id !== id));
-} catch (error) {
-toast.error('Falha ao excluir o componente.');
-console.error(error);
-}
-}
-};
+  const handleDelete = async (id) => {
+    // ... (a sua função handleDelete continua exatamente igual)
+    if (
+      window.confirm("Você tem certeza que deseja excluir este componente?")
+    ) {
+      try {
+        await api.delete(`/api/componentes/${id}`);
+        toast.success("Componente excluído com sucesso!");
+        setComponentes((listaAtual) =>
+          listaAtual.filter((componente) => componente.id !== id)
+        );
+      } catch (error) {
+        toast.error("Falha ao excluir o componente.");
+        console.error(error);
+      }
+    }
+  };
 
-const handleAdd = () => {
-setComponenteEmEdicao(null);
-setModalVisible(true);
-};
+  const handleAdd = () => {
+    setComponenteEmEdicao(null);
+    setModalVisible(true);
+  };
 
 // 3. A NOVA ESTRUTURA VISUAL COM COMPONENTES MUI
 return (
@@ -106,54 +110,66 @@ return (
         </Box>
 
         {loading ? (
-            // CircularProgress: O spinner de loading do MUI.
-            <Box sx={{ display: 'flex', justifyContent: 'center', mt: 10 }}>
-                <CircularProgress />
-            </Box>
+          // CircularProgress: O spinner de loading do MUI.
+          <Box sx={{ display: "flex", justifyContent: "center", mt: 10 }}>
+            <CircularProgress />
+          </Box>
         ) : (
-            // Paper: Um "pedaço de papel" elevado. Ótimo para envolver tabelas e cards.
-            <Paper sx={{ width: '100%', overflow: 'hidden', boxShadow: 3 }}>
-                <TableContainer>
-                    <Table stickyHeader aria-label="tabela de componentes">
-                        <TableHead>
-                            <TableRow>
-                                <TableCell sx={{ fontWeight: 'bold' }}>Nome</TableCell>
-                                <TableCell sx={{ fontWeight: 'bold' }}>Patrimônio</TableCell>
-                                <TableCell sx={{ fontWeight: 'bold' }}>Quantidade</TableCell>
-                                {isUserAdmin && <TableCell sx={{ fontWeight: 'bold' }}>Ações</TableCell>}
-                            </TableRow>
-                        </TableHead>
-                        <TableBody>
-                            {componentes.map((componente) => (
-                                <TableRow hover key={componente.id}>
-                                    <TableCell>{componente.nome}</TableCell>
-                                    <TableCell>{componente.codigoPatrimonio}</TableCell>
-                                    <TableCell>{componente.quantidade}</TableCell>
-                                    {isUserAdmin && (
-                                        <TableCell>
-                                            {/* Stack: Ótimo para organizar itens (como botões) em linha com espaçamento */}
-                                            <Stack direction="row" spacing={1}>
-                                                <IconButton color="info" onClick={() => handleEdit(componente)}>
-                                                    <EditIcon />
-                                                </IconButton>
-                                                <IconButton color="error" onClick={() => handleDelete(componente.id)}>
-                                                    <DeleteIcon />
-                                                </IconButton>
-                                            </Stack>
-                                        </TableCell>
-                                    )}
-                                </TableRow>
-                            ))}
-                        </TableBody>
-                    </Table>
-                </TableContainer>
-            </Paper>
+          // Paper: Um "pedaço de papel" elevado. Ótimo para envolver tabelas e cards.
+          <Paper sx={{ width: "100%", overflow: "hidden", boxShadow: 3 }}>
+            <TableContainer>
+              <Table stickyHeader aria-label="tabela de componentes">
+                <TableHead>
+                  <TableRow>
+                    <TableCell sx={{ fontWeight: "bold" }}>Nome</TableCell>
+                    <TableCell sx={{ fontWeight: "bold" }}>
+                      Patrimônio
+                    </TableCell>
+                    <TableCell sx={{ fontWeight: "bold" }}>
+                      Quantidade
+                    </TableCell>
+                    {isUserAdmin && (
+                      <TableCell sx={{ fontWeight: "bold" }}>Ações</TableCell>
+                    )}
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {componentes.map((componente) => (
+                    <TableRow hover key={componente.id}>
+                      <TableCell>{componente.nome}</TableCell>
+                      <TableCell>{componente.codigoPatrimonio}</TableCell>
+                      <TableCell>{componente.quantidade}</TableCell>
+                      {isUserAdmin && (
+                        <TableCell>
+                          {/* Stack: Ótimo para organizar itens (como botões) em linha com espaçamento */}
+                          <Stack direction="row" spacing={1}>
+                            <IconButton
+                              color="info"
+                              onClick={() => handleEdit(componente)}
+                            >
+                              <EditIcon />
+                            </IconButton>
+                            <IconButton
+                              color="error"
+                              onClick={() => handleDelete(componente.id)}
+                            >
+                              <DeleteIcon />
+                            </IconButton>
+                          </Stack>
+                        </TableCell>
+                      )}
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </TableContainer>
+          </Paper>
         )}
         </Container>
     </Box>
 
-    <ModalComponente 
-        isVisible={isModalVisible} 
+      <ModalComponente
+        isVisible={isModalVisible}
         onClose={() => setModalVisible(false)}
         onComponenteAdicionado={fetchData}
         componenteParaEditar={componenteEmEdicao}

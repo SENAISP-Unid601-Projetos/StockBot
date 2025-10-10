@@ -123,29 +123,29 @@ function ConfiguracoesPage() {
             />
           </Paper>
 
-          {/* Secção de Gestão de Utilizadores */}
-          {isAdmin && (
-            <Paper sx={{ p: 3, boxShadow: 3 }}>
-              <Box
+        {/* Secção de Gestão de Utilizadores */}
+        {isAdmin && (
+          <Paper sx={{ p: 3, boxShadow: 3 }}>
+            <Box
+              sx={{
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
+                mb: 2,
+              }}
+            >
+              <Typography variant="h6">Gestão de Utilizadores</Typography>
+              <MuiButton
+                variant="contained"
+                onClick={() => setAddUserModalVisible(true)}
                 sx={{
-                  display: "flex",
-                  justifyContent: "space-between",
-                  alignItems: "center",
-                  mb: 2,
+                  backgroundColor: "#ce0000",
+                  "&:hover": { backgroundColor: "#a40000" },
                 }}
               >
-                <Typography variant="h6">Gestão de Utilizadores</Typography>
-                <MuiButton
-                  variant="contained"
-                  onClick={() => setAddUserModalVisible(true)}
-                  sx={{
-                    backgroundColor: "#ce0000",
-                    "&:hover": { backgroundColor: "#a40000" },
-                  }}
-                >
-                  Adicionar Utilizador
-                </MuiButton>
-              </Box>
+                Adicionar Utilizador
+              </MuiButton>
+            </Box>
 
               {!isVerified ? (
                 <Box

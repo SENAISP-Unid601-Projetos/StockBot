@@ -8,18 +8,19 @@ const apiUrl = 'http://localhost:8080/api/auth';
 function LoginPage() {
   const [email, setEmail] = useState('');
   const [senha, setSenha] = useState('');
+  const [dominioEmpresa, setDominioEmpresa] = useState(''); // Estado para o domínio da empresa
   const navigate = useNavigate();
 
   const handleLogin = async (event) => {
     event.preventDefault();
     try {
-      const response = await axios.post(`${apiUrl}/login`, { email, senha });
+      const response = await axios.post(`${apiUrl}/login`, { email, senha, dominioEmpresa });
       const token = response.data.token;
       localStorage.setItem('jwt-token', token);
       navigate('/');
     } catch (error) {
       console.error('Erro de login:', error);
-      alert('E-mail ou senha inválidos.');
+      alert('Credenciais inválidas. Verifique o e-mail, senha e domínio.');
     }
   };
 
@@ -28,6 +29,14 @@ function LoginPage() {
       <div className="form-wrapper">
         <form id="login-form" onSubmit={handleLogin}>
           <h2>Acessar o StockBot</h2>
+          <label htmlFor="dominio">Domínio da Empresa</label>
+          <input
+            type="text"
+            id="dominio"
+            value={dominioEmpresa}
+            onChange={(e) => setDominioEmpresa(e.target.value)}
+            required
+          />
           <label htmlFor="email">E-mail</label>
           <input 
             type="email" 
