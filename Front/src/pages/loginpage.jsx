@@ -31,12 +31,12 @@ function LoginPage() {
         <form id="login-form" onSubmit={handleLogin}>
           <h2>Acessar o StockBot</h2>
           <label htmlFor="dominio">Domínio da Empresa</label>
-          <input 
-            type="text" 
+          <input
+            type="text"
             id="dominio"
             value={dominioEmpresa}
             onChange={(e) => setDominioEmpresa(e.target.value)}
-            required 
+            required
           />
           <label htmlFor="email">E-mail</label>
           <input 
