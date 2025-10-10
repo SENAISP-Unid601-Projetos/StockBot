@@ -84,7 +84,7 @@ return (
 // Box: Pense nele como uma div superpoderosa. Usamo-lo para layouts.
 <>
     {/* O conteúdo principal da página */}
-    <Box component="main" sx={{ flexGrow: 1, p: 3, backgroundColor: '#f8f9fa', minHeight: '100vh' }}>
+    <Box component="main" sx={{ flexGrow: 1, p: 3, minHeight: '100vh' }}>
         {/* Header da página */}
         <Container maxWidth="lg">
         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 4 }}>
