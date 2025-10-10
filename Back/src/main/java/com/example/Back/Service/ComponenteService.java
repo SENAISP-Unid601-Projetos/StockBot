@@ -112,6 +112,19 @@ public class ComponenteService {
         componenteRepository.delete(componente);
     }
 
+    @Transactional
+    public void registrarPerda(Long id, int quantidadePerdida) {
+        Componente componente = componenteRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Componente não encontrado com o id: " + id));
+
+        int novaQuantidade = componente.getQuantidade() - quantidadePerdida;
+        componente.setQuantidade(Math.max(0, novaQuantidade)); // Evita estoque negativo
+
+        componenteRepository.save(componente);
+
+        criarRegistroHistorico(componente, TipoMovimentacao.PERDA, quantidadePerdida);
+    }
+
     private void criarRegistroHistorico(Componente componente, TipoMovimentacao tipo, int quantidade) {
         String emailUsuario = SecurityContextHolder.getContext().getAuthentication().getName();
         Historico historico = new Historico();
