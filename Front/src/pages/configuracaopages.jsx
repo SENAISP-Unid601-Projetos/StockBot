@@ -2,7 +2,8 @@ import { useState, useEffect, useContext } from "react";
 import { jwtDecode } from "jwt-decode";
 import api from "../services/api";
 import { toast } from "react-toastify";
-import { ThemeContext } from "../context/ThemeContext.jsx";
+import { useColorMode } from "../main.jsx";
+import { useTheme } from "@mui/material/styles";
 
 // Componentes do MUI e outros
 import {
@@ -21,7 +22,8 @@ import UserManagement from "../components/usermanagement.jsx";
 import ModalAddUser from "../components/modaladduser.jsx";
 
 function ConfiguracoesPage() {
-  const { theme, toggleTheme } = useContext(ThemeContext);
+  const themeMui = useTheme(); // Hook do MUI para acessar o tema atual
+  const { toggleColorMode } = useColorMode(); // Nosso hook para pegar a função de toggle
 
   const [isAdmin, setIsAdmin] = useState(false);
   const [users, setUsers] = useState([]);
@@ -115,7 +117,7 @@ function ConfiguracoesPage() {
             </Typography>
             <FormControlLabel
               control={
-                <Switch checked={theme === "dark"} onChange={toggleTheme} />
+                <Switch checked={themeMui.palette.mode === "dark"} onChange={toggleColorMode} />
               }
               label="Modo Escuro"
             />

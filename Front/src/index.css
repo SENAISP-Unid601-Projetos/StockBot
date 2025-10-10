@@ -29,23 +29,6 @@
   --border-radius-padrao: 8px;
 }
 
-/* Modo Escuro */
-body.dark {
-  /* Reatribuição das variáveis semânticas para o modo escuro */
-  --cor-fundo-primario: #121212;
-  --cor-fundo-secundario: #1e1e1e;
-  --cor-fundo-sidebar: #2a2a2a; /* Um cinza escuro para diferenciar do fundo */
-  --cor-borda: #333;
-
-  --cor-texto-primario: #e0e0e0;
-  --cor-texto-secundario: #f4f4f4;
-  --cor-texto-sidebar: #e0e0e0;
-  
-  /* Ajuste de cores de destaque para melhor contraste */
-  --amareloOuro: #FFC107;
-  --vermelho-alerta: #E53935;
-}
-
 /* 3. Reset Básico e Padrões do Corpo */
 * {
   box-sizing: border-box;
