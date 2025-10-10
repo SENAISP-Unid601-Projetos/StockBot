@@ -2,7 +2,8 @@ import { useState, useEffect, useContext } from "react";
 import { jwtDecode } from "jwt-decode";
 import api from "../services/api";
 import { toast } from "react-toastify";
-import { ThemeContext } from "../context/ThemeContext.jsx";
+import { useColorMode } from "../main.jsx";
+import { useTheme } from "@mui/material/styles";
 
 // Componentes do MUI e outros
 import {
@@ -21,8 +22,9 @@ import UserManagement from "../components/usermanagement.jsx";
 import ModalAddUser from "../components/modaladduser.jsx";
 
 function ConfiguracoesPage() {
-  const { theme, toggleTheme } = useContext(ThemeContext);
-  console.log("[ConfiguracoesPage] Recebeu o tema do contexto:", theme);
+  const themeMui = useTheme(); // Hook do MUI para acessar o tema atual
+  const { toggleColorMode } = useColorMode(); // Nosso hook para pegar a função de toggle
+
   const [isAdmin, setIsAdmin] = useState(false);
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -96,7 +98,7 @@ function ConfiguracoesPage() {
     <>
       <Box
         component="main"
-        sx={{ flexGrow: 1, p: 3, backgroundColor: "#f8f9fa" }}
+        sx={{ flexGrow: 1, p: 3}}
       >
         <Container maxWidth="lg">
           <Typography
@@ -108,18 +110,18 @@ function ConfiguracoesPage() {
             Configurações
           </Typography>
 
-        {/* Secção de Aparência com componentes MUI */}
-        <Paper sx={{ p: 3, mb: 4, boxShadow: 3 }}>
-          <Typography variant="h6" gutterBottom>
-            Aparência
-          </Typography>
-          <FormControlLabel
-            control={
-              <Switch checked={theme === "dark"} onChange={toggleTheme} />
-            }
-            label="Modo Escuro"
-          />
-        </Paper>
+          {/* Secção de Aparência com componentes MUI */}
+          <Paper sx={{ p: 3, mb: 4, boxShadow: 3 }}>
+            <Typography variant="h6" gutterBottom>
+              Aparência
+            </Typography>
+            <FormControlLabel
+              control={
+                <Switch checked={themeMui.palette.mode === "dark"} onChange={toggleColorMode} />
+              }
+              label="Modo Escuro"
+            />
+          </Paper>
 
         {/* Secção de Gestão de Utilizadores */}
         {isAdmin && (
