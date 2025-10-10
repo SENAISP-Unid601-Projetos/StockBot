@@ -1,88 +1,117 @@
-import React, { useState } from "react";
-import './'
+import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import axios from 'axios';
+import './loginpage.css'; // Reutilizando o mesmo CSS da página de login
 
-function cadastroUsuariopages(){
+const apiUrl = 'http://localhost:8080/api/auth';
 
-    const [formData, setFormDate] = useState({
-        dominio: '',
-        nome: '',
-        email: '',
-        senha: '',
-    });
+function CadastroUsuariopages() {
+  // Estados para todos os campos do formulário
+  const [nome, setNome] = useState('');
+  const [email, setEmail] = useState('');
+  const [senha, setSenha] = useState('');
+  const [confirmarSenha, setConfirmarSenha] = useState('');
+  const [nomeEmpresa, setNomeEmpresa] = useState('');
+  const [dominioEmpresa, setDominioEmpresa] = useState('');
+  
+  const navigate = useNavigate();
 
-    const handleChange = (event) => {
-        const{nome, value} = event.target;
-        setFormData((prevData) => ({
-            prevData,
-            [nome]: value,
-        }));
-    };
+  const handleRegister = async (event) => {
+    event.preventDefault();
 
-    const handleSubmit = (event) =>{
-        event.prevenDefault(); //impede o carregamento da pagi
-        console.log('Dados do formulario enviados:', formData);
+    // 1. Validação: Verifica se as senhas coincidem
+    if (senha !== confirmarSenha) {
+      alert('As senhas não coincidem. Por favor, verifique.');
+      return; // Interrompe a execução se as senhas forem diferentes
+    }
 
-        alert(`Cadastro de ${formData.nome} realizado com sucesso!`);
+    try {
+      // 2. Envio dos dados para a API (ajuste os campos conforme seu backend)
+      await axios.post(`${apiUrl}/register`, { 
+        nome, 
+        email, 
+        senha, 
+        nomeEmpresa, 
+        dominioEmpresa 
+      });
 
-    };
+      // 3. Sucesso: Informa o usuário e redireciona para a tela de login
+      alert('Cadastro realizado com sucesso! Você será redirecionado para a tela de login.');
+      navigate('/login'); // Redireciona para a página de login após o sucesso
 
-    return(
-        <div className="form-container">
-            <form onSubmit={handleSubmit}>
-                <h2>Tela de Cadastro</h2>
+    } catch (error) {
+      // 4. Erro: Exibe uma mensagem de erro genérica
+      console.error('Erro no cadastro:', error);
+      alert('Não foi possível realizar o cadastro. Verifique os dados e tente novamente.');
+    }
+  };
 
-                <div className="form-group">
-                    <label htmlFor="dominio">Dominio</label>
-                    <input 
-                    type="text"
-                    id="dominio"
-                    name="dominio"
-                    value={formData.dominio}
-                    onChange={handleChange}
-                    required
-                     />
-                </div>
+  return (
+    <div className="login-container">
+      <div className="form-wrapper">
+        <form id="register-form" onSubmit={handleRegister}>
+          <h2>Criar Conta no StockBot</h2>
 
-                 <div className="form-group">
-                 <label htmlFor="nome">Nome Completo</label>
-                 <input
-                  type="text"
-                  id="nome"
-                 name="nome"
-                 value={formData.nome}
-                 onChange={handleChange}
-                 required
-                 />
-                </div>
-
-                 <div className="form-group">
-                <label htmlFor="email">E-mail</label>
-                <input
-                  type="email"
-                     id="email"
-                    name="email"
-                     value={formData.email}
-                     onChange={handleChange}
-                     required
-                     />
-                      </div>
-                        
-        <div className="form-group">
-          <label htmlFor="senha">Senha</label>
+          <label htmlFor="nome">Nome Completo</label>
           <input
-            type="password"
-            id="senha"
-            name="senha"
-            value={formData.senha}
-            onChange={handleChange}
+            type="text"
+            id="nome"
+            value={nome}
+            onChange={(e) => setNome(e.target.value)}
             required
           />
-        </div>
 
-        <button type="submit">Cadastrar</button>
-            </form>
-        </div>
-    );
+          <label htmlFor="email">E-mail</label>
+          <input 
+            type="email" 
+            id="email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            required 
+          />
+          
+          <label htmlFor="nomeEmpresa">Nome da Empresa</label>
+          <input
+            type="text"
+            id="nomeEmpresa"
+            value={nomeEmpresa}
+            onChange={(e) => setNomeEmpresa(e.target.value)}
+            required
+          />
+
+          <label htmlFor="dominio">Domínio da Empresa</label>
+          <input
+            type="text"
+            id="dominio"
+            placeholder="ex: minhaempresa.com"
+            value={dominioEmpresa}
+            onChange={(e) => setDominioEmpresa(e.target.value)}
+            required
+          />
+
+          <label htmlFor="password">Senha</label>
+          <input 
+            type="password" 
+            id="password"
+            value={senha}
+            onChange={(e) => setSenha(e.target.value)}
+            required 
+          />
+
+          <label htmlFor="confirm-password">Confirmar Senha</label>
+          <input 
+            type="password" 
+            id="confirm-password"
+            value={confirmarSenha}
+            onChange={(e) => setConfirmarSenha(e.target.value)}
+            required 
+          />
+
+          <button type="submit">Cadastrar</button>
+        </form>
+      </div>
+    </div>
+  );
 }
 
-export default   cadastroUsuariopages;
+export default CadastroUsuariopages;

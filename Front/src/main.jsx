@@ -3,10 +3,11 @@ import ReactDOM from "react-dom/client";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import cadastroUsuariopages from "./pages/cadastroUsuariopages.jsx";
+
 
 import App from "./App.jsx";
 import LoginPage from "./pages/loginpage.jsx";
+import CadastroUsuariospages from "./pages/cadastroUsuariopages.jsx";
 import DashboardPage from "./pages/dashboardpage.jsx";
 import ComponentesPage from './pages/componentepages.jsx'
 import HistoricoPage from "./pages/historicopage.jsx";
@@ -30,6 +31,10 @@ const router = createBrowserRouter([
   {
     path: "/login",
     element: <LoginPage />,
+  },
+  {
+    path: "/cadastro",
+    element: <CadastroUsuariospages />,
   },
 ]);
 
