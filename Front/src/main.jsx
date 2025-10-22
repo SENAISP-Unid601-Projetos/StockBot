@@ -68,12 +68,12 @@ function MainApp() {
             ? {
                 // Paleta para o modo claro
                 primary: { main: '#C00000' }, // Vermelho SENAI
-                background: { default: '#f4f4f4', paper: '#ffffff' },
+                background: { default: '#e8e8e8', paper: '#ffffff' },
               }
             : {
                 // Paleta para o modo escuro
                 primary: { main: '#C00000' },
-                background: { default: '#121212', paper: '#1e1e1e' },
+                background: { default: '#121212ff', paper: '#1e1e1e' },
               }),
         },
       }),
