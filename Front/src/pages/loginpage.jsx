@@ -34,9 +34,10 @@ function LoginPage() {
   return (
     <div className="login-container">
       <div className="form-wrapper">
-        <form id="login-form" onSubmit={handleLogin}>
+        {/* ALTERAÇÃO AQUI: id="login-form" para className="auth-form" */}
+        <form className="auth-form" onSubmit={handleLogin}>
           <h2>Acessar o StockBot</h2>
-          
+
           <label htmlFor="dominio">Domínio da Empresa</label>
           <input
             type="text"
@@ -46,29 +47,29 @@ function LoginPage() {
             required
             disabled={loading}
           />
-          
+
           <label htmlFor="email">E-mail</label>
-          <input 
-            type="email" 
+          <input
+            type="email"
             id="email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            required 
+            required
             disabled={loading}
           />
-          
+
           <label htmlFor="password">Senha</label>
-          <input 
-            type="password" 
+          <input
+            type="password"
             id="password"
             value={senha}
             onChange={(e) => setSenha(e.target.value)}
-            required 
+            required
             disabled={loading}
           />
 
           {error && <p className="error-message">{error}</p>}
-          
+
           <button type="submit" disabled={loading}>
             {loading ? 'A entrar...' : 'Entrar'}
           </button>
