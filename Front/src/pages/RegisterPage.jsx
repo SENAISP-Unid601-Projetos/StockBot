@@ -50,7 +50,6 @@ function RegisterPage() {
   return (
     <div className="login-container">
       <div className="form-wrapper">
-        {/* ALTERAÇÃO AQUI: id="register-form" para className="auth-form" */}
         <form className="auth-form" onSubmit={handleRegister}>
           <h2>Criar Conta no StockBot</h2>
 
@@ -97,7 +96,8 @@ function RegisterPage() {
           {error && <p className="error-message">{error}</p>}
 
           <button type="submit" disabled={loading}>
-            {loading ? 'A registar...' : 'Registar'}
+             {}
+            {loading ? 'A registrar...' : 'Registrar'}
           </button>
         </form>
 
