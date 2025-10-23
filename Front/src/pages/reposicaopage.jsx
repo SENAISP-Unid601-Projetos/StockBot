@@ -104,7 +104,7 @@ function ReposicaoPage() {
   return (
     <Box
       component="main"
-      sx={{ flexGrow: 1, p: 3, backgroundColor: "#f8f9fa" }}
+      sx={{ flexGrow: 1, p: 3}}
     >
       <Container maxWidth="lg">
         <Box

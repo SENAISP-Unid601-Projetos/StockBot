@@ -52,11 +52,4 @@ public class ComponenteController {
         return ResponseEntity.noContent().build();
     }
 
-    @PostMapping("/{id}/perda")
-    @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity registrarPerda(@PathVariable Long id, @RequestBody Map<String, Integer> payload) {
-        int quantidade = payload.get("quantidade");
-        componenteService.registrarPerda(id, quantidade);
-        return ResponseEntity.ok().build();
-    }
 }

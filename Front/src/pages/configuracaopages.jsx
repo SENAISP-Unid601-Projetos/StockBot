@@ -1,8 +1,9 @@
-import { useState, useEffect, useContext } from "react";
+import { useState, useEffect } from "react";
 import { jwtDecode } from "jwt-decode";
 import api from "../services/api";
 import { toast } from "react-toastify";
-import { ThemeContext } from "../context/ThemeContext.jsx";
+import { useColorMode } from "../useColorMode.js"
+import { useTheme } from "@mui/material/styles";
 
 // Componentes do MUI e outros
 import {
@@ -21,7 +22,8 @@ import UserManagement from "../components/usermanagement.jsx";
 import ModalAddUser from "../components/modaladduser.jsx";
 
 function ConfiguracoesPage() {
-  const { theme, toggleTheme } = useContext(ThemeContext);
+  const themeMui = useTheme(); // Hook do MUI para acessar o tema atual
+  const { toggleColorMode } = useColorMode(); // Nosso hook para pegar a função de toggle
 
   const [isAdmin, setIsAdmin] = useState(false);
   const [users, setUsers] = useState([]);
@@ -93,11 +95,10 @@ function ConfiguracoesPage() {
   };
 
   return (
-    <Box sx={{ display: "flex" }}>
-      <Sidebar />
+    <>
       <Box
         component="main"
-        sx={{ flexGrow: 1, p: 3, backgroundColor: "#f8f9fa" }}
+        sx={{ flexGrow: 1, p: 3}}
       >
         <Container maxWidth="lg">
           <Typography
@@ -116,35 +117,35 @@ function ConfiguracoesPage() {
             </Typography>
             <FormControlLabel
               control={
-                <Switch checked={theme === "dark"} onChange={toggleTheme} />
+                <Switch checked={themeMui.palette.mode === "dark"} onChange={toggleColorMode} />
               }
               label="Modo Escuro"
             />
           </Paper>
 
-          {/* Secção de Gestão de Utilizadores */}
-          {isAdmin && (
-            <Paper sx={{ p: 3, boxShadow: 3 }}>
-              <Box
+        {/* Secção de Gestão de Utilizadores */}
+        {isAdmin && (
+          <Paper sx={{ p: 3, boxShadow: 3 }}>
+            <Box
+              sx={{
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
+                mb: 2,
+              }}
+            >
+              <Typography variant="h6">Gestão de Utilizadores</Typography>
+              <MuiButton
+                variant="contained"
+                onClick={() => setAddUserModalVisible(true)}
                 sx={{
-                  display: "flex",
-                  justifyContent: "space-between",
-                  alignItems: "center",
-                  mb: 2,
+                  backgroundColor: "#ce0000",
+                  "&:hover": { backgroundColor: "#a40000" },
                 }}
               >
-                <Typography variant="h6">Gestão de Utilizadores</Typography>
-                <MuiButton
-                  variant="contained"
-                  onClick={() => setAddUserModalVisible(true)}
-                  sx={{
-                    backgroundColor: "#ce0000",
-                    "&:hover": { backgroundColor: "#a40000" },
-                  }}
-                >
-                  Adicionar Utilizador
-                </MuiButton>
-              </Box>
+                Adicionar Utilizador
+              </MuiButton>
+            </Box>
 
               {!isVerified ? (
                 <Box
@@ -181,7 +182,7 @@ function ConfiguracoesPage() {
           onUserAdded={fetchUsers}
         />
       </Box>
-    </Box>
+    </>
   );
 }
 
