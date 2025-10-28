@@ -1,8 +1,13 @@
+// src/main.jsx
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import { createBrowserRouter } from 'react-router-dom';
 import 'react-toastify/dist/ReactToastify.css';
 import './index.css';
+
+// **** IMPORTA O ThemeProvider ****
+import { ThemeProvider } from './ThemeContext.jsx'; 
+
 import App from './App.jsx';
 import LoginPage from './pages/loginpage.jsx';
 import RegisterPage from './pages/RegisterPage.jsx';
@@ -11,13 +16,12 @@ import ComponentesPage from './pages/componentepages.jsx';
 import HistoricoPage from './pages/historicopage.jsx';
 import ConfiguracoesPage from './pages/configuracaopages.jsx';
 import ReposicaoPage from './pages/reposicaopage.jsx';
-
 import MainApp from './MainApp.jsx';
 
 const router = createBrowserRouter([
   {
     path: '/',
-    element: <App />, 
+    element: <App />,
     children: [
       { index: true, element: <DashboardPage /> },
       { path: '/componentes', element: <ComponentesPage /> },
@@ -26,19 +30,15 @@ const router = createBrowserRouter([
       { path: '/configuracoes', element: <ConfiguracoesPage /> },
     ],
   },
-  {
-    path: '/login',
-    element: <LoginPage />,
-  },
-  {
-    path: '/register',
-    element: <RegisterPage />,
-  },
+  { path: '/login', element: <LoginPage /> },
+  { path: '/register', element: <RegisterPage /> },
 ]);
 
+// **** ENVLOVE MainApp COM ThemeProvider ****
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
-    {}
-    <MainApp router={router} />
+    <ThemeProvider> 
+      <MainApp router={router} />
+    </ThemeProvider>
   </React.StrictMode>
 );
