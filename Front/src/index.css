@@ -1,32 +1,51 @@
-/* ================================================== */
-/* CSS Global - src/index.css                           */
-/* ================================================== */
-
-/* 1. Variáveis de Cor e Estilo (Paleta do Projeto) */
-
-/* Modo Claro (Padrão) */
 :root {
   /* Cores base */
   --vermelhoSenai: #C00000;
   --azulEscuroOriginal: #1A2E44;
   --amareloOuro: #FFD700;
   --vermelho-alerta: #dc3545;
+  --verde-sucesso: #2ecc71;
+  --laranja-aviso: #ff9f43;
   --branco-puro: #FFFFFF;
   --preto-puro: #000000;
 
-  /* Variáveis Semânticas (por função) */
-  --cor-fundo-primario: #e8e8e8;      /* Fundo principal da página */
-  --cor-fundo-secundario: #FFFFFF;   /* Fundo de cards, tabelas, modais */
+  /* Variáveis Semânticas (Claro) */
+  --cor-fundo-primario: #f4f4f4;
+  --cor-fundo-secundario: #FFFFFF;
   --cor-fundo-sidebar: var(--azulEscuroOriginal);
   --cor-borda: #e0e0e0;
-
-  --cor-texto-primario: #333;         /* Texto principal do corpo */
-  --cor-texto-secundario: var(--azulEscuroOriginal); /* Títulos, cabeçalhos de tabela */
+  --cor-texto-primario: #333;
+  --cor-texto-secundario: var(--azulEscuroOriginal);
   --cor-texto-sidebar: var(--branco-puro);
   --cor-texto-botao-principal: var(--branco-puro);
+  
+  /* Variáveis antigas (para loginpage.css) */
+  --cinzaClaro: #f4f4f4;
+  --branco: #FFFFFF;
+  --azulEscuro: var(--azulEscuroOriginal);
+  --cinzaMedio: #cccccc;
 
   /* Estilos Gerais */
   --border-radius-padrao: 8px;
+}
+
+/* MODO ESCURO - A PARTE QUE FALTAVA */
+body.dark {
+  /* Variáveis Semânticas (Escuro) */
+  --cor-fundo-primario: #121212;
+  --cor-fundo-secundario: #1e1e1e;
+  --cor-fundo-sidebar: #1e1e1e; /* Ajustado para o tema MUI */
+  --cor-borda: #333;
+  --cor-texto-primario: #e0e0e0;
+  --cor-texto-secundario: #f4f4f4;
+  --cor-texto-sidebar: #e0e0e0;
+
+  /* Variáveis antigas (para loginpage.css) */
+  --cinzaClaro: #121212;
+  --branco: #1e1e1e;
+  --azulEscuro: #f4f4f4;
+  --cinzaMedio: #555;
+  --vermelho-alerta: #E53935;
 }
 
 /* 3. Reset Básico e Padrões do Corpo */
@@ -38,6 +57,8 @@
 }
 
 body {
+  /* Aplica a cor de fundo primária (que muda com o modo) */
+  background-color: var(--cor-fundo-primario); 
   color: var(--cor-texto-primario);
   transition: background-color 0.3s, color 0.3s;
 }
@@ -54,7 +75,8 @@ body {
   overflow-y: auto;
 }
 
-/* 5. Estilos do Sidebar */
+/* 5. Estilos do Sidebar (usados pelo sidebar antigo) */
+/* Nota: O Sidebar novo (MUI) usa 'sx' e 'useTheme' */
 .sidebar {
   width: 250px;
   background-color: var(--cor-fundo-sidebar);
@@ -64,19 +86,16 @@ body {
   display: flex;
   flex-direction: column;
 }
-
 .sidebar-header {
   font-size: 1.5rem;
   font-weight: bold;
   margin-bottom: 2rem;
   text-align: center;
 }
-
 .sidebar-nav {
   list-style-type: none;
   flex-grow: 1;
 }
-
 .nav-link {
   display: flex;
   align-items: center;
@@ -88,14 +107,12 @@ body {
   margin-bottom: 0.5rem;
   transition: background-color 0.2s;
 }
-
 .nav-link:hover {
   background-color: rgba(255, 255, 255, 0.1);
 }
-
 .nav-link.active {
   background-color: var(--vermelhoSenai);
-  color: var(--branco-puro); /* Texto do link ativo sempre branco */
+  color: var(--branco-puro);
   font-weight: bold;
 }
 
@@ -108,7 +125,6 @@ body {
   padding-bottom: 1rem;
   border-bottom: 1px solid var(--cor-borda);
 }
-
 .header-dashboard h1 {
   font-size: 2rem;
   color: var(--cor-texto-secundario);
@@ -126,7 +142,6 @@ body {
   cursor: pointer;
   transition: background-color 0.2s, transform 0.2s;
 }
-
 .action-button:hover {
   background-color: #a40000;
   transform: translateY(-2px);
@@ -142,55 +157,47 @@ body {
   overflow-x: auto;
   transition: background-color 0.3s;
 }
-
 body.dark .table-container {
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
 }
-
 table {
   width: 100%;
   border-collapse: collapse;
 }
-
 th, td {
   padding: 1rem;
   text-align: left;
   border-bottom: 1px solid var(--cor-borda);
 }
-
 thead th {
   font-weight: bold;
   color: var(--cor-texto-secundario);
 }
-
 tbody tr:hover {
   background-color: rgba(0, 0, 0, 0.03);
 }
-
 body.dark tbody tr:hover {
   background-color: rgba(255, 255, 255, 0.05);
 }
 
+/* Botões de Ação da Tabela */
 td.actions button {
   border: none;
   padding: 0.5rem 1rem;
   border-radius: 5px;
   cursor: pointer;
   margin-right: 0.5rem;
-  color: var(--branco-puro); /* Texto sempre branco para contraste */
+  color: var(--branco-puro);
   font-weight: bold;
   transition: opacity 0.2s;
 }
-
 td.actions button:hover {
   opacity: 0.85;
 }
-
 .btn-edit {
   background-color: var(--amareloOuro);
-  color: var(--preto-puro); /* Amarelo fica melhor com texto preto */
+  color: var(--preto-puro);
 }
-
 .btn-delete {
   background-color: var(--vermelho-alerta);
 }
@@ -202,7 +209,6 @@ td.actions button:hover {
   align-items: center;
   margin-bottom: 1rem;
 }
-
 .section-header .action-button {
   padding: 0.5rem 1rem;
   font-size: 0.9rem;
@@ -214,4 +220,25 @@ td.actions button:hover {
   justify-content: center;
   align-items: center;
   height: 60vh;
+}
+
+/* Estilos Adicionais para Modo Escuro em componentes específicos */
+body.dark .auth-form input,
+body.dark .modal-content input,
+body.dark .modal-content select {
+    background-color: #333;
+    color: var(--cor-texto-primario);
+    border-color: #555;
+}
+
+body.dark .login-link p,
+body.dark .register-link p {
+    color: #aaa;
+}
+
+body.dark .close-button {
+  color: var(--cinzaMedio);
+}
+body.dark .close-button:hover {
+  color: var(--cor-texto-secundario);
 }
