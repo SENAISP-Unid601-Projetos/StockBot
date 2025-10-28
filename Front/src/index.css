@@ -15,7 +15,7 @@
   --preto-puro: #000000;
 
   /* Variáveis Semânticas (por função) */
-  --cor-fundo-primario: #FFFFFF;      /* Fundo principal da página */
+  --cor-fundo-primario: #e8e8e8;      /* Fundo principal da página */
   --cor-fundo-secundario: #FFFFFF;   /* Fundo de cards, tabelas, modais */
   --cor-fundo-sidebar: var(--azulEscuroOriginal);
   --cor-borda: #e0e0e0;

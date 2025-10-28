@@ -36,6 +36,7 @@
   border: 1px solid var(--cinzaMedio); /* Verifique se --cinzaMedio está definido */
   border-radius: var(--border-radius-padrao);
   font-size: 1rem;
+  background-color: var(--cor-fundo-primario);
 }
 
 .auth-form button {
@@ -49,6 +50,7 @@
   font-weight: bold;
   cursor: pointer;
   transition: background-color 0.2s;
+  color: white;
 }
 
 .auth-form button:hover:not(:disabled) { /* Adicionado :not(:disabled) */
