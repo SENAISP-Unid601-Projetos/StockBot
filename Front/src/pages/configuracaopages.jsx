@@ -1,8 +1,8 @@
-import { useState, useEffect, useContext } from "react";
+import { useState, useEffect } from "react";
 import { jwtDecode } from "jwt-decode";
 import api from "../services/api";
 import { toast } from "react-toastify";
-import { useColorMode } from "../main.jsx";
+import { useColorMode } from "../useColorMode.js"
 import { useTheme } from "@mui/material/styles";
 
 // Componentes do MUI e outros

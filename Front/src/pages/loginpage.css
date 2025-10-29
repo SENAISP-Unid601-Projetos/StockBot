@@ -1,55 +1,98 @@
-
-.login-container {
+/* src/pages/loginpage.css */
+.login-container { /* Mantém */
   display: flex;
   justify-content: center;
   align-items: center;
   height: 100vh;
-  background-color: var(--cinzaClaro);
+  background-color: var(--cinzaClaro); /* Verifique se --cinzaClaro está definido em index.css ou colors.css */
 }
 
-.form-wrapper {
-  background-color: var(--branco);
+.form-wrapper { /* Mantém */
+  background-color: var(--branco); /* Verifique se --branco está definido */
   padding: 2rem 3rem;
-  border-radius: var(--border-radius-padrao);
+  border-radius: var(--border-radius-padrao); /* Verifique se --border-radius-padrao está definido */
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
   width: 100%;
   max-width: 400px;
 }
 
-#login-form h2 {
+/* ALTERAÇÃO: Usa a classe .auth-form em vez de #login-form */
+.auth-form h2 {
   text-align: center;
   margin-bottom: 1.5rem;
-  color: var(--azulEscuro);
+  color: var(--azulEscuro); /* Verifique se --azulEscuro está definido */
 }
 
-#login-form label {
+.auth-form label {
   display: block;
   margin-bottom: 0.5rem;
   font-weight: 500;
 }
 
-#login-form input {
+.auth-form input {
   width: 100%;
   padding: 0.75rem;
   margin-bottom: 1rem;
-  border: 1px solid var(--cinzaMedio);
+  border: 1px solid var(--cinzaMedio); /* Verifique se --cinzaMedio está definido */
   border-radius: var(--border-radius-padrao);
   font-size: 1rem;
+  background-color: var(--cor-fundo-primario);
 }
 
-#login-form button {
+.auth-form button {
   width: 100%;
   padding: 0.75rem;
   border: none;
   border-radius: var(--border-radius-padrao);
-  background-color: var(--vermelhoSenai);
+  background-color: var(--vermelhoSenai); /* Verifique se --vermelhoSenai está definido */
   color: var(--branco);
   font-size: 1rem;
   font-weight: bold;
   cursor: pointer;
   transition: background-color 0.2s;
+  color: white;
 }
 
-#login-form button:hover {
+.auth-form button:hover:not(:disabled) { /* Adicionado :not(:disabled) */
   opacity: 0.9;
+}
+
+.auth-form button:disabled { /* Estilo para botão desabilitado */
+    cursor: not-allowed;
+    opacity: 0.6;
+}
+
+/* Estilos de erro e links (já devem estar corretos) */
+.error-message {
+  color: var(--vermelho-alerta); /* Verifique se --vermelho-alerta está definido */
+  background-color: rgba(220, 53, 69, 0.1);
+  padding: 0.75rem;
+  border-radius: var(--border-radius-padrao);
+  margin-bottom: 1rem;
+  text-align: center;
+  font-size: 0.9rem;
+  border: 1px solid var(--vermelho-alerta);
+}
+
+.login-link,
+.register-link {
+  text-align: center;
+  margin-top: 1.5rem;
+}
+
+.login-link p,
+.register-link p {
+  color: #555;
+}
+
+.login-link a,
+.register-link a {
+  color: var(--vermelhoSenai);
+  font-weight: bold;
+  text-decoration: none;
+}
+
+.login-link a:hover,
+.register-link a:hover {
+  text-decoration: underline;
 }
