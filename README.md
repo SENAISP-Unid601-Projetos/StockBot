@@ -27,12 +27,7 @@ Este projeto é dividido em duas partes principais (front-end e back-end):
     * Spring Boot (Para a criação da API REST)
 * **Banco de Dados:**
     * MySQL
- 
--- 1. Abra o seu cliente MySQL.
--- e crie o schema (banco) que o Spring irá usar.
--- Exemplo:
-CREATE DATABASE stockbot;
-USE stockbot;
+
 
 ## 🚀 Instalação e Execução
 
@@ -71,7 +66,13 @@ npm install
 # 4. Execute o servidor de desenvolvimento
 npm run dev
 
+----------------------------------------------
 
+-- 1. Abra o seu cliente MySQL.
+-- e crie o schema (banco) que o Spring irá usar.
+-- Exemplo:
+CREATE DATABASE stockbot;
+USE stockbot;
 
 
 
