@@ -40,6 +40,12 @@ public class SecurityConfig {
                 .authorizeHttpRequests(authorize -> authorize
                         .requestMatchers(HttpMethod.POST, "/api/auth/**").permitAll()
                         .requestMatchers("/api/users/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.POST, "/api/pedidos-compra").authenticated() // Usuários podem criar pedidos
+                        .requestMatchers(HttpMethod.GET, "/api/pedidos-compra/me").authenticated() // Usuários podem ver seus pedidos
+                        .requestMatchers(HttpMethod.GET, "/api/pedidos-compra/pendentes").hasRole("ADMIN") // Admins veem pendentes
+                        .requestMatchers(HttpMethod.PUT, "/api/pedidos-compra/**/aprovar").hasRole("ADMIN") // Admins aprovam
+                        .requestMatchers(HttpMethod.PUT, "/api/pedidos-compra/**/recusar").hasRole("ADMIN") // Admins recusam
+                        // --- FIM DAS LINHAS NOVAS ---
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(securityFilter, UsernamePasswordAuthenticationFilter.class)

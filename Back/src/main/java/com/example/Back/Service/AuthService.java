@@ -49,7 +49,7 @@ public class AuthService {
         Usuario novoUsuario = new Usuario();
         novoUsuario.setEmail(data.email());
         novoUsuario.setSenha(passwordEncoder.encode(data.senha()));
-        novoUsuario.setRole(UserRole.ADMIN);
+        novoUsuario.setRole(UserRole.USER);
 
         // NOVO: Adiciona o domínio da empresa
         novoUsuario.setDominioEmpresa(data.dominioEmpresa());
