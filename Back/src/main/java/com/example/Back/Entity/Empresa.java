@@ -18,4 +18,6 @@ public class Empresa {
     @Column(unique = true, nullable = false, length = 100)
     private String dominio;
 
+    @Column(nullable = false)
+    private int nivelEstoqueBaixoPadrao = 5;
 }
