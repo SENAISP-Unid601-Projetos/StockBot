@@ -2,17 +2,18 @@ package com.example.Back.Service;
 
 import com.example.Back.Dto.AuthDTO;
 import com.example.Back.Dto.RegisterDTO;
-import com.example.Back.Entity.Empresa; // <-- Adicionar importação
+import com.example.Back.Entity.Empresa;
 import com.example.Back.Entity.Usuario;
 import com.example.Back.Entity.UserRole;
-import com.example.Back.Repository.EmpresaRepository; // <-- Adicionar importação
+import com.example.Back.Repository.EmpresaRepository;
 import com.example.Back.Repository.UsuarioRepository;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional; // <-- Adicionar importação
+import org.springframework.transaction.annotation.Transactional;
+import java.util.Optional; // Importar Optional
 
 @Service
 public class AuthService {
@@ -21,30 +22,25 @@ public class AuthService {
     private final UsuarioRepository usuarioRepository;
     private final TokenService tokenService;
     private final PasswordEncoder passwordEncoder;
-    private final EmpresaRepository empresaRepository; // <-- Adicionar Repositório da Empresa
+    private final EmpresaRepository empresaRepository;
 
-    // 1. Injetar EmpresaRepository no construtor
     public AuthService(AuthenticationManager authenticationManager, UsuarioRepository usuarioRepository, TokenService tokenService, PasswordEncoder passwordEncoder, EmpresaRepository empresaRepository) {
         this.authenticationManager = authenticationManager;
         this.usuarioRepository = usuarioRepository;
         this.tokenService = tokenService;
         this.passwordEncoder = passwordEncoder;
-        this.empresaRepository = empresaRepository; // <-- Atribuir aqui
+        this.empresaRepository = empresaRepository;
     }
 
-    // 2. Método de Login CORRIGIDO
     @Transactional(readOnly = true)
     public String login(AuthDTO data) {
         try {
             Usuario usuario = usuarioRepository.findByEmail(data.email())
                     .orElseThrow(() -> new RuntimeException("E-mail, senha ou domínio inválidos."));
 
-
-            // Verifica a 'Empresa' associada ao 'Usuario', e o 'dominio' dessa 'Empresa'
             if (usuario.getEmpresa() == null || !usuario.getEmpresa().getDominio().equals(data.dominioEmpresa())) {
                 throw new RuntimeException("E-mail, senha ou domínio inválidos.");
             }
-            // *** FIM DA CORREÇÃO ***
 
             var usernamePassword = new UsernamePasswordAuthenticationToken(data.email(), data.senha());
             var auth = this.authenticationManager.authenticate(usernamePassword);
@@ -57,33 +53,42 @@ public class AuthService {
         }
     }
 
-    // 3. Método de Registo CORRIGIDO
+    // *** MÉTODO REGISTER CORRIGIDO PARA SEGURANÇA ***
     @Transactional
     public void register(RegisterDTO data) {
+        // 1. Verifica se o email já existe
         if (this.usuarioRepository.findByEmail(data.email()).isPresent()) {
             throw new IllegalArgumentException("E-mail já está em uso.");
         }
 
-        // Procura ou cria a Empresa
-        Empresa empresa = empresaRepository.findByDominio(data.dominioEmpresa())
-                .orElseGet(() -> {
-                    Empresa novaEmpresa = new Empresa();
-                    novaEmpresa.setDominio(data.dominioEmpresa());
-                    return empresaRepository.save(novaEmpresa);
-                });
+        // 2. Verifica se o DOMÍNIO já existe
+        Optional<Empresa> empresaExistente = empresaRepository.findByDominio(data.dominioEmpresa());
 
-        Usuario novoUsuario = new Usuario();
-        novoUsuario.setEmail(data.email());
-        novoUsuario.setSenha(passwordEncoder.encode(data.senha()));
+        if (empresaExistente.isPresent()) {
+            // Se o domínio JÁ EXISTE, não permite o registo público.
+            throw new IllegalArgumentException("Domínio já registado. Peça a um administrador para criar a sua conta.");
 
-        // Define a role (ADMIN por defeito, conforme o seu UserRole.java atual)
-        novoUsuario.setRole(UserRole.ADMIN);
+        } else {
+            // 3. Se o domínio é NOVO, cria a empresa E o primeiro ADMIN
 
-        // *** CORREÇÃO AQUI ***
-        // Associa a entidade Empresa, em vez de definir o campo String
-        novoUsuario.setEmpresa(empresa);
-        // *** FIM DA CORREÇÃO ***
+            // (Adicione aqui a lógica de personalização que discutimos, se quiser)
+            Empresa novaEmpresa = new Empresa();
+            novaEmpresa.setDominio(data.dominioEmpresa());
+            // novaEmpresa.setNomeExibicao(data.dominioEmpresa()); // <-- Pode adicionar depois
+            // novaEmpresa.setCorPrimaria("#C00000"); // <-- Pode adicionar depois
+            empresaRepository.save(novaEmpresa); // Salva a nova empresa
 
-        this.usuarioRepository.save(novoUsuario);
+            Usuario novoUsuario = new Usuario();
+            novoUsuario.setEmail(data.email());
+            novoUsuario.setSenha(passwordEncoder.encode(data.senha()));
+
+            // O primeiro utilizador do domínio é automaticamente ADMIN
+            novoUsuario.setRole(UserRole.ADMIN);
+
+            // Associa à nova empresa
+            novoUsuario.setEmpresa(novaEmpresa);
+
+            this.usuarioRepository.save(novoUsuario);
+        }
     }
 }
