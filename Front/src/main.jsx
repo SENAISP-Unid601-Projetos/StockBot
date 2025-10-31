@@ -7,7 +7,7 @@ import "./index.css";
 import { ThemeProvider } from "./ThemeContext.jsx";
 import App from "./App.jsx";
 import LoginPage from "./pages/loginpage.jsx";
-// import RegisterPage from './pages/RegisterPage.jsx'; // Removido
+import RegisterPage from "./pages/RegisterPage.jsx"; // <-- ADICIONAR IMPORTAÇÃO
 import DashboardPage from "./pages/dashboardpage.jsx";
 import ComponentesPage from "./pages/componentepages.jsx";
 import HistoricoPage from "./pages/historicopage.jsx";
@@ -28,7 +28,7 @@ const router = createBrowserRouter([
     ],
   },
   { path: "/login", element: <LoginPage /> },
-  // Rota de registo REMOVIDA
+  { path: "/register", element: <RegisterPage /> }, // <-- ADICIONAR ROTA
 ]);
 
 ReactDOM.createRoot(document.getElementById("root")).render(

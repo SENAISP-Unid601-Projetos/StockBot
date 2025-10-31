@@ -1,7 +1,8 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom"; // Removido 'Link'
+import { useNavigate, Link } from "react-router-dom"; // <-- ADICIONAR 'Link'
 import axios from "axios";
 import "./loginpage.css";
+import { toast } from "react-toastify"; // Importar toast para consistência
 
 const apiUrl = "http://localhost:8080/api/auth";
 
@@ -29,7 +30,10 @@ function LoginPage() {
       navigate("/");
     } catch (error) {
       console.error("Erro de login:", error);
-      setError("Credenciais inválidas. Verifique o e-mail, senha e domínio.");
+      const errorMsg =
+        error.response?.data?.message || "E-mail, senha ou domínio inválidos.";
+      setError(errorMsg);
+      // toast.error(errorMsg);
     } finally {
       setLoading(false);
     }
@@ -78,7 +82,12 @@ function LoginPage() {
           </button>
         </form>
 
-        {/* Bloco de registo REMOVIDO */}
+        {/* // <-- ADICIONAR ESTE BLOCO DE VOLTA */}
+        <div className="register-link">
+          <p>
+            Não tem uma conta? <Link to="/register">Crie uma nova empresa</Link>
+          </p>
+        </div>
       </div>
     </div>
   );

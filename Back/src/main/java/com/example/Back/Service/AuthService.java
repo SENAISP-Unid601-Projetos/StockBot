@@ -53,30 +53,26 @@ public class AuthService {
         }
     }
 
-    // *** MÉTODO REGISTER CORRIGIDO PARA SEGURANÇA ***
+    // *** MÉTODO REGISTER SEGURO ***
     @Transactional
     public void register(RegisterDTO data) {
-        // 1. Verifica se o email já existe
         if (this.usuarioRepository.findByEmail(data.email()).isPresent()) {
             throw new IllegalArgumentException("E-mail já está em uso.");
         }
 
-        // 2. Verifica se o DOMÍNIO já existe
+        // Verifica se o DOMÍNIO já existe
         Optional<Empresa> empresaExistente = empresaRepository.findByDominio(data.dominioEmpresa());
 
         if (empresaExistente.isPresent()) {
-            // Se o domínio JÁ EXISTE, não permite o registo público.
-            throw new IllegalArgumentException("Domínio já registado. Peça a um administrador para criar a sua conta.");
+            // Se o domínio JÁ EXISTE, bloqueia o registo público.
+            throw new IllegalArgumentException("Domínio já registado. Peça a um administrador da sua empresa para criar a sua conta.");
 
         } else {
-            // 3. Se o domínio é NOVO, cria a empresa E o primeiro ADMIN
-
-            // (Adicione aqui a lógica de personalização que discutimos, se quiser)
+            // Se o domínio é NOVO, cria a empresa E o primeiro ADMIN
             Empresa novaEmpresa = new Empresa();
             novaEmpresa.setDominio(data.dominioEmpresa());
-            // novaEmpresa.setNomeExibicao(data.dominioEmpresa()); // <-- Pode adicionar depois
-            // novaEmpresa.setCorPrimaria("#C00000"); // <-- Pode adicionar depois
-            empresaRepository.save(novaEmpresa); // Salva a nova empresa
+            // (Pode adicionar nomeExibicao e corPrimaria aqui depois)
+            empresaRepository.save(novaEmpresa);
 
             Usuario novoUsuario = new Usuario();
             novoUsuario.setEmail(data.email());
@@ -85,7 +81,6 @@ public class AuthService {
             // O primeiro utilizador do domínio é automaticamente ADMIN
             novoUsuario.setRole(UserRole.ADMIN);
 
-            // Associa à nova empresa
             novoUsuario.setEmpresa(novaEmpresa);
 
             this.usuarioRepository.save(novoUsuario);
