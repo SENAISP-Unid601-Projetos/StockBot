@@ -22,4 +22,8 @@ public class Requisicao {
     private LocalDateTime dataRequisicao;
 
     private String status;
+
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "empresa_id", nullable = false)
+    private Empresa empresa;
     }

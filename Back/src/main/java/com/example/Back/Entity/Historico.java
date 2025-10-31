@@ -34,9 +34,12 @@ public class Historico {
     @Column(nullable = false, unique = true)
     private String codigoMovimentacao;
 
-
     @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "componente_id", nullable = false)
     private Componente componente;
+
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "empresa_id", nullable = false)
+    private Empresa empresa;
 }
