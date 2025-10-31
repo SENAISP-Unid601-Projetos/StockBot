@@ -1,31 +1,35 @@
-import { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
-import axios from 'axios';
-import './loginpage.css';
+import { useState } from "react";
+import { useNavigate } from "react-router-dom"; // Removido 'Link'
+import axios from "axios";
+import "./loginpage.css";
 
-const apiUrl = 'http://localhost:8080/api/auth';
+const apiUrl = "http://localhost:8080/api/auth";
 
 function LoginPage() {
-  const [email, setEmail] = useState('');
-  const [senha, setSenha] = useState('');
-  const [dominioEmpresa, setDominioEmpresa] = useState('');
-  const [error, setError] = useState('');
+  const [email, setEmail] = useState("");
+  const [senha, setSenha] = useState("");
+  const [dominioEmpresa, setDominioEmpresa] = useState("");
+  const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
   const handleLogin = async (event) => {
     event.preventDefault();
-    setError('');
+    setError("");
     setLoading(true);
 
     try {
-      const response = await axios.post(`${apiUrl}/login`, { email, senha, dominioEmpresa });
+      const response = await axios.post(`${apiUrl}/login`, {
+        email,
+        senha,
+        dominioEmpresa,
+      });
       const token = response.data.token;
-      localStorage.setItem('jwt-token', token);
-      navigate('/');
+      localStorage.setItem("jwt-token", token);
+      navigate("/");
     } catch (error) {
-      console.error('Erro de login:', error);
-      setError('Credenciais inválidas. Verifique o e-mail, senha e domínio.');
+      console.error("Erro de login:", error);
+      setError("Credenciais inválidas. Verifique o e-mail, senha e domínio.");
     } finally {
       setLoading(false);
     }
@@ -34,7 +38,6 @@ function LoginPage() {
   return (
     <div className="login-container">
       <div className="form-wrapper">
-        {/* ALTERAÇÃO AQUI: id="login-form" para className="auth-form" */}
         <form className="auth-form" onSubmit={handleLogin}>
           <h2>Acessar o StockBot</h2>
 
@@ -71,13 +74,11 @@ function LoginPage() {
           {error && <p className="error-message">{error}</p>}
 
           <button type="submit" disabled={loading}>
-            {loading ? 'A entrar...' : 'Entrar'}
+            {loading ? "A entrar..." : "Entrar"}
           </button>
         </form>
 
-        <div className="register-link">
-          <p>Não tem uma conta? <Link to="/register">Crie uma conta</Link></p>
-        </div>
+        {/* Bloco de registo REMOVIDO */}
       </div>
     </div>
   );
