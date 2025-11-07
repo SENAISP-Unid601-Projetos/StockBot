@@ -1,5 +1,5 @@
 # Usa uma imagem base do Java 21 (como no seu pom.xml)
-FROM eclipse-temurin:21-jdk-slim
+FROM eclipse-temurin:21-jdk-alpine
 
 # Copia o .jar do seu projeto para dentro da imagem
 COPY target/*.jar app.jar
