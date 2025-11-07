@@ -1,8 +1,8 @@
 import { useState, useEffect } from "react";
 import api from "../services/api";
 import { toast } from "react-toastify";
-import { useColorMode } from "../useColorMode.js";
-import { useTheme } from "@mui/material/styles";
+// import { useColorMode } from "../useColorMode.js" // <-- Removido (não é mais necessário aqui)
+import { useTheme } from "@mui/material/styles"; // <-- Pode ser removido se não usar o themeMui
 import { isAdmin } from "../services/authService";
 
 import {
@@ -10,19 +10,19 @@ import {
   Container,
   Typography,
   Paper,
-  FormControlLabel,
-  Switch,
+  // FormControlLabel, // <-- Removido
+  // Switch, // <-- Removido
   TextField,
   Button as MuiButton,
   CircularProgress,
-  Grid, // Importado
+  Grid,
 } from "@mui/material";
 import UserManagement from "../components/usermanagement.jsx";
 import ModalAddUser from "../components/modaladduser.jsx";
 
 function ConfiguracoesPage() {
-  const themeMui = useTheme();
-  const { toggleColorMode } = useColorMode();
+  const themeMui = useTheme(); // <-- Mantido caso queira usar para o placeholder
+  // const { toggleColorMode } = useColorMode(); // <-- Removido
 
   const [isUserAdmin, setIsUserAdmin] = useState(false);
   const [users, setUsers] = useState([]);
@@ -87,7 +87,15 @@ function ConfiguracoesPage() {
 
   return (
     <>
-      <Box component="main" sx={{ flexGrow: 1, p: 3 }}>
+      <Box
+        component="main"
+        sx={{
+          flexGrow: 1,
+          p: 3,
+          minHeight: "100vh",
+          backgroundColor: "background.default",
+        }}
+      >
         <Container maxWidth="lg">
           <Typography
             variant="h4"
@@ -98,30 +106,13 @@ function ConfiguracoesPage() {
             Configurações
           </Typography>
 
-          {/* SINTAXE DO GRID V2 (sem 'item') */}
           <Grid container spacing={3}>
-            <Grid xs={12} md={6}>
-              {" "}
-              {/* Removido 'item' */}
-              <Paper sx={{ p: 3, boxShadow: 3, height: "100%" }}>
-                <Typography variant="h6" gutterBottom>
-                  Aparência
-                </Typography>
-                <FormControlLabel
-                  control={
-                    <Switch
-                      checked={themeMui.palette.mode === "dark"}
-                      onChange={toggleColorMode}
-                    />
-                  }
-                  label="Modo Escuro"
-                />
-              </Paper>
-            </Grid>
+            {/* *** BLOCO DE APARÊNCIA REMOVIDO DAQUI *** */}
 
-            <Grid xs={12} md={6}>
+            {/* Bloco de Placeholder (Ocupa o espaço) */}
+            <Grid xs={12}>
               {" "}
-              {/* Removido 'item' */}
+              {/* Ocupa a linha inteira agora */}
               <Paper
                 sx={{
                   p: 3,
@@ -139,13 +130,10 @@ function ConfiguracoesPage() {
               </Paper>
             </Grid>
 
+            {/* Bloco de Gestão de Utilizadores (só para Admin) */}
             {isUserAdmin && (
               <Grid xs={12}>
-                {" "}
-                {/* Removido 'item' */}
                 <Paper sx={{ p: 3, boxShadow: 3, mt: 3 }}>
-                  {" "}
-                  {/* Adicionado margin top */}
                   <Box
                     sx={{
                       display: "flex",
@@ -167,6 +155,7 @@ function ConfiguracoesPage() {
                       Adicionar Utilizador
                     </MuiButton>
                   </Box>
+
                   {!isVerified ? (
                     <Box
                       component="form"
