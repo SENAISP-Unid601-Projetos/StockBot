@@ -13,6 +13,10 @@ COPY pom.xml .
 # Copia o código-fonte
 COPY src src
 
+# --- !! A CORREÇÃO ESTÁ AQUI !! ---
+# Adiciona permissão de execução ao script mvnw
+RUN chmod +x ./mvnw
+
 # Executa o comando para "empacotar" a aplicação (criar o .jar)
 # -DskipTests pula os testes para um build mais rápido no deploy
 RUN ./mvnw clean package -DskipTests
