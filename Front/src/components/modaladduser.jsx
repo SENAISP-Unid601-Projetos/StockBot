@@ -1,47 +1,47 @@
 import { useState } from "react";
 import api from "../services/api";
+import "./modalcomponente.css"; // <-- 1. ADICIONA O CSS BASE DO MODAL
 import "./mudaluser.css";
-import { toast } from "react-toastify"; // <-- 1. Importar toast
+import { toast } from "react-toastify";
 
 function ModalAddUser({ isVisible, onClose, onUserAdded }) {
   const [email, setEmail] = useState("");
   const [senha, setSenha] = useState("");
-  const [role, setRole] = useState("USER"); // Cargo padrão
+  const [role, setRole] = useState("USER");
   const [error, setError] = useState("");
-  const [loading, setLoading] = useState(false); // <-- 2. Adicionar estado de loading
+  const [loading, setLoading] = useState(false);
 
   if (!isVisible) return null;
 
   const handleSubmit = async (event) => {
     event.preventDefault();
     setError("");
-    setLoading(true); // <-- 3. Ativar loading
+    setLoading(true);
 
-    const novoUsuario = { email, senha, role }; // Payload está correto
+    const novoUsuario = { email, senha, role };
 
     try {
       await api.post("/api/users", novoUsuario);
-      toast.success("Utilizador criado com sucesso!"); // <-- 4. Usar toast
-      onUserAdded(); // Atualiza a lista na página principal
-      onClose(); // Fecha o modal
-      // Limpa os campos
+      toast.success("Utilizador criado com sucesso!");
+      onUserAdded();
+      onClose();
       setEmail("");
       setSenha("");
       setRole("USER");
     } catch (err) {
       console.error("Erro ao criar utilizador:", err);
-      // Pega a mensagem de erro do backend (ex: "Email já em uso")
       const errorMsg =
         err.response?.data?.message ||
         err.response?.data ||
         "Ocorreu um erro ao criar o utilizador.";
       setError(errorMsg);
     } finally {
-      setLoading(false); // <-- 5. Desativar loading
+      setLoading(false);
     }
   };
 
   return (
+    // 2. O '.modal-overlay' e '.modal-content' agora vão buscar o estilo ao CSS importado
     <div className="modal-overlay" onClick={onClose}>
       <div className="modal-content" onClick={(e) => e.stopPropagation()}>
         <button className="close-button" onClick={onClose}>
@@ -55,7 +55,7 @@ function ModalAddUser({ isVisible, onClose, onUserAdded }) {
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             required
-            disabled={loading} // <-- 6. Desativar campos
+            disabled={loading}
           />
           <input
             type="password"
@@ -63,8 +63,8 @@ function ModalAddUser({ isVisible, onClose, onUserAdded }) {
             value={senha}
             onChange={(e) => setSenha(e.target.value)}
             required
-            minLength={6} // Validação de 6 caracteres
-            disabled={loading} // <-- 6. Desativar campos
+            minLength={6}
+            disabled={loading}
           />
           <select
             value={role}
@@ -75,8 +75,6 @@ function ModalAddUser({ isVisible, onClose, onUserAdded }) {
             <option value="ADMIN">Administrador</option>
           </select>
           <button type="submit" disabled={loading}>
-            {" "}
-            {/* 7. Desativar botão */}
             {loading ? "A criar..." : "Criar Utilizador"}
           </button>
           {error && <p className="error-message">{error}</p>}
