@@ -1,8 +1,7 @@
 # Usa uma imagem base do Java 21 (como no seu pom.xml)
-FROM openjdk:21-jdk-slim
+FROM eclipse-temurin:21-jdk-slim
 
 # Copia o .jar do seu projeto para dentro da imagem
-# (Você precisa gerar o .jar primeiro com 'mvn clean package')
 COPY target/*.jar app.jar
 
 # Expõe a porta 8080 (a mesma do seu application.properties)
