@@ -27,12 +27,11 @@ function ReposicaoPage() {
       try {
         setLoading(true);
 
-        // Buscar dados em paralelo para melhor performance
         const [componentesResponse, thresholdResponse] = await Promise.all([
           api.get("/api/componentes"),
-          api
-            .get("/api/configuracoes/limiteEstoqueBaixo")
-            .catch(() => ({ data: 5 })), // Fallback para 5 se der erro
+
+          // **** CORREÇÃO DO ENDPOINT AQUI ****
+          api.get("/api/settings/lowStockThreshold").catch(() => ({ data: 5 })),
         ]);
 
         if (Array.isArray(componentesResponse.data)) {
@@ -53,12 +52,9 @@ function ReposicaoPage() {
 
   const handleGerarPedidoPDF = () => {
     const doc = new jsPDF();
-
-    // Adicionar título
     doc.setFontSize(18);
     doc.text("Relatório de Reposição de Estoque", 14, 22);
 
-    // Preparar dados para a tabela
     const tableData = componentes
       .filter((comp) => comp.quantidade <= threshold)
       .map((comp) => [
@@ -68,7 +64,6 @@ function ReposicaoPage() {
         comp.quantidade <= 0 ? "ESGOTADO" : "BAIXO",
       ]);
 
-    // Adicionar tabela
     autoTable(doc, {
       head: [["Código", "Nome", "Quantidade", "Status"]],
       body: tableData,
@@ -76,8 +71,6 @@ function ReposicaoPage() {
       styles: { fontSize: 10 },
       headStyles: { fillColor: [66, 66, 66] },
     });
-
-    // Salvar PDF
     doc.save("relatorio-reposicao-estoque.pdf");
   };
 
@@ -102,10 +95,7 @@ function ReposicaoPage() {
   }
 
   return (
-    <Box
-      component="main"
-      sx={{ flexGrow: 1, p: 3}}
-    >
+    <Box component="main" sx={{ flexGrow: 1, p: 3 }}>
       <Container maxWidth="lg">
         <Box
           display="flex"
@@ -113,7 +103,7 @@ function ReposicaoPage() {
           alignItems="center"
           mb={3}
         >
-          <Typography variant="h4" component="h1">
+          <Typography variant="h4" component="h1" fontWeight="bold">
             Relatório de Reposição
           </Typography>
 
@@ -121,7 +111,7 @@ function ReposicaoPage() {
             variant="contained"
             startIcon={<PrintIcon />}
             onClick={handleGerarPedidoPDF}
-            disabled={componentes.length === 0}
+            disabled={!necessitaReposicao} // Desabilita se não houver nada a repor
           >
             Gerar PDF
           </Button>
@@ -135,7 +125,8 @@ function ReposicaoPage() {
 
         <Grid container spacing={3}>
           {itensEmFalta.length > 0 && (
-            <Grid item xs={12} md={6}>
+            // Removido 'item' da prop do Grid
+            <Grid xs={12} md={6}>
               <ActionList
                 title="Itens Esgotados"
                 items={itensEmFalta}
@@ -146,7 +137,8 @@ function ReposicaoPage() {
           )}
 
           {itensEstoqueBaixo.length > 0 && (
-            <Grid item xs={12} md={6}>
+            // Removido 'item' da prop do Grid
+            <Grid xs={12} md={6}>
               <ActionList
                 title={`Itens com Estoque Baixo (≤ ${threshold} unidades)`}
                 items={itensEstoqueBaixo}

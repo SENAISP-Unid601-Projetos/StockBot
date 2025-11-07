@@ -1,33 +1,41 @@
 package com.example.Back.Controller;
 
 import com.example.Back.Dto.ThresholdDTO;
+import com.example.Back.Service.SettingsService; // <-- Agora o Java vai encontrar este ficheiro
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.concurrent.atomic.AtomicInteger;
+// Não precisamos mais do AtomicInteger
 
 @RestController
 @RequestMapping("/api/settings")
 public class SettingsController {
 
-    // Para simplificar, vamos guardar o limite na memória.
-    // Numa aplicação real, isto viria de uma tabela 'settings' na base de dados.
-    private final AtomicInteger lowStockThreshold = new AtomicInteger(5);
+    // Remove a variável antiga
+    // private final AtomicInteger lowStockThreshold = new AtomicInteger(5);
 
-    // Endpoint para OBTER o limite atual
-    @GetMapping("/lowStockThreshold")
-    public ResponseEntity<Integer> getLowStockThreshold() {
-        System.out.println("[SETTINGS CONTROLLER] GET /lowStockThreshold - Retornando: " + lowStockThreshold.get());
-        return ResponseEntity.ok(lowStockThreshold.get());
+    private final SettingsService settingsService; // <-- Adiciona o serviço
+
+    // Injeta o SettingsService
+    public SettingsController(SettingsService settingsService) {
+        this.settingsService = settingsService;
     }
 
-    // Endpoint para ATUALIZAR o limite (só para admins)
+    // Modifica o GET para usar o serviço
+    @GetMapping("/lowStockThreshold")
+    @PreAuthorize("isAuthenticated()") // Permite que USERs leiam
+    public ResponseEntity<Integer> getLowStockThreshold() {
+        int threshold = settingsService.getLowStockThreshold(); // Usa o serviço
+        System.out.println("[SETTINGS CONTROLLER] GET /lowStockThreshold - Retornando: " + threshold);
+        return ResponseEntity.ok(threshold);
+    }
+
+    // Modifica o PUT para usar o serviço
     @PutMapping("/lowStockThreshold")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Void> updateLowStockThreshold(@RequestBody ThresholdDTO dto) {
         System.out.println("[SETTINGS CONTROLLER] PUT /lowStockThreshold - Novo valor: " + dto.getThreshold());
-        lowStockThreshold.set(dto.getThreshold());
+        settingsService.updateLowStockThreshold(dto.getThreshold()); // Usa o serviço
         return ResponseEntity.ok().build();
     }
 }

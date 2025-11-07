@@ -1,30 +1,31 @@
-import { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
-import axios from 'axios';
-import './loginpage.css'; // Reutiliza o CSS
+import { useState } from "react";
+import { useNavigate, Link } from "react-router-dom";
+import axios from "axios";
+import "./loginpage.css"; // Reutiliza o CSS
+import { toast } from "react-toastify"; // Usar toast para erros
 
-const apiUrl = 'http://localhost:8080/api/auth';
+const apiUrl = "http://localhost:8080/api/auth";
 
 function RegisterPage() {
-  const [email, setEmail] = useState('');
-  const [senha, setSenha] = useState('');
-  const [confirmarSenha, setConfirmarSenha] = useState('');
-  const [dominioEmpresa, setDominioEmpresa] = useState('');
-  const [error, setError] = useState('');
+  const [email, setEmail] = useState("");
+  const [senha, setSenha] = useState("");
+  const [confirmarSenha, setConfirmarSenha] = useState("");
+  const [dominioEmpresa, setDominioEmpresa] = useState("");
+  const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
   const handleRegister = async (event) => {
     event.preventDefault();
-    setError('');
+    setError("");
 
     if (senha !== confirmarSenha) {
-      setError('As senhas não coincidem.');
+      setError("As senhas não coincidem.");
       return;
     }
 
     if (senha.length < 6) {
-      setError('A senha deve ter no mínimo 6 caracteres.');
+      setError("A senha deve ter no mínimo 6 caracteres.");
       return;
     }
 
@@ -32,16 +33,17 @@ function RegisterPage() {
     try {
       await axios.post(`${apiUrl}/register`, { email, senha, dominioEmpresa });
 
-      alert('Cadastro realizado com sucesso! Você já pode fazer o login.');
-      navigate('/login');
-
+      toast.success("Empresa registada com sucesso! Já pode fazer o login.");
+      navigate("/login");
     } catch (error) {
-      console.error('Erro no cadastro:', error);
-      if (error.response && error.response.data) {
-        setError(error.response.data.message || 'Erro ao realizar o cadastro. Verifique os dados.');
-      } else {
-        setError('Não foi possível conectar ao servidor.');
-      }
+      console.error("Erro no cadastro:", error);
+      // Pega a mensagem de erro específica do backend (que definimos agora)
+      const errorMsg =
+        error.response?.data?.message ||
+        error.response?.data ||
+        "Erro ao realizar o cadastro. Tente novamente.";
+      setError(errorMsg);
+      // toast.error(errorMsg); // Pode usar toast ou o <p>
     } finally {
       setLoading(false);
     }
@@ -51,9 +53,9 @@ function RegisterPage() {
     <div className="login-container">
       <div className="form-wrapper">
         <form className="auth-form" onSubmit={handleRegister}>
-          <h2>Criar Conta no StockBot</h2>
+          <h2>Registar Nova Empresa</h2>
 
-          <label htmlFor="dominio">Domínio da Empresa</label>
+          <label htmlFor="dominio">Domínio da Empresa (Ex: senai)</label>
           <input
             type="text"
             id="dominio"
@@ -63,7 +65,7 @@ function RegisterPage() {
             disabled={loading}
           />
 
-          <label htmlFor="email">E-mail</label>
+          <label htmlFor="email">E-mail do Administrador</label>
           <input
             type="email"
             id="email"
@@ -96,13 +98,14 @@ function RegisterPage() {
           {error && <p className="error-message">{error}</p>}
 
           <button type="submit" disabled={loading}>
-             {}
-            {loading ? 'A registrar...' : 'Registrar'}
+            {loading ? "A registar..." : "Registar"}
           </button>
         </form>
 
         <div className="login-link">
-          <p>Já tem uma conta? <Link to="/login">Faça o login</Link></p>
+          <p>
+            Já tem uma conta? <Link to="/login">Faça o login</Link>
+          </p>
         </div>
       </div>
     </div>
