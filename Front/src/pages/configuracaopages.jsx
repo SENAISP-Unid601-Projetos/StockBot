@@ -1,11 +1,10 @@
 import { useState, useEffect } from "react";
-import { jwtDecode } from "jwt-decode";
 import api from "../services/api";
 import { toast } from "react-toastify";
-import { useColorMode } from "../useColorMode.js"
+import { useColorMode } from "../useColorMode.js";
 import { useTheme } from "@mui/material/styles";
+import { isAdmin } from "../services/authService";
 
-// Componentes do MUI e outros
 import {
   Box,
   Container,
@@ -16,34 +15,25 @@ import {
   TextField,
   Button as MuiButton,
   CircularProgress,
+  Grid, // Importado
 } from "@mui/material";
-import Sidebar from "../components/sidebar";
 import UserManagement from "../components/usermanagement.jsx";
 import ModalAddUser from "../components/modaladduser.jsx";
 
 function ConfiguracoesPage() {
-  const themeMui = useTheme(); // Hook do MUI para acessar o tema atual
-  const { toggleColorMode } = useColorMode(); // Nosso hook para pegar a função de toggle
+  const themeMui = useTheme();
+  const { toggleColorMode } = useColorMode();
 
-  const [isAdmin, setIsAdmin] = useState(false);
+  const [isUserAdmin, setIsUserAdmin] = useState(false);
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [verifyLoading, setVerifyLoading] = useState(false);
   const [isAddUserModalVisible, setAddUserModalVisible] = useState(false);
   const [isVerified, setIsVerified] = useState(false);
   const [password, setPassword] = useState("");
 
   useEffect(() => {
-    const token = localStorage.getItem("jwt-token");
-    if (token) {
-      try {
-        const decodedToken = jwtDecode(token);
-        if (decodedToken.roles?.includes("ROLE_ADMIN")) {
-          setIsAdmin(true);
-        }
-      } catch (error) {
-        console.error("Erro ao descodificar o token:", error);
-      }
-    }
+    setIsUserAdmin(isAdmin());
   }, []);
 
   const fetchUsers = async () => {
@@ -61,45 +51,43 @@ function ConfiguracoesPage() {
 
   const handleVerifyPassword = async (e) => {
     e.preventDefault();
-    setLoading(true);
+    setVerifyLoading(true);
     try {
       await api.post("/api/auth/verify-password", { password });
       setIsVerified(true);
-      fetchUsers(); // fetchUsers já gere o seu próprio loading state
+      fetchUsers();
     } catch (error) {
       console.error("Erro na verificação de senha:", error);
       toast.error("Senha incorreta. Acesso negado.");
       setIsVerified(false);
-      setLoading(false); // Precisamos de parar o loading aqui no caso de erro
+    } finally {
+      setVerifyLoading(false);
     }
-    // O finally foi removido daqui porque o fetchUsers já o tem.
-    // O setLoading(false) só é necessário no catch agora.
   };
 
   const handleDeleteUser = async (id) => {
     if (
       window.confirm("Tem a certeza de que deseja excluir este utilizador?")
     ) {
-      setLoading(true); // ← MELHORIA: Inicia o loading
+      setLoading(true);
       try {
         await api.delete(`/api/users/${id}`);
         toast.success("Utilizador excluído com sucesso!");
-        fetchUsers(); // ← IMPORTANTE: Recarregar a lista após exclusão
+        fetchUsers();
       } catch (error) {
         console.error("Erro ao excluir utilizador:", error);
-        toast.error("Falha ao excluir o utilizador.");
+        toast.error(
+          error.response?.data?.message || "Falha ao excluir o utilizador."
+        );
       } finally {
-        setLoading(false); // ← IMPORTANTE: Parar o loading em qualquer caso
+        setLoading(false);
       }
     }
   };
 
   return (
     <>
-      <Box
-        component="main"
-        sx={{ flexGrow: 1, p: 3}}
-      >
+      <Box component="main" sx={{ flexGrow: 1, p: 3 }}>
         <Container maxWidth="lg">
           <Typography
             variant="h4"
@@ -110,77 +98,132 @@ function ConfiguracoesPage() {
             Configurações
           </Typography>
 
-          {/* Secção de Aparência com componentes MUI */}
-          <Paper sx={{ p: 3, mb: 4, boxShadow: 3 }}>
-            <Typography variant="h6" gutterBottom>
-              Aparência
-            </Typography>
-            <FormControlLabel
-              control={
-                <Switch checked={themeMui.palette.mode === "dark"} onChange={toggleColorMode} />
-              }
-              label="Modo Escuro"
-            />
-          </Paper>
+          {/* SINTAXE DO GRID V2 (sem 'item') */}
+          <Grid container spacing={3}>
+            <Grid xs={12} md={6}>
+              {" "}
+              {/* Removido 'item' */}
+              <Paper sx={{ p: 3, boxShadow: 3, height: "100%" }}>
+                <Typography variant="h6" gutterBottom>
+                  Aparência
+                </Typography>
+                <FormControlLabel
+                  control={
+                    <Switch
+                      checked={themeMui.palette.mode === "dark"}
+                      onChange={toggleColorMode}
+                    />
+                  }
+                  label="Modo Escuro"
+                />
+              </Paper>
+            </Grid>
 
-        {/* Secção de Gestão de Utilizadores */}
-        {isAdmin && (
-          <Paper sx={{ p: 3, boxShadow: 3 }}>
-            <Box
-              sx={{
-                display: "flex",
-                justifyContent: "space-between",
-                alignItems: "center",
-                mb: 2,
-              }}
-            >
-              <Typography variant="h6">Gestão de Utilizadores</Typography>
-              <MuiButton
-                variant="contained"
-                onClick={() => setAddUserModalVisible(true)}
+            <Grid xs={12} md={6}>
+              {" "}
+              {/* Removido 'item' */}
+              <Paper
                 sx={{
-                  backgroundColor: "#ce0000",
-                  "&:hover": { backgroundColor: "#a40000" },
+                  p: 3,
+                  boxShadow: 3,
+                  height: "100%",
+                  backgroundColor: themeMui.palette.background.default,
                 }}
               >
-                Adicionar Utilizador
-              </MuiButton>
-            </Box>
+                <Typography variant="h6" gutterBottom sx={{ opacity: 0.7 }}>
+                  Configurações da Empresa
+                </Typography>
+                <Typography sx={{ opacity: 0.5, mt: 2 }}>
+                  (Em breve: alterar nome da empresa, cor do tema, etc.)
+                </Typography>
+              </Paper>
+            </Grid>
 
-              {!isVerified ? (
-                <Box
-                  component="form"
-                  onSubmit={handleVerifyPassword}
-                  sx={{ mt: 2, display: "flex", gap: 2, alignItems: "center" }}
-                >
-                  <TextField
-                    type="password"
-                    label="Senha de Administrador"
-                    variant="outlined"
-                    size="small"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    required
-                  />
-                  <MuiButton type="submit" variant="contained">
-                    Verificar
-                  </MuiButton>
-                </Box>
-              ) : loading ? (
-                <Box sx={{ display: "flex", justifyContent: "center", mt: 4 }}>
-                  <CircularProgress />
-                </Box>
-              ) : (
-                <UserManagement users={users} onDeleteUser={handleDeleteUser} />
-              )}
-            </Paper>
-          )}
+            {isUserAdmin && (
+              <Grid xs={12}>
+                {" "}
+                {/* Removido 'item' */}
+                <Paper sx={{ p: 3, boxShadow: 3, mt: 3 }}>
+                  {" "}
+                  {/* Adicionado margin top */}
+                  <Box
+                    sx={{
+                      display: "flex",
+                      justifyContent: "space-between",
+                      alignItems: "center",
+                      mb: 2,
+                    }}
+                  >
+                    <Typography variant="h6">Gestão de Utilizadores</Typography>
+                    <MuiButton
+                      variant="contained"
+                      onClick={() => setAddUserModalVisible(true)}
+                      disabled={!isVerified}
+                      sx={{
+                        backgroundColor: "#ce0000",
+                        "&:hover": { backgroundColor: "#a40000" },
+                      }}
+                    >
+                      Adicionar Utilizador
+                    </MuiButton>
+                  </Box>
+                  {!isVerified ? (
+                    <Box
+                      component="form"
+                      onSubmit={handleVerifyPassword}
+                      sx={{
+                        mt: 2,
+                        display: "flex",
+                        gap: 2,
+                        alignItems: "center",
+                      }}
+                    >
+                      <TextField
+                        type="password"
+                        label="Confirmar Senha de Administrador"
+                        variant="outlined"
+                        size="small"
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
+                        required
+                      />
+                      <MuiButton
+                        type="submit"
+                        variant="contained"
+                        disabled={verifyLoading}
+                      >
+                        {verifyLoading ? (
+                          <CircularProgress size={24} />
+                        ) : (
+                          "Verificar"
+                        )}
+                      </MuiButton>
+                    </Box>
+                  ) : loading ? (
+                    <Box
+                      sx={{ display: "flex", justifyContent: "center", mt: 4 }}
+                    >
+                      <CircularProgress />
+                    </Box>
+                  ) : (
+                    <UserManagement
+                      users={users}
+                      onDeleteUser={handleDeleteUser}
+                    />
+                  )}
+                </Paper>
+              </Grid>
+            )}
+          </Grid>
         </Container>
-        <ModalAddUser
-          isVisible={isAddUserModalVisible}
-          onClose={() => setAddUserModalVisible(false)}
-          onUserAdded={fetchUsers}
-        />
+
+        {isAddUserModalVisible && (
+          <ModalAddUser
+            isVisible={isAddUserModalVisible}
+            onClose={() => setAddUserModalVisible(false)}
+            onUserAdded={fetchUsers}
+          />
+        )}
       </Box>
     </>
   );

@@ -33,7 +33,7 @@ function RegisterPage() {
     try {
       await axios.post(`${apiUrl}/register`, { email, senha, dominioEmpresa });
 
-      toast.success("Empresa registada com sucesso! Já pode fazer o login.");
+      toast.success("Empresa registrada com sucesso!");
       navigate("/login");
     } catch (error) {
       console.error("Erro no cadastro:", error);
@@ -53,9 +53,9 @@ function RegisterPage() {
     <div className="login-container">
       <div className="form-wrapper">
         <form className="auth-form" onSubmit={handleRegister}>
-          <h2>Registar Nova Empresa</h2>
+          <h2>Registrar Nova Empresa</h2>
 
-          <label htmlFor="dominio">Domínio da Empresa (Ex: senai)</label>
+          <label htmlFor="dominio">Domínio da Empresa</label>
           <input
             type="text"
             id="dominio"
@@ -65,7 +65,7 @@ function RegisterPage() {
             disabled={loading}
           />
 
-          <label htmlFor="email">E-mail do Administrador</label>
+          <label htmlFor="email">E-mail</label>
           <input
             type="email"
             id="email"
@@ -98,7 +98,7 @@ function RegisterPage() {
           {error && <p className="error-message">{error}</p>}
 
           <button type="submit" disabled={loading}>
-            {loading ? "A registar..." : "Registar"}
+            {loading ? "A registrar..." : "Registrar"}
           </button>
         </form>
 

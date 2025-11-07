@@ -20,7 +20,7 @@ import {
   LogOut,
 } from "lucide-react";
 
-// 2. Importar a função de verificação de admin
+// 2. IMPORTAR a função de verificação de admin
 import { isAdmin } from "../services/authService";
 
 const menuItems = [
