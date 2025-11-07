@@ -20,23 +20,20 @@ import CategoryChart from "../components/categoriachart";
 function DashboardPage() {
   const [componentes, setComponentes] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [threshold, setThreshold] = useState(5); // <-- 1. Adicionar estado para o limite
+  const [threshold, setThreshold] = useState(5);
 
   const fetchData = async () => {
     setLoading(true);
     try {
-      // 2. Buscar componentes E o limite em paralelo
       const [componentesResponse, thresholdResponse] = await Promise.all([
         api.get("/api/componentes"),
-        api
-          .get("/api/settings/lowStockThreshold") // <-- Buscar o limite
-          .catch(() => ({ data: 5 })), // Fallback
+        api.get("/api/settings/lowStockThreshold").catch(() => ({ data: 5 })), // Fallback
       ]);
 
       if (Array.isArray(componentesResponse.data)) {
         setComponentes(componentesResponse.data);
       }
-      setThreshold(thresholdResponse.data); // 3. Definir o limite
+      setThreshold(thresholdResponse.data);
     } catch (error) {
       console.error("Erro ao buscar dados!", error);
       toast.error("Não foi possível carregar os dados do dashboard.");
@@ -106,9 +103,9 @@ function DashboardPage() {
     (total, comp) => total + comp.quantidade,
     0
   );
+
   const itensEmFalta = componentes.filter((comp) => comp.quantidade <= 0);
 
-  // 4. Usar o 'threshold' do estado, em vez do valor '5' fixo
   const itensEstoqueBaixo = componentes.filter(
     (comp) => comp.quantidade > 0 && comp.quantidade <= threshold
   );
@@ -151,39 +148,63 @@ function DashboardPage() {
               <CircularProgress />
             </Box>
           ) : (
-            <Grid container spacing={3}>
-              <Grid xs={12} md={4}>
+            <Grid container spacing={2}>
+              {/* --- LINHA 1: KPI CARDS --- */}
+              {/*
+               *
+               * MUDANÇA 1: Adicionamos 'sx' ao Grid e a prop 'items' ao KpiCard
+               *
+               */}
+              <Grid xs={12} md={4} sx={{ display: "flex" }}>
                 <KpiCard
                   title="Total de Itens"
                   value={componentes.length}
                   description="Tipos de itens cadastrados"
+                  items={componentes} // <-- Passa a lista de TODOS os itens
                 />
               </Grid>
-              <Grid xs={12} md={4}>
+
+              {/* Card de Unidades não precisa de lista */}
+              <Grid xs={12} md={4} sx={{ display: "flex" }}>
                 <KpiCard
-                  title="Unidades em Stock"
+                  title="Unidades em Estoque"
                   value={totalUnidades}
                   description="Total de unidades no inventário"
+                  // Sem lista aqui
                 />
               </Grid>
-              <Grid xs={12} md={4}>
+
+              {/*
+               *
+               * MUDANÇA 2: Adicionamos 'sx' ao Grid e a prop 'items' ao KpiCard
+               *
+               */}
+              <Grid xs={12} md={4} sx={{ display: "flex" }}>
                 <KpiCard
                   title="Itens em Falta"
                   value={itensEmFalta.length}
-                  description="Itens com stock zerado"
+                  description="Itens com estoque zerado"
                   isCritical={true}
+                  items={itensEmFalta} // <-- Passa a lista de ITENS EM FALTA
                 />
               </Grid>
+
+              {/* --- LINHA 2: GRÁFICO E LISTAS --- */}
               <Grid xs={12} lg={8}>
-                <Paper sx={{ p: 2, height: "100%" }}>
+                <Paper sx={{ p: 0, height: "100%" }}>
                   <CategoryChart componentes={componentes} />
                 </Paper>
               </Grid>
+
+              {/*
+               *
+               * MUDANÇA 3: A coluna da direita agora só tem a lista de "Stock Baixo"
+               *
+               */}
               <Grid xs={12} lg={4}>
                 <Paper sx={{ p: 2, height: "100%" }}>
-                  {/* 5. Passar o 'threshold' para o ActionList */}
                   <ActionList
-                    title={`Itens com Stock Baixo (≤ ${threshold})`}
+                    title={"Itens com Stock Baixo"}
                     items={itensEstoqueBaixo}
                   />
                 </Paper>
