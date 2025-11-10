@@ -62,7 +62,7 @@ function DashboardPage() {
 
       const doc = new jsPDF();
       doc.setFontSize(18);
-      doc.text("Relatório de Movimentações de Stock", 14, 22);
+      doc.text("Relatório de Movimentações de Estoque", 14, 22);
       doc.setFontSize(11);
       doc.text(`Gerado em: ${new Date().toLocaleDateString("pt-BR")}`, 14, 30);
 
@@ -204,7 +204,7 @@ function DashboardPage() {
               <Grid xs={12} lg={4}>
                 <Paper sx={{ p: 2, height: "100%" }}>
                   <ActionList
-                    title={"Itens com Stock Baixo"}
+                    title={"Itens com Estoque Baixo"}
                     items={itensEstoqueBaixo}
                   />
                 </Paper>
