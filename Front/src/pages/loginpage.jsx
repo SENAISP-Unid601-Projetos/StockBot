@@ -1,10 +1,9 @@
 import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom"; // <-- ADICIONAR 'Link'
-import axios from "axios";
+import api from "../services/api";
 import "./loginpage.css";
 import { toast } from "react-toastify"; // Importar toast para consistência
 
-const apiUrl = "http://localhost:8080/api/auth";
 
 function LoginPage() {
   const [email, setEmail] = useState("");
@@ -20,7 +19,7 @@ function LoginPage() {
     setLoading(true);
 
     try {
-      const response = await axios.post(`${apiUrl}/login`, {
+      const response = await api.post("/api/auth/login", {
         email,
         senha,
         dominioEmpresa,
