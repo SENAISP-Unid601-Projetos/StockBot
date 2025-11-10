@@ -15,7 +15,7 @@ import {
 } from "@mui/material";
 import PrintIcon from "@mui/icons-material/Print";
 
-import ActionList from "../components/actionlist";
+import ActionList from "../components/actionList";
 
 function ReposicaoPage() {
   const [componentes, setComponentes] = useState([]);
