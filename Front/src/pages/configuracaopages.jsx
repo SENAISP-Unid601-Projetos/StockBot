@@ -1,8 +1,7 @@
 import { useState, useEffect } from "react";
 import api from "../services/api";
 import { toast } from "react-toastify";
-// import { useColorMode } from "../useColorMode.js" // <-- Removido (não é mais necessário aqui)
-import { useTheme } from "@mui/material/styles"; // <-- Pode ser removido se não usar o themeMui
+import { useTheme } from "@mui/material/styles";
 import { isAdmin } from "../services/authService";
 
 import {
@@ -10,32 +9,33 @@ import {
   Container,
   Typography,
   Paper,
-  // FormControlLabel, // <-- Removido
-  // Switch, // <-- Removido
   TextField,
   Button as MuiButton,
   CircularProgress,
   Grid,
 } from "@mui/material";
+
 import UserManagement from "../components/usermanagement.jsx";
 import ModalAddUser from "../components/modaladduser.jsx";
 
 function ConfiguracoesPage() {
-  const themeMui = useTheme(); // <-- Mantido caso queira usar para o placeholder
-  // const { toggleColorMode } = useColorMode(); // <-- Removido
+  const themeMui = useTheme();
 
   const [isUserAdmin, setIsUserAdmin] = useState(false);
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [verifyLoading, setVerifyLoading] = useState(false);
   const [isAddUserModalVisible, setAddUserModalVisible] = useState(false);
-  const [isVerified, setIsVerified] = useState(false);
-  const [password, setPassword] = useState("");
 
+  // 🔹 Verifica se é admin e carrega utilizadores automaticamente
   useEffect(() => {
-    setIsUserAdmin(isAdmin());
+    const adminStatus = isAdmin();
+    setIsUserAdmin(adminStatus);
+    if (adminStatus) {
+      fetchUsers();
+    }
   }, []);
 
+  // 🔹 Busca todos os usuários (apenas se admin)
   const fetchUsers = async () => {
     setLoading(true);
     try {
@@ -49,22 +49,7 @@ function ConfiguracoesPage() {
     }
   };
 
-  const handleVerifyPassword = async (e) => {
-    e.preventDefault();
-    setVerifyLoading(true);
-    try {
-      await api.post("/api/auth/verify-password", { password });
-      setIsVerified(true);
-      fetchUsers();
-    } catch (error) {
-      console.error("Erro na verificação de senha:", error);
-      toast.error("Senha incorreta. Acesso negado.");
-      setIsVerified(false);
-    } finally {
-      setVerifyLoading(false);
-    }
-  };
-
+  // 🔹 Deletar usuário
   const handleDeleteUser = async (id) => {
     if (
       window.confirm("Tem a certeza de que deseja excluir este utilizador?")
@@ -107,12 +92,8 @@ function ConfiguracoesPage() {
           </Typography>
 
           <Grid container spacing={3}>
-            {/* *** BLOCO DE APARÊNCIA REMOVIDO DAQUI *** */}
-
-            {/* Bloco de Placeholder (Ocupa o espaço) */}
+            {/* Bloco de Configurações da Empresa (placeholder) */}
             <Grid xs={12}>
-              {" "}
-              {/* Ocupa a linha inteira agora */}
               <Paper
                 sx={{
                   p: 3,
@@ -130,7 +111,7 @@ function ConfiguracoesPage() {
               </Paper>
             </Grid>
 
-            {/* Bloco de Gestão de Utilizadores (só para Admin) */}
+            {/* Bloco de Gestão de Utilizadores (apenas Admin) */}
             {isUserAdmin && (
               <Grid xs={12}>
                 <Paper sx={{ p: 3, boxShadow: 3, mt: 3 }}>
@@ -146,7 +127,6 @@ function ConfiguracoesPage() {
                     <MuiButton
                       variant="contained"
                       onClick={() => setAddUserModalVisible(true)}
-                      disabled={!isVerified}
                       sx={{
                         backgroundColor: "#ce0000",
                         "&:hover": { backgroundColor: "#a40000" },
@@ -156,39 +136,7 @@ function ConfiguracoesPage() {
                     </MuiButton>
                   </Box>
 
-                  {!isVerified ? (
-                    <Box
-                      component="form"
-                      onSubmit={handleVerifyPassword}
-                      sx={{
-                        mt: 2,
-                        display: "flex",
-                        gap: 2,
-                        alignItems: "center",
-                      }}
-                    >
-                      <TextField
-                        type="password"
-                        label="Confirmar Senha de Administrador"
-                        variant="outlined"
-                        size="small"
-                        value={password}
-                        onChange={(e) => setPassword(e.target.value)}
-                        required
-                      />
-                      <MuiButton
-                        type="submit"
-                        variant="contained"
-                        disabled={verifyLoading}
-                      >
-                        {verifyLoading ? (
-                          <CircularProgress size={24} />
-                        ) : (
-                          "Verificar"
-                        )}
-                      </MuiButton>
-                    </Box>
-                  ) : loading ? (
+                  {loading ? (
                     <Box
                       sx={{ display: "flex", justifyContent: "center", mt: 4 }}
                     >

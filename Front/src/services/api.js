@@ -1,10 +1,10 @@
-import axios from 'axios';
+import axios from "axios";
 
 const api = axios.create({
   baseURL: import.meta.env.VITE_API_URL || 'http://localhost:8080',
 });
 
-// Seu interceptor de requisição (perfeito, sem alterações)
+// --- Interceptor de Requisição ---
 api.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem('jwt-token');
@@ -18,29 +18,26 @@ api.interceptors.request.use(
   }
 );
 
-// --- SUGESTÃO: Adicionar Interceptor de Resposta ---
+// --- Interceptor de Resposta ---
 api.interceptors.response.use(
-  // 1. O que fazer com respostas de SUCESSO (status 2xx)
-  (response) => {
-    // Apenas retorna a resposta
-    return response;
-  },
-  // 2. O que fazer com respostas de ERRO
-  (error) => {
-    // Se o erro for 401 (Não Autorizado)
-    if (error.response && error.response.status === 401) {
-      // a. Limpe o token do localStorage
-      localStorage.removeItem('jwt-token');
+  // ✅ Resposta de sucesso
+  (response) => response,
 
-      // b. Redirecione o usuário para a página de login
-      //    (Evita que ele fique em uma tela que exige autenticação)
-      window.location.href = '/login'; 
-      
-      // Você também pode mostrar uma mensagem de "Sessão expirada".
+  // ❌ Resposta de erro
+  (error) => {
+    // Se o backend responder com 401 (não autorizado)
+    if (error.response && error.response.status === 401) {
+      // Remove o token expirado/inválido
+      localStorage.removeItem("jwt-token");
+
+      // Redireciona o utilizador para o login
+      window.location.href = "/login";
+
+      // Opcional: pode exibir uma mensagem amigável
+      // toast.warn("Sessão expirada. Faça login novamente.");
     }
 
-    // Para outros erros, apenas rejeita a promessa para que
-    // o bloco .catch() do seu componente possa lidar com eles.
+    // Rejeita o erro para que o .catch() do componente possa tratá-lo
     return Promise.reject(error);
   }
 );
