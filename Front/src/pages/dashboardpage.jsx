@@ -20,20 +20,23 @@ import CategoryChart from "../components/categoriachart";
 function DashboardPage() {
   const [componentes, setComponentes] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [threshold, setThreshold] = useState(5);
+  const [threshold, setThreshold] = useState(5); // <-- 1. Adicionar estado para o limite
 
   const fetchData = async () => {
     setLoading(true);
     try {
+      // 2. Buscar componentes E o limite em paralelo
       const [componentesResponse, thresholdResponse] = await Promise.all([
         api.get("/api/componentes"),
-        api.get("/api/settings/lowStockThreshold").catch(() => ({ data: 5 })), // Fallback
+        api
+          .get("/api/settings/lowStockThreshold") // <-- Buscar o limite
+          .catch(() => ({ data: 5 })), // Fallback
       ]);
 
       if (Array.isArray(componentesResponse.data)) {
         setComponentes(componentesResponse.data);
       }
-      setThreshold(thresholdResponse.data);
+      setThreshold(thresholdResponse.data); // 3. Definir o limite
     } catch (error) {
       console.error("Erro ao buscar dados!", error);
       toast.error("Não foi possível carregar os dados do dashboard.");
@@ -103,9 +106,9 @@ function DashboardPage() {
     (total, comp) => total + comp.quantidade,
     0
   );
-
   const itensEmFalta = componentes.filter((comp) => comp.quantidade <= 0);
 
+  // 4. Usar o 'threshold' do estado, em vez do valor '5' fixo
   const itensEstoqueBaixo = componentes.filter(
     (comp) => comp.quantidade > 0 && comp.quantidade <= threshold
   );
@@ -162,6 +165,13 @@ function DashboardPage() {
                   description="Tipos de itens cadastrados"
                   items={componentes} // <-- Passa a lista de TODOS os itens
                 />
+            <Grid container spacing={3}>
+              <Grid xs={12} md={4}>
+                <KpiCard
+                  title="Total de Itens"
+                  value={componentes.length}
+                  description="Tipos de itens cadastrados"
+                />
               </Grid>
 
               {/* Card de Unidades não precisa de lista */}
@@ -171,6 +181,12 @@ function DashboardPage() {
                   value={totalUnidades}
                   description="Total de unidades no inventário"
                   // Sem lista aqui
+                />
+              <Grid xs={12} md={4}>
+                <KpiCard
+                  title="Unidades em Stock"
+                  value={totalUnidades}
+                  description="Total de unidades no inventário"
                 />
               </Grid>
 
@@ -187,11 +203,20 @@ function DashboardPage() {
                   isCritical={true}
                   items={itensEmFalta} // <-- Passa a lista de ITENS EM FALTA
                 />
+              <Grid xs={12} md={4}>
+                <KpiCard
+                  title="Itens em Falta"
+                  value={itensEmFalta.length}
+                  description="Itens com stock zerado"
+                  isCritical={true}
+                />
               </Grid>
 
               {/* --- LINHA 2: GRÁFICO E LISTAS --- */}
               <Grid xs={12} lg={8}>
                 <Paper sx={{ p: 0, height: "100%" }}>
+              <Grid xs={12} lg={8}>
+                <Paper sx={{ p: 2, height: "100%" }}>
                   <CategoryChart componentes={componentes} />
                 </Paper>
               </Grid>
@@ -205,6 +230,13 @@ function DashboardPage() {
                 <Paper sx={{ p: 2, height: "100%" }}>
                   <ActionList
                     title={"Itens com Estoque Baixo"}
+                    items={itensEstoqueBaixo}
+                  />
+              <Grid xs={12} lg={4}>
+                <Paper sx={{ p: 2, height: "100%" }}>
+                  {/* 5. Passar o 'threshold' para o ActionList */}
+                  <ActionList
+                    title={`Itens com Stock Baixo (≤ ${threshold})`}
                     items={itensEstoqueBaixo}
                   />
                 </Paper>

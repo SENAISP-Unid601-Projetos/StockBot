@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react"; // 1. Importar useState e useEffect
+import React, { useState, useEffect } from "react";
 import { NavLink, useNavigate } from "react-router-dom";
 import {
   Box,
@@ -10,6 +10,8 @@ import {
   ListItemText,
   Typography,
   useTheme,
+  Switch,
+  FormControlLabel, // <-- 1. Importar Switch e FormControlLabel
 } from "@mui/material";
 import {
   LayoutDashboard,
@@ -18,10 +20,12 @@ import {
   ArchiveRestore,
   Settings,
   LogOut,
+  Moon,
+  Sun, // <-- 2. Importar Ícones de Tema
 } from "lucide-react";
 
-// 2. Importar a função de verificação de admin
 import { isAdmin } from "../services/authService";
+import { useColorMode } from "../useColorMode.js"; // <-- 3. Importar o hook do tema
 
 const menuItems = [
   { text: "Dashboard", icon: <LayoutDashboard size={20} />, path: "/" },
@@ -35,22 +39,23 @@ const drawerWidth = 250;
 function Sidebar() {
   const navigate = useNavigate();
   const theme = useTheme();
-
-  // 3. Criar estado para guardar se é admin
+  const { toggleColorMode } = useColorMode(); // <-- 4. Usar o hook
   const [isUserAdmin, setIsUserAdmin] = useState(false);
 
   useEffect(() => {
-    // 4. Verificar a role quando o componente carrega
     setIsUserAdmin(isAdmin());
-  }, []); // Array vazio significa que só executa uma vez
+  }, []);
 
   const handleLogout = () => {
     localStorage.removeItem("jwt-token");
     navigate("/login");
   };
 
+  // Define o estado do switch com base no tema atual
+  const isDarkMode = theme.palette.mode === "dark";
+
   const drawerContent = (
-    <div>
+    <div style={{ display: "flex", flexDirection: "column", height: "100%" }}>
       <Box sx={{ p: 2, textAlign: "center" }}>
         <Typography variant="h5" component="h2" fontWeight="bold" color="white">
           StockBot
@@ -66,16 +71,12 @@ function Sidebar() {
               sx={{
                 color: "rgba(255, 255, 255, 0.7)",
                 borderRadius: 2,
-                "&:hover": {
-                  backgroundColor: "rgba(255, 255, 255, 0.08)",
-                },
+                "&:hover": { backgroundColor: "rgba(255, 255, 255, 0.08)" },
                 "&.active": {
                   backgroundColor: "primary.main",
                   color: "white",
                   fontWeight: "bold",
-                  ".MuiListItemIcon-root": {
-                    color: "white",
-                  },
+                  ".MuiListItemIcon-root": { color: "white" },
                 },
               }}
             >
@@ -93,8 +94,27 @@ function Sidebar() {
       <Box sx={{ flexGrow: 1 }} />
 
       <List sx={{ p: 1, mt: "auto" }}>
-        {/* 5. RENDERIZAÇÃO CONDICIONAL */}
-        {/* O link de Configurações só aparece se isUserAdmin for true */}
+        {/* 5. SWITCH DO MODO ESCURO MOVIDO PARA AQUI */}
+        <ListItem sx={{ color: "rgba(255, 255, 255, 0.7)" }}>
+          <ListItemIcon
+            sx={{ color: "rgba(255, 255, 255, 0.7)", minWidth: 40 }}
+          >
+            {isDarkMode ? <Sun size={20} /> : <Moon size={20} />}
+          </ListItemIcon>
+          <FormControlLabel
+            control={
+              <Switch
+                checked={isDarkMode}
+                onChange={toggleColorMode}
+                color="primary"
+              />
+            }
+            label="Modo Escuro"
+            sx={{ m: 0, flexGrow: 1 }}
+          />
+        </ListItem>
+
+        {/* Link de Configurações (só para ADMIN) */}
         {isUserAdmin && (
           <ListItem disablePadding>
             <ListItemButton
@@ -121,18 +141,10 @@ function Sidebar() {
           </ListItem>
         )}
 
+        {/* Botão Sair */}
         <ListItem disablePadding>
-          <ListItemButton
-            onClick={handleLogout}
-            sx={{
-              color: "rgba(255, 255, 255, 0.7)",
-              borderRadius: 2,
-              "&:hover": { backgroundColor: "rgba(255, 255, 255, 0.08)" },
-            }}
-          >
-            <ListItemIcon
-              sx={{ color: "rgba(255, 255, 255, 0.7)", minWidth: 40 }}
-            >
+          <ListItemButton onClick={handleLogout} sx={{ color: 'rgba(255, 255, 255, 0.7)', borderRadius: 2, '&:hover': { backgroundColor: 'rgba(255, 255, 255, 0.08)' } }}>
+            <ListItemIcon sx={{ color: 'rgba(255, 255, 255, 0.7)', minWidth: 40 }}>
               <LogOut size={20} />
             </ListItemIcon>
             <ListItemText primary="Sair" />
