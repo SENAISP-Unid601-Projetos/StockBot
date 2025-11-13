@@ -1,10 +1,10 @@
-// Em: src/pages/AprovacoesPage.jsx
-import React, { useState } from "react"; // Import React
+import React, { useState } from "react";
 import { Box, Container, Typography, Tab, Tabs } from "@mui/material";
 
-// Importa os componentes das tabelas
-import TabelaRequisicoes from "../components/TableComponete";
-import TabelaPedidosCompra from "../components/TabelaComponentePedido";
+// Importa apenas a tabela de requisições (Retirada de Estoque)
+import TabelaRequisicoes from "../components/TableComponente"; 
+// NOTA: Verifique se o nome do arquivo importado acima corresponde exatamente ao que está na sua pasta components. 
+// No contexto fornecido, o arquivo chamava-se "TableComponente.jsx".
 
 function AprovacoesPage() {
   const [tabIndex, setTabIndex] = useState(0);
@@ -40,11 +40,7 @@ function AprovacoesPage() {
               id="tab-retirada"
               aria-controls="panel-retirada"
             />
-            <Tab
-              label="Pedidos de Compra"
-              id="tab-compra"
-              aria-controls="panel-compra"
-            />
+            {/* ABA DE PEDIDOS REMOVIDA DAQUI */}
           </Tabs>
         </Box>
 
@@ -55,20 +51,8 @@ function AprovacoesPage() {
           id="panel-retirada"
           aria-labelledby="tab-retirada"
         >
-          {tabIndex === 0 && ( // Renderiza só quando a aba está ativa
+          {tabIndex === 0 && (
             <TabelaRequisicoes />
-          )}
-        </Box>
-
-        {/* Painel da Aba 2 (Pedidos de Compra) */}
-        <Box
-          role="tabpanel"
-          hidden={tabIndex !== 1}
-          id="panel-compra"
-          aria-labelledby="tab-compra"
-        >
-          {tabIndex === 1 && ( // Renderiza só quando a aba está ativa
-            <TabelaPedidosCompra />
           )}
         </Box>
       </Container>
