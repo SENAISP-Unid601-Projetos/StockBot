@@ -173,7 +173,7 @@ function Sidebar() {
           width: drawerWidth,
           boxSizing: "border-box",
           backgroundColor:
-            theme.palette.mode === "dark" ? "#1e1e1e" : "#1A2E44",
+            theme.palette.mode === "dark" ? "#000000ff" : "#000000ff",
           borderRight: "none",
           display: "flex",
           flexDirection: "column",
