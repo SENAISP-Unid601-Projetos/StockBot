@@ -23,6 +23,7 @@ import {
   Moon,
   Sun, // <-- 2. Importar Ícones de Tema
   CheckSquare,
+  ShoppingCart,
 } from "lucide-react";
 
 import { isAdmin } from "../services/authService";
@@ -91,6 +92,30 @@ function Sidebar() {
           </ListItem>
         ))}
       </List>
+
+      <ListItem disablePadding>
+          <ListItemButton
+            component={NavLink}
+            to="/pedidos"
+            sx={{
+              color: "rgba(255, 255, 255, 0.7)",
+              borderRadius: 2,
+              "&:hover": { backgroundColor: "rgba(255, 255, 255, 0.08)" },
+              "&.active": {
+                backgroundColor: "primary.main",
+                color: "white",
+                ".MuiListItemIcon-root": { color: "white" },
+              },
+            }}
+          >
+            <ListItemIcon
+              sx={{ color: "rgba(255, 255, 255, 0.7)", minWidth: 40 }}
+            >
+              <ShoppingCart size={20} />
+            </ListItemIcon>
+            <ListItemText primary="Fazer Pedido de Compra" />
+          </ListItemButton>
+        </ListItem>
 
       <Box sx={{ flexGrow: 1 }} />
 
