@@ -2,7 +2,6 @@ import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom"; // <-- ADICIONAR 'Link'
 import axios from "axios";
 import "./loginpage.css";
-import { toast } from "react-toastify"; // Importar toast para consistência
 
 const apiUrl = "http://localhost:8080/api/auth";
 

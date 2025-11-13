@@ -1,5 +1,6 @@
 .user-management-container {
   margin-top: 1rem;
+  overflow-x: auto;
 }
 
 .user-management-container table {
@@ -11,22 +12,23 @@
 .user-management-container td {
   padding: 0.75rem 1rem;
   text-align: left;
-  border-bottom: 1px solid var(--cinzaMedio);
+  border-bottom: 1px solid var(--cor-borda, var(--cinzaMedio));
+
+  /* 1. AQUI: Forçamos a cor para PRETO PURO no modo claro */
+  color: #000000;
+  font-size: 0.95rem; /* Um ajuste fino no tamanho também ajuda a leitura */
 }
 
-.role-badge {
-  padding: 0.25rem 0.75rem;
-  border-radius: 12px;
-  color: var(--branco);
+/* Opcional: Se quiser que o cabeçalho (th) seja um pouco mais destacado ou diferente */
+.user-management-container th {
   font-weight: bold;
-  font-size: 0.8rem;
-  text-transform: uppercase;
+  /* Pode manter preto ou usar a cor secundária (azul escuro) se preferir */
+  color: var(--azulEscuroOriginal, #1a2e44);
 }
 
-.role-badge.admin {
-  background-color: var(--vermelhoSenai);
-}
-
-.role-badge.user {
-  background-color: #6c757d; /* Cinza */
+/* 2. IMPORTANTE: Correção para o Modo Escuro */
+/* Se não fizermos isso, o texto ficará preto no fundo preto */
+body.dark .user-management-container th,
+body.dark .user-management-container td {
+  color: var(--branco-puro, #ffffff);
 }
