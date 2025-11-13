@@ -22,6 +22,7 @@ import {
   LogOut,
   Moon,
   Sun, // <-- 2. Importar Ícones de Tema
+  CheckSquare,
 } from "lucide-react";
 
 import { isAdmin } from "../services/authService";
@@ -114,6 +115,33 @@ function Sidebar() {
           />
         </ListItem>
 
+        <> {/* <-- 2. Adicione um fragmento para agrupar os links de admin */}
+            
+            {/* 3. ADICIONE ESTE BLOCO NOVO PARA "APROVAÇÕES" */}
+            <ListItem disablePadding>
+              <ListItemButton
+                component={NavLink}
+                to="/aprovacoes"
+                sx={{
+                  color: "rgba(255, 255, 255, 0.7)",
+                  borderRadius: 2,
+                  "&:hover": { backgroundColor: "rgba(255, 255, 255, 0.08)" },
+                  "&.active": {
+                    backgroundColor: "primary.main",
+                    color: "white",
+                    ".MuiListItemIcon-root": { color: "white" },
+                  },
+                }}
+              >
+                <ListItemIcon
+                  sx={{ color: "rgba(255, 255, 255, 0.7)", minWidth: 40 }}
+                >
+                  <CheckSquare size={20} />
+                </ListItemIcon>
+                <ListItemText primary="Aprovações" />
+              </ListItemButton>
+            </ListItem>
+
         {/* Link de Configurações (só para ADMIN) */}
         {isUserAdmin && (
           <ListItem disablePadding>
@@ -140,6 +168,7 @@ function Sidebar() {
             </ListItemButton>
           </ListItem>
         )}
+      </> {/* <-- 4. Feche o fragmento */}
 
         {/* Botão Sair */}
         <ListItem disablePadding>

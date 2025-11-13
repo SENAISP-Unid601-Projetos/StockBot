@@ -13,6 +13,7 @@ import ComponentesPage from "./pages/componentepages.jsx";
 import HistoricoPage from "./pages/historicopage.jsx";
 import ConfiguracoesPage from "./pages/configuracaopages.jsx";
 import ReposicaoPage from "./pages/reposicaopage.jsx";
+import AprovacoesPage from "./pages/aprovacoesPage.jsx";
 import MainApp from "./MainApp.jsx";
 
 const router = createBrowserRouter([
@@ -25,6 +26,7 @@ const router = createBrowserRouter([
       { path: "/historico", element: <HistoricoPage /> },
       { path: "/reposicao", element: <ReposicaoPage /> },
       { path: "/configuracoes", element: <ConfiguracoesPage /> },
+      { path: "/aprovacoes", element: <AprovacoesPage /> },
     ],
   },
   { path: "/login", element: <LoginPage /> },
