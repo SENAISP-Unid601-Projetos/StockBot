@@ -3,6 +3,7 @@ import { useNavigate, Link } from "react-router-dom";
 import api from "../services/api";
 import "./loginpage.css"; // Reutiliza o CSS
 import { toast } from "react-toastify"; // Usar toast para erros
+import ParticlesBackground from "../components/ParticlesBackground";
 
 
 function RegisterPage() {
@@ -50,6 +51,8 @@ function RegisterPage() {
 
   return (
     <div className="login-container">
+      {/* 🎇 Fundo animado de partículas */}
+      <ParticlesBackground />
       <div className="form-wrapper">
         <form className="auth-form" onSubmit={handleRegister}>
           <h2>Registrar Nova Empresa</h2>

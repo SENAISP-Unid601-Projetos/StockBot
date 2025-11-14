@@ -143,17 +143,8 @@ function Sidebar() {
 
         {/* Botão Sair */}
         <ListItem disablePadding>
-          <ListItemButton
-            onClick={handleLogout}
-            sx={{
-              color: "rgba(255, 255, 255, 0.7)",
-              borderRadius: 2,
-              "&:hover": { backgroundColor: "rgba(255, 255, 255, 0.08)" },
-            }}
-          >
-            <ListItemIcon
-              sx={{ color: "rgba(255, 255, 255, 0.7)", minWidth: 40 }}
-            >
+          <ListItemButton onClick={handleLogout} sx={{ color: 'rgba(255, 255, 255, 0.7)', borderRadius: 2, '&:hover': { backgroundColor: 'rgba(255, 255, 255, 0.08)' } }}>
+            <ListItemIcon sx={{ color: 'rgba(255, 255, 255, 0.7)', minWidth: 40 }}>
               <LogOut size={20} />
             </ListItemIcon>
             <ListItemText primary="Sair" />

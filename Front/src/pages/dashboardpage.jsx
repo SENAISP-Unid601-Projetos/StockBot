@@ -20,23 +20,20 @@ import CategoryChart from "../components/categoriachart";
 function DashboardPage() {
   const [componentes, setComponentes] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [threshold, setThreshold] = useState(5); // <-- 1. Adicionar estado para o limite
+  const [threshold, setThreshold] = useState(5);
 
   const fetchData = async () => {
     setLoading(true);
     try {
-      // 2. Buscar componentes E o limite em paralelo
       const [componentesResponse, thresholdResponse] = await Promise.all([
         api.get("/api/componentes"),
-        api
-          .get("/api/settings/lowStockThreshold") // <-- Buscar o limite
-          .catch(() => ({ data: 5 })), // Fallback
+        api.get("/api/settings/lowStockThreshold").catch(() => ({ data: 5 })),
       ]);
 
       if (Array.isArray(componentesResponse.data)) {
         setComponentes(componentesResponse.data);
       }
-      setThreshold(thresholdResponse.data); // 3. Definir o limite
+      setThreshold(thresholdResponse.data);
     } catch (error) {
       console.error("Erro ao buscar dados!", error);
       toast.error("Não foi possível carregar os dados do dashboard.");
@@ -53,7 +50,7 @@ function DashboardPage() {
     toast.info("A gerar o relatório em PDF...");
     try {
       const historicoResponse = await api.get("/api/historico?size=100");
-      const historicoData = historicoResponse.data.content;
+      const historicoData = historicoResponse.data.content || [];
 
       const mapaComponentes = new Map(
         componentes.map((comp) => [comp.id, comp.nome])
@@ -65,7 +62,7 @@ function DashboardPage() {
 
       const doc = new jsPDF();
       doc.setFontSize(18);
-      doc.text("Relatório de Movimentações de Stock", 14, 22);
+      doc.text("Relatório de Movimentações de Estoque", 14, 22);
       doc.setFontSize(11);
       doc.text(`Gerado em: ${new Date().toLocaleDateString("pt-BR")}`, 14, 30);
 
@@ -103,14 +100,14 @@ function DashboardPage() {
   };
 
   const totalUnidades = componentes.reduce(
-    (total, comp) => total + comp.quantidade,
+    (total, comp) => total + (comp.quantidade || 0),
     0
   );
-  const itensEmFalta = componentes.filter((comp) => comp.quantidade <= 0);
-
-  // 4. Usar o 'threshold' do estado, em vez do valor '5' fixo
+  const itensEmFalta = componentes.filter(
+    (comp) => (comp.quantidade || 0) <= 0
+  );
   const itensEstoqueBaixo = componentes.filter(
-    (comp) => comp.quantidade > 0 && comp.quantidade <= threshold
+    (comp) => (comp.quantidade || 0) > 0 && (comp.quantidade || 0) <= threshold
   );
 
   return (
@@ -152,41 +149,52 @@ function DashboardPage() {
             </Box>
           ) : (
             <Grid container spacing={3}>
-              <Grid xs={12} md={4}>
-                <KpiCard
-                  title="Total de Itens"
-                  value={componentes.length}
-                  description="Tipos de itens cadastrados"
-                />
-              </Grid>
-              <Grid xs={12} md={4}>
-                <KpiCard
-                  title="Unidades em Stock"
-                  value={totalUnidades}
-                  description="Total de unidades no inventário"
-                />
-              </Grid>
-              <Grid xs={12} md={4}>
-                <KpiCard
-                  title="Itens em Falta"
-                  value={itensEmFalta.length}
-                  description="Itens com stock zerado"
-                  isCritical={true}
-                />
-              </Grid>
-              <Grid xs={12} lg={8}>
-                <Paper sx={{ p: 2, height: "100%" }}>
-                  <CategoryChart componentes={componentes} />
-                </Paper>
-              </Grid>
-              <Grid xs={12} lg={4}>
-                <Paper sx={{ p: 2, height: "100%" }}>
-                  {/* 5. Passar o 'threshold' para o ActionList */}
-                  <ActionList
-                    title={`Itens com Stock Baixo (≤ ${threshold})`}
-                    items={itensEstoqueBaixo}
+              {/* KPI Cards */}
+              <Grid container item spacing={2}>
+                <Grid item xs={12} md={4} sx={{ display: "flex" }}>
+                  <KpiCard
+                    title="Total de Itens"
+                    value={componentes.length}
+                    description="Tipos de itens cadastrados"
+                    items={componentes}
                   />
-                </Paper>
+                </Grid>
+
+                <Grid item xs={12} md={4} sx={{ display: "flex" }}>
+                  <KpiCard
+                    title="Unidades em Estoque"
+                    value={totalUnidades}
+                    description="Total de unidades no inventário"
+                  />
+                </Grid>
+
+                <Grid item xs={12} md={4} sx={{ display: "flex" }}>
+                  <KpiCard
+                    title="Itens em Falta"
+                    value={itensEmFalta.length}
+                    description="Itens com estoque zerado"
+                    isCritical={true}
+                    items={itensEmFalta}
+                  />
+                </Grid>
+              </Grid>
+
+              {/* Chart + Action List */}
+              <Grid item container spacing={2}>
+                <Grid item xs={12} lg={8}>
+                  <Paper sx={{ p: 2, height: "100%" }}>
+                    <CategoryChart componentes={componentes} />
+                  </Paper>
+                </Grid>
+
+                <Grid item xs={12} lg={4}>
+                  <Paper sx={{ p: 2, height: "100%" }}>
+                    <ActionList
+                      title={`Itens com Stock Baixo (≤ ${threshold})`}
+                      items={itensEstoqueBaixo}
+                    />
+                  </Paper>
+                </Grid>
               </Grid>
             </Grid>
           )}

@@ -1,9 +1,11 @@
 import { useState } from "react";
-import { useNavigate, Link } from "react-router-dom"; // <-- ADICIONAR 'Link'
+import { useNavigate, Link } from "react-router-dom";
 import api from "../services/api";
 import "./loginpage.css";
-import { toast } from "react-toastify"; // Importar toast para consistência
+import ParticlesBackground from "../components/ParticlesBackground";
+import { toast } from "react-toastify";
 
+const apiUrl = "http://localhost:8080/api/auth";
 
 function LoginPage() {
   const [email, setEmail] = useState("");
@@ -39,8 +41,17 @@ function LoginPage() {
   };
 
   return (
-    <div className="login-container">
-      <div className="form-wrapper">
+    <div
+      className="login-container"
+      style={{ position: "relative", minHeight: "100vh" }}
+    >
+      {/* 🎇 Fundo animado de partículas */}
+      <ParticlesBackground />
+
+      <div
+        className="form-wrapper"
+        style={{ position: "relative", zIndex: 10 }}
+      >
         <form className="auth-form" onSubmit={handleLogin}>
           <h2>Acessar o StockBot</h2>
 
@@ -81,7 +92,6 @@ function LoginPage() {
           </button>
         </form>
 
-        {/* // <-- ADICIONAR ESTE BLOCO DE VOLTA */}
         <div className="register-link">
           <p>
             Não tem uma conta? <Link to="/register">Crie uma nova empresa</Link>
