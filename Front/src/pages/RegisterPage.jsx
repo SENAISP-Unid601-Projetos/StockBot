@@ -32,7 +32,8 @@ function RegisterPage() {
 
     setLoading(true);
     try {
-      await axios.post(`${apiUrl}/register`, { email, senha, dominioEmpresa });
+      // Agora a URL está correta
+      await axios.post(apiUrl, { email, senha, dominioEmpresa });
 
       toast.success("Empresa registrada com sucesso!");
       navigate("/login");
