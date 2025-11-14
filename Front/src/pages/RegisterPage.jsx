@@ -5,7 +5,6 @@ import "./loginpage.css"; // Reutiliza o CSS
 import { toast } from "react-toastify"; // Usar toast para erros
 import ParticlesBackground from "../components/ParticlesBackground";
 
-
 function RegisterPage() {
   const [email, setEmail] = useState("");
   const [senha, setSenha] = useState("");
