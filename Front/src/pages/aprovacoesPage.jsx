@@ -19,7 +19,6 @@ import {
 } from "@mui/material";
 
 function AprovacoesPage() {
-  const [tabValue, setTabValue] = useState(0);
   const [pedidosCompra, setPedidosCompra] = useState([]);
   const [loading, setLoading] = useState(true);
   const [updatingId, setUpdatingId] = useState(null);
@@ -40,17 +39,9 @@ function AprovacoesPage() {
   };
 
   useEffect(() => {
-    // Por enquanto, só carregamos dados para a aba "Pedidos de Compra"
-    if (tabValue === 0) {
-      // TODO: Lógica para "Retirada de Estoque"
-    } else {
-      fetchPedidosCompra();
-    }
-  }, [tabValue]); // Recarrega quando a aba muda
-
-  const handleChangeTab = (event, newValue) => {
-    setTabValue(newValue);
-  };
+  // Carrega os pedidos de compra assim que a página abrir
+  fetchPedidosCompra();
+  }, []); // O array vazio [] faz com que isto execute apenas uma vez
 
   const handleAprovar = async (id) => {
     setUpdatingId(id); // Desabilita o botão desta linha
@@ -103,30 +94,7 @@ function AprovacoesPage() {
         </Typography>
 
         <Paper sx={{ width: "100%", boxShadow: 3 }}>
-          {/* --- Abas (Tabs) --- */}
-          <Box sx={{ borderBottom: 1, borderColor: "divider" }}>
-            <Tabs
-              value={tabValue}
-              onChange={handleChangeTab}
-              aria-label="abas de aprovações"
-              variant="fullWidth"
-            >
-              <Tab label="Retirada de Estoque" />
-              <Tab label="Pedidos de Compra" />
-            </Tabs>
-          </Box>
-
-          {/* --- Conteúdo da Aba "Retirada de Estoque" (Aba 0) --- */}
-          {tabValue === 0 && (
-            <Box sx={{ p: 3 }}>
-              <Typography>
-                Funcionalidade de "Retirada de Estoque" ainda não implementada.
-              </Typography>
-            </Box>
-          )}
-
           {/* --- Conteúdo da Aba "Pedidos de Compra" (Aba 1) --- */}
-          {tabValue === 1 && (
             <TableContainer>
               {loading ? (
                 <Box sx={{ display: "flex", justifyContent: "center", p: 5 }}>
@@ -203,7 +171,6 @@ function AprovacoesPage() {
                 </Table>
               )}
             </TableContainer>
-          )}
         </Paper>
       </Container>
     </Box>
