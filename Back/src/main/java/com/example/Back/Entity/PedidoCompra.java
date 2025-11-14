@@ -35,4 +35,16 @@ public class PedidoCompra {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "empresa_id", nullable = false)
     private Empresa empresa;
+
+    @PrePersist
+    protected void onCreate() {
+        // Se a data ainda não tiver sido definida, define agora com a hora atual
+        if (this.dataPedido == null) {
+            this.dataPedido = LocalDateTime.now();
+        }
+        // Também definimos o status padrão aqui, para segurança
+        if (this.status == null) {
+            this.status = "PENDENTE";
+        }
+    }
 }

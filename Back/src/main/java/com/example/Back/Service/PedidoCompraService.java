@@ -44,8 +44,6 @@ public class PedidoCompraService {
         pedido.setNomeItem(dto.getNomeItem());
         pedido.setQuantidade(dto.getQuantidade());
         pedido.setJustificativa(dto.getJustificativa());
-        pedido.setStatus("PENDENTE");
-        pedido.setDataPedido(LocalDateTime.now());
         pedido.setSolicitante(solicitante);
         pedido.setEmpresa(empresa);
 
