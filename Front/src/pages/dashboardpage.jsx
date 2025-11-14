@@ -14,7 +14,7 @@ import {
 } from "@mui/material";
 import PictureAsPdfIcon from "@mui/icons-material/PictureAsPdf";
 import KpiCard from "../components/kpicard";
-import ActionList from "../components/actionlist";
+import ActionList from "../components/actionList";
 import CategoryChart from "../components/categoriachart";
 
 function DashboardPage() {

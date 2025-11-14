@@ -1,5 +1,6 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react"; // Adicionado useCallback
 import { toast } from "react-toastify";
+import _ from "lodash"; // Importe lodash (npm install lodash)
 
 import {
   Box,
@@ -16,26 +17,33 @@ import {
   Typography,
   IconButton,
   Stack,
-  TextField,
+  TextField, // Importado
+  InputAdornment, // Importado
 } from "@mui/material";
 
 import AddIcon from "@mui/icons-material/Add";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
+import SearchIcon from "@mui/icons-material/Search"; // Importado
 
 import ModalComponente from "../components/modalcomponente";
 import api from "../services/api";
+import { isAdmin } from "../services/authService"; // Importado
 
 function ComponentesPage() {
   const [componentes, setComponentes] = useState([]);
   const [loading, setLoading] = useState(true);
   const [isModalVisible, setModalVisible] = useState(false);
   const [componenteEmEdicao, setComponenteEmEdicao] = useState(null);
+  const [isUserAdmin, setIsUserAdmin] = useState(false); // Estado para admin
+  const [termoBusca, setTermoBusca] = useState(""); // Estado da busca
 
-  const fetchData = async () => {
+  // Busca dados com parâmetro opcional
+  const fetchData = async (termo = "") => {
     setLoading(true);
     try {
-      const response = await api.get("/api/componentes");
+      // Envia o termo para o backend filtrar
+      const response = await api.get(`/api/componentes?termo=${encodeURIComponent(termo)}`);
       setComponentes(response.data);
     } catch (error) {
       console.error("Erro ao buscar componentes:", error);
@@ -45,9 +53,23 @@ function ComponentesPage() {
     }
   };
 
+  // Debounce para não chamar a API a cada tecla digitada
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  const debouncedFetchData = useCallback(_.debounce(fetchData, 500), []);
+
   useEffect(() => {
-    fetchData();
+    setIsUserAdmin(isAdmin());
+    fetchData(); // Busca inicial
   }, []);
+
+  // Efeito para buscar quando o termo muda
+  useEffect(() => {
+    debouncedFetchData(termoBusca);
+  }, [termoBusca, debouncedFetchData]);
+
+  const handleBuscaChange = (event) => {
+    setTermoBusca(event.target.value);
+  };
 
   const handleEdit = (componente) => {
     setComponenteEmEdicao(componente);
@@ -61,12 +83,9 @@ function ComponentesPage() {
       try {
         await api.delete(`/api/componentes/${id}`);
         toast.success("Componente excluído com sucesso!");
-        setComponentes((listaAtual) =>
-          listaAtual.filter((componente) => componente.id !== id)
-        );
+        fetchData(termoBusca); // Recarrega mantendo a busca atual
       } catch (error) {
         toast.error("Falha ao excluir o componente.");
-        console.error(error);
       }
     }
   };
@@ -76,43 +95,46 @@ function ComponentesPage() {
     setModalVisible(true);
   };
 
+  const handleComponenteAdicionado = () => {
+    fetchData(termoBusca);
+  };
+
   return (
-    // *** 1. ADICIONA O FRAGMENTO AQUI (elemento "pai" único) ***
     <>
-      <Box
-        component="main"
-        sx={{
-          flexGrow: 1,
-          p: 3,
-          minHeight: "100vh",
-          backgroundColor: "background.default",
-        }}
-      >
+      <Box component="main" sx={{ flexGrow: 1, p: 3, minHeight: "100vh", backgroundColor: "background.default" }}>
         <Container maxWidth="lg">
-          {/* Header da página */}
-          <Box
-            sx={{
-              display: "flex",
-              justifyContent: "space-between",
-              alignItems: "center",
-              mb: 4,
-            }}
-          >
+          <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mb: 4, flexWrap: "wrap", gap: 2 }}>
             <Typography variant="h4" component="h1" fontWeight="bold">
               Gerenciamento de Itens
             </Typography>
 
-            <Button
-              variant="contained"
-              startIcon={<AddIcon />}
-              onClick={handleAdd}
-              sx={{
-                backgroundColor: "#ce0000",
-                "&:hover": { backgroundColor: "#a40000" },
+            {/* --- BARRA DE PESQUISA ADICIONADA --- */}
+            <TextField
+              variant="outlined"
+              size="small"
+              placeholder="Buscar por nome ou patrimônio..."
+              value={termoBusca}
+              onChange={handleBuscaChange}
+              InputProps={{
+                startAdornment: (
+                  <InputAdornment position="start">
+                    <SearchIcon />
+                  </InputAdornment>
+                ),
               }}
-            >
-              Adicionar Item
-            </Button>
+              sx={{ minWidth: "250px", backgroundColor: "background.paper" }}
+            />
+
+            {isUserAdmin && (
+              <Button
+                variant="contained"
+                startIcon={<AddIcon />}
+                onClick={handleAdd}
+                sx={{ backgroundColor: "#ce0000", "&:hover": { backgroundColor: "#a40000" } }}
+              >
+                Adicionar Item
+              </Button>
+            )}
           </Box>
 
           {loading ? (
@@ -142,31 +164,37 @@ function ComponentesPage() {
                     </TableRow>
                   </TableHead>
                   <TableBody>
-                    {componentes.map((componente) => (
-                      <TableRow hover key={componente.id}>
-                        <TableCell>{componente.nome}</TableCell>
-                        <TableCell>{componente.codigoPatrimonio}</TableCell>
-                        <TableCell>{componente.quantidade}</TableCell>
-                        <TableCell>{componente.localizacao}</TableCell>
-                        <TableCell>{componente.categoria}</TableCell>
-                        <TableCell>
-                          <Stack direction="row" spacing={1}>
-                            <IconButton
-                              color="info"
-                              onClick={() => handleEdit(componente)}
-                            >
-                              <EditIcon />
-                            </IconButton>
-                            <IconButton
-                              color="error"
-                              onClick={() => handleDelete(componente.id)}
-                            >
-                              <DeleteIcon />
-                            </IconButton>
-                          </Stack>
+                    {componentes.length > 0 ? (
+                      componentes.map((componente) => (
+                        <TableRow hover key={componente.id}>
+                          <TableCell>{componente.nome}</TableCell>
+                          <TableCell>{componente.codigoPatrimonio}</TableCell>
+                          <TableCell>{componente.quantidade}</TableCell>
+                          <TableCell>{componente.localizacao || "-"}</TableCell>
+                          <TableCell>{componente.categoria || "-"}</TableCell>
+                          {isUserAdmin && (
+                            <TableCell align="right">
+                              <Stack direction="row" spacing={1} justifyContent="flex-end">
+                                <IconButton color="info" size="small" onClick={() => handleEdit(componente)}>
+                                  <EditIcon />
+                                </IconButton>
+                                <IconButton color="error" size="small" onClick={() => handleDelete(componente.id)}>
+                                  <DeleteIcon />
+                                </IconButton>
+                              </Stack>
+                            </TableCell>
+                          )}
+                        </TableRow>
+                      ))
+                    ) : (
+                      <TableRow>
+                        <TableCell colSpan={isUserAdmin ? 6 : 5} align="center">
+                          <Typography color="text.secondary" sx={{ p: 3 }}>
+                            Nenhum componente encontrado.
+                          </Typography>
                         </TableCell>
                       </TableRow>
-                    ))}
+                    )}
                   </TableBody>
                 </Table>
               </TableContainer>
@@ -175,17 +203,12 @@ function ComponentesPage() {
         </Container>
       </Box>
 
-      {/* O Modal agora é "irmão" do Box, mas DENTRO do fragmento */}
-      {isModalVisible && (
-        <ModalComponente
-          isVisible={isModalVisible}
-          onClose={() => setModalVisible(false)}
-          onComponenteAdicionado={fetchData}
-          componenteParaEditar={componenteEmEdicao}
-        />
-      )}
-
-      {/* *** 2. FECHA O FRAGMENTO AQUI *** */}
+      <ModalComponente
+        isVisible={isModalVisible}
+        onClose={() => setModalVisible(false)}
+        onComponenteAdicionado={handleComponenteAdicionado}
+        componenteParaEditar={componenteEmEdicao}
+      />
     </>
   );
 }

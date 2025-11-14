@@ -1,11 +1,9 @@
 import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
-import axios from "axios";
+import api from "../services/api";
 import "./loginpage.css"; // Reutiliza o CSS
 import { toast } from "react-toastify"; // Usar toast para erros
 import ParticlesBackground from "../components/ParticlesBackground";
-
-const apiUrl = "http://localhost:8080/api/auth/register";
 
 function RegisterPage() {
   const [email, setEmail] = useState("");
@@ -32,8 +30,7 @@ function RegisterPage() {
 
     setLoading(true);
     try {
-      // Agora a URL está correta
-      await axios.post(apiUrl, { email, senha, dominioEmpresa });
+      await api.post("/api/auth/register", { email, senha, dominioEmpresa });
 
       toast.success("Empresa registrada com sucesso!");
       navigate("/login");
