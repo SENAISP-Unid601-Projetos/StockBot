@@ -1,4 +1,4 @@
-import React from 'react';
+import React from "react";
 
 // 1. IMPORTAÇÕES DE COMPONENTES E ÍCONES DO MUI
 import {
@@ -11,26 +11,29 @@ import {
   TableHead,
   TableRow,
   IconButton, // Botão de ícone
-  Stack,      // Para organizar os botões
-  Typography
-} from '@mui/material';
-import EditIcon from '@mui/icons-material/Edit';
-import DeleteIcon from '@mui/icons-material/Delete';
+  Stack, // Para organizar os botões
+  Typography,
+} from "@mui/material";
+import EditIcon from "@mui/icons-material/Edit";
+import DeleteIcon from "@mui/icons-material/Delete";
 
 function ComponentesTable({ componentes, onEdit, onDelete, isAdmin }) {
   return (
     // 2. A "CARCAÇA" AGORA É UM COMPONENTE <Paper> DO MUI
-    <Paper sx={{ width: '100%', overflow: 'hidden', boxShadow: 3 }}>
+    <Paper sx={{ width: "100%", overflow: "hidden", boxShadow: 3 }}>
       <TableContainer>
         {/* Usamos 'stickyHeader' para manter o cabeçalho visível ao rolar a página */}
         <Table stickyHeader aria-label="tabela de componentes">
           <TableHead>
             <TableRow>
-              <TableCell sx={{ fontWeight: 'bold' }}>Nome</TableCell>
-              <TableCell sx={{ fontWeight: 'bold' }}>Patrimônio</TableCell>
-              <TableCell sx={{ fontWeight: 'bold' }}>Quantidade</TableCell>
+              <TableCell sx={{ fontWeight: "bold" }}>Nome</TableCell>
+              <TableCell sx={{ fontWeight: "bold" }}>Patrimônio</TableCell>
+              <TableCell sx={{ fontWeight: "bold" }}>Localização</TableCell>
+              <TableCell sx={{ fontWeight: "bold" }}>Quantidade</TableCell>
               {/* A sua lógica de 'isAdmin' continua a funcionar perfeitamente */}
-              {isAdmin && <TableCell sx={{ fontWeight: 'bold' }}>Ações</TableCell>}
+              {isAdmin && (
+                <TableCell sx={{ fontWeight: "bold" }}>Ações</TableCell>
+              )}
             </TableRow>
           </TableHead>
           <TableBody>
@@ -38,6 +41,7 @@ function ComponentesTable({ componentes, onEdit, onDelete, isAdmin }) {
               componentes.map((componente) => (
                 <TableRow hover key={componente.id}>
                   <TableCell>{componente.nome}</TableCell>
+                  <TableCell>{componente.localizacao}</TableCell>
                   <TableCell>{componente.codigoPatrimonio}</TableCell>
                   <TableCell>{componente.quantidade}</TableCell>
                   {isAdmin && (

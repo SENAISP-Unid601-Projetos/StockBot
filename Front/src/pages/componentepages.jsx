@@ -132,6 +132,12 @@ function ComponentesPage() {
                       <TableCell sx={{ fontWeight: "bold" }}>
                         Quantidade
                       </TableCell>
+                      <TableCell sx={{ fontWeight: "bold" }}>
+                        Localização
+                      </TableCell>
+                      <TableCell sx={{ fontWeight: "bold" }}>
+                        Categoria
+                      </TableCell>
                       <TableCell sx={{ fontWeight: "bold" }}>Ações</TableCell>
                     </TableRow>
                   </TableHead>
@@ -141,6 +147,8 @@ function ComponentesPage() {
                         <TableCell>{componente.nome}</TableCell>
                         <TableCell>{componente.codigoPatrimonio}</TableCell>
                         <TableCell>{componente.quantidade}</TableCell>
+                        <TableCell>{componente.localizacao}</TableCell>
+                        <TableCell>{componente.categoria}</TableCell>
                         <TableCell>
                           <Stack direction="row" spacing={1}>
                             <IconButton
