@@ -11,8 +11,8 @@ import {
   DialogTitle,
   TextField,
   Box,
-  Typography, // Adicionado para mostrar a quantidade atual
-  MenuItem,   // Adicionado para o <select>
+  Typography,
+  MenuItem,
 } from "@mui/material";
 
 function ModalComponente({
@@ -21,56 +21,56 @@ function ModalComponente({
   onComponenteAdicionado,
   componenteParaEditar,
 }) {
-  // --- NOVOS ESTADOS ---
+  // --- ESTADOS ---
   const [nome, setNome] = useState("");
   const [codigoPatrimonio, setCodigoPatrimonio] = useState("");
-  
-  // State 'quantidade' é usado APENAS para o modo de CRIAÇÃO
-  const [quantidade, setQuantidade] = useState(1); 
-  
-  // States novos, usados APENAS para o modo de EDIÇÃO
+  const [localizacao, setLocalizacao] = useState(""); // opcional
+  const [categoria, setCategoria] = useState(""); // opcional
+  const [quantidade, setQuantidade] = useState(1);
+
   const [tipoMovimentacao, setTipoMovimentacao] = useState("ENTRADA");
   const [quantidadeMovimentar, setQuantidadeMovimentar] = useState(0);
 
-  // --- useEffect ATUALIZADO ---
-  // Popula o formulário de forma diferente para "Criar" vs "Editar"
+  // --- useEffect ---
   useEffect(() => {
     if (componenteParaEditar) {
-      // MODO DE EDIÇÃO
+      // EDIÇÃO
       setNome(componenteParaEditar.nome);
       setCodigoPatrimonio(componenteParaEditar.codigoPatrimonio);
-      
-      // Reseta os campos de movimentação
+      setLocalizacao(componenteParaEditar.localizacao);
+      setCategoria(componenteParaEditar.categoria);
       setTipoMovimentacao("ENTRADA");
       setQuantidadeMovimentar(0);
-      
-      // Não mexemos no state 'quantidade', pois ele só é usado na criação
     } else {
-      // MODO DE CRIAÇÃO
+      // CRIAÇÃO
       setNome("");
       setCodigoPatrimonio("");
-      setQuantidade(1); // Define a quantidade inicial para 1
+      setLocalizacao("");
+      setCategoria("");
+      setQuantidade(1);
     }
   }, [componenteParaEditar, isVisible]);
 
-  // --- handleSubmit ATUALIZADO ---
-  // Contém a lógica separada para Criar (POST) e Editar (PUT)
+  // --- handleSubmit ---
   const handleSubmit = async (event) => {
     event.preventDefault();
 
     try {
+      // valores padrão caso usuário deixe em branco
+      const localizacaoFinal =
+        localizacao.trim() === "" ? "Padrão" : localizacao;
+      const categoriaFinal = categoria.trim() === "" ? "Geral" : categoria;
+
       if (componenteParaEditar) {
-        // --- LÓGICA DE EDIÇÃO (Movimentação) ---
-        
+        // --- EDIÇÃO ---
         let novaQuantidade = componenteParaEditar.quantidade;
         const valorMovimentar = parseInt(quantidadeMovimentar) || 0;
 
         if (valorMovimentar > 0) {
-          if (tipoMovimentacao === "ENTRADA") {
-            novaQuantidade += valorMovimentar;
-          } else { // "SAIDA"
-            novaQuantidade -= valorMovimentar;
-          }
+          novaQuantidade =
+            tipoMovimentacao === "ENTRADA"
+              ? novaQuantidade + valorMovimentar
+              : novaQuantidade - valorMovimentar;
         }
 
         if (novaQuantidade < 0) {
@@ -78,45 +78,46 @@ function ModalComponente({
           return;
         }
 
-        // Mantém todos os dados antigos e atualiza apenas os campos do formulário
         const dadosComponente = {
-          ...componenteParaEditar, 
-          nome: nome,
-          codigoPatrimonio: codigoPatrimonio,
-          quantidade: novaQuantidade, // Envia a NOVA QUANTIDADE TOTAL calculada
+          ...componenteParaEditar,
+          nome,
+          codigoPatrimonio,
+          localizacao: localizacaoFinal,
+          categoria: categoriaFinal,
+          quantidade: novaQuantidade,
         };
 
         await api.put(
           `/api/componentes/${componenteParaEditar.id}`,
           dadosComponente
         );
-        toast.success("Estoque atualizado com sucesso!");
 
+        toast.success("Estoque atualizado com sucesso!");
       } else {
-        // --- LÓGICA DE CRIAÇÃO (Original) ---
+        // --- CRIAÇÃO ---
         const dadosComponente = {
           nome,
           codigoPatrimonio,
           quantidade: parseInt(quantidade),
-          localizacao: "Padrão",
-          categoria: "Geral",
+          localizacao: localizacaoFinal,
+          categoria: categoriaFinal,
           observacoes: "",
-          nivelMinimoEstoque: 0 // Adicionando campo que faltava
+          nivelMinimoEstoque: 0,
         };
 
         await api.post("/api/componentes", dadosComponente);
         toast.success("Componente adicionado com sucesso!");
       }
 
-      onComponenteAdicionado(); // Atualiza a tabela na página
-      onClose(); // Fecha o modal
+      onComponenteAdicionado();
+      onClose();
     } catch (error) {
       console.error("Erro ao salvar componente:", error);
       toast.error("Falha ao salvar componente. Verifique os dados.");
     }
   };
 
-  // --- JSX ATUALIZADO (Renderização Condicional) ---
+  // --- JSX ---
   return (
     <Dialog open={isVisible} onClose={onClose}>
       <Box component="form" onSubmit={handleSubmit}>
@@ -127,42 +128,54 @@ function ModalComponente({
         </DialogTitle>
 
         <DialogContent>
-          {/* Campos que aparecem em ambos os modos */}
+          {/* Nome */}
           <TextField
             autoFocus
-            required
             margin="dense"
             id="nome"
             label="Nome do Componente"
             type="text"
             fullWidth
             variant="outlined"
+            required
             value={nome}
             onChange={(e) => setNome(e.target.value)}
           />
+
+          {/* Localização (opcional) */}
           <TextField
-            required
             margin="dense"
-            id="patrimonio"
-            label="Código do Patrimônio"
+            id="localizacao"
+            label="Localização (opcional)"
             type="text"
             fullWidth
             variant="outlined"
-            value={codigoPatrimonio}
-            onChange={(e) => setCodigoPatrimonio(e.target.value)}
-            // No modo "Criar", o backend ignora este campo e gera um novo.
-            // No modo "Editar", ele permite a alteração.
+            value={localizacao}
+            onChange={(e) => setLocalizacao(e.target.value)}
           />
 
+          {/* Categoria (opcional) */}
+          <TextField
+            margin="dense"
+            id="categoria"
+            label="Categoria (opcional)"
+            type="text"
+            fullWidth
+            variant="outlined"
+            value={categoria}
+            onChange={(e) => setCategoria(e.target.value)}
+          />
+
+          {/* EDIÇÃO */}
           {componenteParaEditar ? (
-            // --- CAMPOS PARA O MODO DE EDIÇÃO ---
             <>
               <Typography variant="body1" sx={{ mt: 2, mb: 1 }}>
-                Quantidade Atual: <strong>{componenteParaEditar.quantidade}</strong>
+                Quantidade Atual:{" "}
+                <strong>{componenteParaEditar.quantidade}</strong>
               </Typography>
-              
+
               <TextField
-                select // Transforma em um <select>
+                select
                 margin="dense"
                 id="tipoMovimentacao"
                 label="Tipo de Movimentação"
@@ -184,22 +197,22 @@ function ModalComponente({
                 variant="outlined"
                 value={quantidadeMovimentar}
                 onChange={(e) => setQuantidadeMovimentar(e.target.value)}
-                InputProps={{ inputProps: { min: 0 } }} 
+                InputProps={{ inputProps: { min: 0 } }}
               />
             </>
           ) : (
-            // --- CAMPO PARA O MODO DE CRIAÇÃO ---
+            // CRIAÇÃO
             <TextField
-              required
               margin="dense"
               id="quantidade"
               label="Quantidade Inicial"
               type="number"
               fullWidth
               variant="outlined"
+              required
               value={quantidade}
               onChange={(e) => setQuantidade(parseInt(e.target.value))}
-              InputProps={{ inputProps: { min: 0 } }} // Garante que não seja negativo
+              InputProps={{ inputProps: { min: 0 } }}
             />
           )}
         </DialogContent>

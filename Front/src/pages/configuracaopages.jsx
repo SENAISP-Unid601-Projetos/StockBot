@@ -9,7 +9,6 @@ import {
   Container,
   Typography,
   Paper,
-  TextField,
   Button as MuiButton,
   CircularProgress,
   Grid,
@@ -91,14 +90,19 @@ function ConfiguracoesPage() {
             Configurações
           </Typography>
 
-          <Grid container spacing={3}>
-            {/* Bloco de Configurações da Empresa (placeholder) */}
-            <Grid xs={12}>
+          {/* Grid container define o espaçamento entre os itens */}
+          <Grid container spacing={3} direction="column">
+            {/* CORREÇÃO: 'item' e 'xs={12}' garantem que ocupa a largura total.
+               Removemos o width: 220% que quebrava o layout.
+            */}
+
+            {/* Bloco de Configurações da Empresa */}
+            <Grid item xs={12}>
               <Paper
                 sx={{
                   p: 3,
                   boxShadow: 3,
-                  height: "100%",
+                  width: "100%", // Garante que ocupa a largura correta do container
                   backgroundColor: themeMui.palette.background.default,
                 }}
               >
@@ -113,8 +117,15 @@ function ConfiguracoesPage() {
 
             {/* Bloco de Gestão de Utilizadores (apenas Admin) */}
             {isUserAdmin && (
-              <Grid xs={12}>
-                <Paper sx={{ p: 3, boxShadow: 3, mt: 3 }}>
+              <Grid item xs={12}>
+                <Paper
+                  sx={{
+                    p: 3,
+                    boxShadow: 3,
+                    width: "100%", // Garante a mesma largura do bloco de cima
+                    // mt: 3, // Removido pois o spacing={3} do Grid já trata disto
+                  }}
+                >
                   <Box
                     sx={{
                       display: "flex",
@@ -123,7 +134,7 @@ function ConfiguracoesPage() {
                       mb: 2,
                     }}
                   >
-                    <Typography variant="h6">Gestão de Utilizadores</Typography>
+                    <Typography variant="h6">Gestão de Usuários</Typography>
                     <MuiButton
                       variant="contained"
                       onClick={() => setAddUserModalVisible(true)}
@@ -132,7 +143,7 @@ function ConfiguracoesPage() {
                         "&:hover": { backgroundColor: "#a40000" },
                       }}
                     >
-                      Adicionar Utilizador
+                      Adicionar
                     </MuiButton>
                   </Box>
 

@@ -77,7 +77,9 @@ function ComponentesPage() {
   };
 
   const handleDelete = async (id) => {
-    if (window.confirm("Tem a certeza que deseja excluir este componente?")) {
+    if (
+      window.confirm("Você tem certeza que deseja excluir este componente?")
+    ) {
       try {
         await api.delete(`/api/componentes/${id}`);
         toast.success("Componente excluído com sucesso!");
@@ -146,11 +148,19 @@ function ComponentesPage() {
                   <TableHead>
                     <TableRow>
                       <TableCell sx={{ fontWeight: "bold" }}>Nome</TableCell>
-                      <TableCell sx={{ fontWeight: "bold" }}>Patrimônio</TableCell>
-                      <TableCell sx={{ fontWeight: "bold" }}>Quantidade</TableCell>
-                      <TableCell sx={{ fontWeight: "bold" }}>Localização</TableCell>
-                      <TableCell sx={{ fontWeight: "bold" }}>Categoria</TableCell>
-                      {isUserAdmin && <TableCell sx={{ fontWeight: "bold", textAlign: "right" }}>Ações</TableCell>}
+                      <TableCell sx={{ fontWeight: "bold" }}>
+                        Patrimônio
+                      </TableCell>
+                      <TableCell sx={{ fontWeight: "bold" }}>
+                        Quantidade
+                      </TableCell>
+                      <TableCell sx={{ fontWeight: "bold" }}>
+                        Localização
+                      </TableCell>
+                      <TableCell sx={{ fontWeight: "bold" }}>
+                        Categoria
+                      </TableCell>
+                      <TableCell sx={{ fontWeight: "bold" }}>Ações</TableCell>
                     </TableRow>
                   </TableHead>
                   <TableBody>

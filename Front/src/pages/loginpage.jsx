@@ -92,6 +92,7 @@ function LoginPage() {
           </button>
         </form>
 
+        {/* // <-- ADICIONAR ESTE BLOCO DE VOLTA */}
         <div className="register-link">
           <p>
             Não tem uma conta? <Link to="/register">Crie uma nova empresa</Link>
