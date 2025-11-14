@@ -54,4 +54,32 @@ public class PedidoCompraController {
         List<RequisicaoDTO> pedidos = pedidoCompraService.findPendentesByEmpresa();
         return ResponseEntity.ok(pedidos);
     }
+
+    /**
+     * Endpoint para APROVAR um pedido de compra. (ADMIN)
+     */
+    @PutMapping("/{id}/aprovar")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<Void> aprovarPedido(@PathVariable Long id) {
+        try {
+            pedidoCompraService.aprovarPedidoCompra(id);
+            return ResponseEntity.ok().build();
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().body(null); // Retorna 400 se algo der errado
+        }
+    }
+
+    /**
+     * Endpoint para RECUSAR um pedido de compra. (ADMIN)
+     */
+    @PutMapping("/{id}/recusar")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<Void> recusarPedido(@PathVariable Long id) {
+        try {
+            pedidoCompraService.recusarPedidoCompra(id);
+            return ResponseEntity.ok().build();
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().body(null); // Retorna 400 se algo der errado
+        }
+    }
 }

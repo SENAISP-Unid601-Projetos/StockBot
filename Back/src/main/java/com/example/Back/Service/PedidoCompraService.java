@@ -113,4 +113,45 @@ public class PedidoCompraService {
                 pedido.getDataPedido()    // Mapeado para 'dataRequisicao'
         );
     }
+
+    /**
+     * Aprova um pedido de compra.
+     * Altera o status de PENDENTE para APROVADO.
+     */
+    @Transactional
+    public void aprovarPedidoCompra(Long pedidoId) {
+        Empresa empresa = usuarioService.getEmpresaDoUsuarioAutenticado();
+
+        PedidoCompra pedido = pedidoCompraRepository.findByIdAndEmpresaId(pedidoId, empresa.getId())
+                .orElseThrow(() -> new RuntimeException("Pedido não encontrado ou não pertence a esta empresa."));
+
+        if (!pedido.getStatus().equals("PENDENTE")) {
+            throw new RuntimeException("Apenas pedidos PENDENTES podem ser aprovados.");
+        }
+
+        pedido.setStatus("APROVADO");
+        pedidoCompraRepository.save(pedido);
+
+        // TODO Opcional: Aqui podes adicionar a lógica para criar o item no
+        // estoque (ComponenteService) ou gerar um histórico.
+    }
+
+    /**
+     * Recusa um pedido de compra.
+     * Altera o status de PENDENTE para RECUSADO.
+     */
+    @Transactional
+    public void recusarPedidoCompra(Long pedidoId) {
+        Empresa empresa = usuarioService.getEmpresaDoUsuarioAutenticado();
+
+        PedidoCompra pedido = pedidoCompraRepository.findByIdAndEmpresaId(pedidoId, empresa.getId())
+                .orElseThrow(() -> new RuntimeException("Pedido não encontrado ou não pertence a esta empresa."));
+
+        if (!pedido.getStatus().equals("PENDENTE")) {
+            throw new RuntimeException("Apenas pedidos PENDENTES podem ser recusados.");
+        }
+
+        pedido.setStatus("RECUSADO");
+        pedidoCompraRepository.save(pedido);
+    }
 }

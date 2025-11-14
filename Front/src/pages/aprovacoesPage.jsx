@@ -22,6 +22,7 @@ function AprovacoesPage() {
   const [tabValue, setTabValue] = useState(0);
   const [pedidosCompra, setPedidosCompra] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [updatingId, setUpdatingId] = useState(null);
 
   // Busca os dados da API de requisições pendentes
   const fetchPedidosCompra = async () => {
@@ -51,15 +52,34 @@ function AprovacoesPage() {
     setTabValue(newValue);
   };
 
-  // Funções para os botões (Ainda não ligadas ao backend)
-  const handleAprovar = (id) => {
-    toast.info(`Aprovar item ${id} (não implementado)`);
-    // Aqui viria a chamada à API, ex: api.put(`/api/requisicoes/${id}/aprovar`);
+  const handleAprovar = async (id) => {
+    setUpdatingId(id); // Desabilita o botão desta linha
+    try {
+      await api.put(`/api/pedidos-compra/${id}/aprovar`);
+      toast.success("Pedido aprovado com sucesso!");
+      // Remove o item da lista sem precisar recarregar a página
+      setPedidosCompra((prev) => prev.filter((p) => p.id !== id));
+    } catch (error) {
+      toast.error("Falha ao aprovar o pedido.");
+      console.error(error);
+    } finally {
+      setUpdatingId(null); // Reabilita os botões
+    }
   };
 
-  const handleRecusar = (id) => {
-    toast.warn(`Recusar item ${id} (não implementado)`);
-    // Aqui viria a chamada à API, ex: api.put(`/api/requisicoes/${id}/recusar`);
+  const handleRecusar = async (id) => {
+    setUpdatingId(id); // Desabilita o botão desta linha
+    try {
+      await api.put(`/api/pedidos-compra/${id}/recusar`);
+      toast.warn("Pedido recusado.");
+      // Remove o item da lista
+      setPedidosCompra((prev) => prev.filter((p) => p.id !== id));
+    } catch (error) {
+      toast.error("Falha ao recusar o pedido.");
+      console.error(error);
+    } finally {
+      setUpdatingId(null); // Reabilita os botões
+    }
   };
 
   return (
@@ -155,6 +175,7 @@ function AprovacoesPage() {
                                 color="success"
                                 size="small"
                                 onClick={() => handleAprovar(req.id)}
+                                disabled={loading || updatingId === req.id} // <-- ADICIONAR ESTA LINHA
                               >
                                 Aprovar
                               </Button>
@@ -163,6 +184,7 @@ function AprovacoesPage() {
                                 color="error"
                                 size="small"
                                 onClick={() => handleRecusar(req.id)}
+                                disabled={loading || updatingId === req.id} // <-- ADICIONAR ESTA LINHA
                               >
                                 Recusar
                               </Button>
