@@ -3,8 +3,9 @@ import { useNavigate, Link } from "react-router-dom";
 import axios from "axios";
 import "./loginpage.css"; // Reutiliza o CSS
 import { toast } from "react-toastify"; // Usar toast para erros
+import ParticlesBackground from "../components/ParticlesBackground";
 
-const apiUrl = "http://localhost:8080/api/auth";
+const apiUrl = "http://localhost:8080/api/auth/register";
 
 function RegisterPage() {
   const [email, setEmail] = useState("");
@@ -31,7 +32,8 @@ function RegisterPage() {
 
     setLoading(true);
     try {
-      await axios.post(`${apiUrl}/register`, { email, senha, dominioEmpresa });
+      // Agora a URL está correta
+      await axios.post(apiUrl, { email, senha, dominioEmpresa });
 
       toast.success("Empresa registrada com sucesso!");
       navigate("/login");
@@ -51,6 +53,8 @@ function RegisterPage() {
 
   return (
     <div className="login-container">
+      {/* 🎇 Fundo animado de partículas */}
+      <ParticlesBackground />
       <div className="form-wrapper">
         <form className="auth-form" onSubmit={handleRegister}>
           <h2>Registrar Nova Empresa</h2>

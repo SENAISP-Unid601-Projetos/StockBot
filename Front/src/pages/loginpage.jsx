@@ -1,7 +1,9 @@
 import { useState } from "react";
-import { useNavigate, Link } from "react-router-dom"; // <-- ADICIONAR 'Link'
+import { useNavigate, Link } from "react-router-dom";
 import axios from "axios";
 import "./loginpage.css";
+import ParticlesBackground from "../components/ParticlesBackground";
+import { toast } from "react-toastify";
 
 const apiUrl = "http://localhost:8080/api/auth";
 
@@ -39,8 +41,17 @@ function LoginPage() {
   };
 
   return (
-    <div className="login-container">
-      <div className="form-wrapper">
+    <div
+      className="login-container"
+      style={{ position: "relative", minHeight: "100vh" }}
+    >
+      {/* 🎇 Fundo animado de partículas */}
+      <ParticlesBackground />
+
+      <div
+        className="form-wrapper"
+        style={{ position: "relative", zIndex: 10 }}
+      >
         <form className="auth-form" onSubmit={handleLogin}>
           <h2>Acessar o StockBot</h2>
 
