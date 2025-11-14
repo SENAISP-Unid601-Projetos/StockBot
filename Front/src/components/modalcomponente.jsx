@@ -142,6 +142,23 @@ function ModalComponente({
             onChange={(e) => setNome(e.target.value)}
           />
 
+          {/* === ADICIONE ESTE BLOCO === */}
+          <TextField
+            margin="dense"
+            id="codigoPatrimonio"
+            label="Código de Patrimônio"
+            type="text"
+            fullWidth
+            variant="outlined"
+            required
+            value={codigoPatrimonio}
+            onChange={(e) => setCodigoPatrimonio(e.target.value)}
+            // Desabilita a edição do código se for um item existente
+            // Isso previne erros de lógica de atualização de patrimônio
+            disabled={!!componenteParaEditar} 
+          />
+          {/* === FIM DO BLOCO === */}
+
           {/* Localização (opcional) */}
           <TextField
             margin="dense"
