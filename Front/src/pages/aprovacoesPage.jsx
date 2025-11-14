@@ -28,7 +28,7 @@ function AprovacoesPage() {
     setLoading(true);
     try {
       // Usamos o endpoint que já existe no seu RequisicaoController
-      const response = await api.get("/api/requisicoes/pendentes");
+      const response = await api.get("/api/pedidos-compra/pendentes"); // <-- CORREÇÃO AQUI
       setPedidosCompra(response.data);
     } catch (error) {
       toast.error("Falha ao carregar pedidos de compra pendentes.");

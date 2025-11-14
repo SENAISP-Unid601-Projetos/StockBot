@@ -2,6 +2,7 @@ package com.example.Back.Service;
 
 import com.example.Back.Dto.PedidoCompraCreateDTO;
 import com.example.Back.Dto.MeusPedidosCompraDTO;
+import com.example.Back.Dto.RequisicaoDTO;
 import com.example.Back.Entity.Empresa;
 import com.example.Back.Entity.PedidoCompra;
 import com.example.Back.Entity.Usuario;
@@ -63,7 +64,7 @@ public class PedidoCompraService {
         List<PedidoCompra> pedidos = pedidoCompraRepository.findAllBySolicitanteId(solicitante.getId());
 
         return pedidos.stream()
-                .map(this::toMeusPedidosCompraDTO)
+                .map(this::toMeusPedidosDTO)
                 .collect(Collectors.toList());
     }
 
@@ -75,6 +76,41 @@ public class PedidoCompraService {
                 pedido.getQuantidade(),
                 pedido.getDataPedido(),
                 pedido.getStatus()
+        );
+    }
+
+    /**
+     * Busca todos os pedidos de compra pendentes da empresa.
+     * (Para a página de Aprovações do Admin)
+     */
+    @Transactional(readOnly = true)
+    public List<RequisicaoDTO> findPendentesByEmpresa() {
+        Empresa empresa = usuarioService.getEmpresaDoUsuarioAutenticado();
+
+        List<PedidoCompra> pedidos = pedidoCompraRepository.findAllByEmpresaIdAndStatus(empresa.getId(), "PENDENTE");
+
+        return pedidos.stream()
+                .map(this::toAprovacaoDTO) // Usa o novo conversor
+                .collect(Collectors.toList());
+    }
+
+    // ADICIONAR ESTE MÉTODO
+    /**
+     * Converte um PedidoCompra para o RequisicaoDTO.
+     * Reutilizamos este DTO porque a página de aprovações já espera esta estrutura.
+     */
+    private RequisicaoDTO toAprovacaoDTO(PedidoCompra pedido) {
+        String solicitanteEmail = (pedido.getSolicitante() != null)
+                ? pedido.getSolicitante().getEmail()
+                : "Solicitante desconhecido";
+
+        return new RequisicaoDTO(
+                pedido.getId(),
+                pedido.getNomeItem(),     // Mapeado para 'componenteNome' no DTO
+                pedido.getQuantidade(),   // Mapeado para 'quantidade'
+                pedido.getJustificativa(),// Mapeado para 'justificativa'
+                solicitanteEmail,         // Mapeado para 'solicitanteEmail'
+                pedido.getDataPedido()    // Mapeado para 'dataRequisicao'
         );
     }
 }

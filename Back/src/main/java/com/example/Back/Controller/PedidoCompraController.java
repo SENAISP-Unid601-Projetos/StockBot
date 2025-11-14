@@ -2,6 +2,7 @@ package com.example.Back.Controller;
 
 import com.example.Back.Dto.PedidoCompraCreateDTO;
 import com.example.Back.Dto.MeusPedidosCompraDTO;
+import com.example.Back.Dto.RequisicaoDTO;
 import com.example.Back.Service.PedidoCompraService;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
@@ -41,6 +42,16 @@ public class PedidoCompraController {
     @PreAuthorize("isAuthenticated()")
     public ResponseEntity<List<MeusPedidosCompraDTO>> getMeusPedidos() {
         List<MeusPedidosCompraDTO> pedidos = pedidoCompraService.findMeusPedidos();
+        return ResponseEntity.ok(pedidos);
+    }
+
+    /**
+     * Endpoint para listar pedidos de compra pendentes (para Admin).
+     */
+    @GetMapping("/pendentes")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<List< RequisicaoDTO>> getPedidosPendentes() {
+        List<RequisicaoDTO> pedidos = pedidoCompraService.findPendentesByEmpresa();
         return ResponseEntity.ok(pedidos);
     }
 }
