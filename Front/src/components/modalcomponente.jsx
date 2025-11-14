@@ -153,8 +153,7 @@ function ModalComponente({
             required
             value={codigoPatrimonio}
             onChange={(e) => setCodigoPatrimonio(e.target.value)}
-            // Desabilita a edição do código se for um item existente
-            // Isso previne erros de lógica de atualização de patrimônio
+            // Desabilitar a edição do código previne erros de duplicidade
             disabled={!!componenteParaEditar} 
           />
           {/* === FIM DO BLOCO === */}
