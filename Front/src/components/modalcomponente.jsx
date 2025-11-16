@@ -36,7 +36,7 @@ function ModalComponente({
     if (componenteParaEditar) {
       // EDIÇÃO
       setNome(componenteParaEditar.nome);
-      setCodigoPatrimonio(componenteParaEditar.codigoPatrimonio);
+      setCodigoPatrimonio(componenteParaEditar.codigoPatrimonio); // <-- Alterado
       setLocalizacao(componenteParaEditar.localizacao);
       setCategoria(componenteParaEditar.categoria);
       setTipoMovimentacao("ENTRADA");
@@ -44,7 +44,7 @@ function ModalComponente({
     } else {
       // CRIAÇÃO
       setNome("");
-      setCodigoPatrimonio("");
+      setCodigoPatrimonio(""); // <-- Alterado (não é mais necessário)
       setLocalizacao("");
       setCategoria("");
       setQuantidade(1);
@@ -81,7 +81,7 @@ function ModalComponente({
         const dadosComponente = {
           ...componenteParaEditar,
           nome,
-          codigoPatrimonio,
+          // O 'codigoPatrimonio' não é mais enviado na edição
           localizacao: localizacaoFinal,
           categoria: categoriaFinal,
           quantidade: novaQuantidade,
@@ -97,7 +97,7 @@ function ModalComponente({
         // --- CRIAÇÃO ---
         const dadosComponente = {
           nome,
-          codigoPatrimonio,
+          // O 'codigoPatrimonio' não é mais enviado na criação
           quantidade: parseInt(quantidade),
           localizacao: localizacaoFinal,
           categoria: categoriaFinal,
@@ -113,7 +113,9 @@ function ModalComponente({
       onClose();
     } catch (error) {
       console.error("Erro ao salvar componente:", error);
-      toast.error("Falha ao salvar componente. Verifique os dados.");
+      // *** MELHORIA: Mostrar erro específico do backend ***
+      const errorMsg = error.response?.data?.message || "Falha ao salvar componente. Verifique os dados.";
+      toast.error(errorMsg);
     }
   };
 
@@ -142,22 +144,22 @@ function ModalComponente({
             onChange={(e) => setNome(e.target.value)}
           />
 
-          {/* === ADICIONE ESTE BLOCO === */}
-          <TextField
-            margin="dense"
-            id="codigoPatrimonio"
-            label="Código de Patrimônio"
-            type="text"
-            fullWidth
-            variant="outlined"
-            required
-            value={codigoPatrimonio}
-            onChange={(e) => setCodigoPatrimonio(e.target.value)}
-            // Desabilita a edição do código se for um item existente
-            // Isso previne erros de lógica de atualização de patrimônio
-            disabled={!!componenteParaEditar} 
-          />
-          {/* === FIM DO BLOCO === */}
+          {/* *** ALTERAÇÃO AQUI: CAMPO DE PATRIMÔNIO CONDICIONAL *** */}
+          {/* Mostra o código APENAS se estiver editando (e o mantém desabilitado) */}
+          {componenteParaEditar && (
+            <TextField
+              margin="dense"
+              id="codigoPatrimonio"
+              label="Código de Patrimônio"
+              type="text"
+              fullWidth
+              variant="outlined"
+              value={codigoPatrimonio}
+              disabled // Sempre desabilitado
+            />
+          )}
+          {/* *** FIM DA ALTERAÇÃO *** */}
+
 
           {/* Localização (opcional) */}
           <TextField
