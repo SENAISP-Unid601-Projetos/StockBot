@@ -1,4 +1,3 @@
-```javascript
 // Importa os hooks 'useState', 'useEffect' e 'useCallback' do React.
 import { useState, useEffect, useCallback } from "react";
 // Importa a biblioteca 'toast' para exibir notificações.
@@ -287,4 +286,3 @@ function ComponentesPage() {
 
 // Exporta o componente para ser usado em outras partes da aplicação (ex: main.jsx).
 export default ComponentesPage;
-```
