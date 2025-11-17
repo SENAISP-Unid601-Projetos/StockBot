@@ -2,7 +2,6 @@ import { useState, useEffect } from "react";
 import api from "../services/api";
 import { toast } from "react-toastify";
 
-// 1. IMPORTAÇÕES DE COMPONENTES DO MUI PARA O DIÁLOGO
 import {
   Button,
   Dialog,
@@ -24,8 +23,8 @@ function ModalComponente({
   // --- ESTADOS ---
   const [nome, setNome] = useState("");
   const [codigoPatrimonio, setCodigoPatrimonio] = useState("");
-  const [localizacao, setLocalizacao] = useState(""); // opcional
-  const [categoria, setCategoria] = useState(""); // opcional
+  const [localizacao, setLocalizacao] = useState("");
+  const [categoria, setCategoria] = useState("");
   const [quantidade, setQuantidade] = useState(1);
 
   const [tipoMovimentacao, setTipoMovimentacao] = useState("ENTRADA");
@@ -36,7 +35,7 @@ function ModalComponente({
     if (componenteParaEditar) {
       // EDIÇÃO
       setNome(componenteParaEditar.nome);
-      setCodigoPatrimonio(componenteParaEditar.codigoPatrimonio); // <-- Alterado
+      setCodigoPatrimonio(componenteParaEditar.codigoPatrimonio);
       setLocalizacao(componenteParaEditar.localizacao);
       setCategoria(componenteParaEditar.categoria);
       setTipoMovimentacao("ENTRADA");
@@ -44,7 +43,7 @@ function ModalComponente({
     } else {
       // CRIAÇÃO
       setNome("");
-      setCodigoPatrimonio(""); // <-- Alterado (não é mais necessário)
+      setCodigoPatrimonio("");
       setLocalizacao("");
       setCategoria("");
       setQuantidade(1);
@@ -53,73 +52,72 @@ function ModalComponente({
 
   // --- handleSubmit ---
   const handleSubmit = async (event) => {
-    event.preventDefault();
+  event.preventDefault();
 
-    try {
-      // valores padrão caso usuário deixe em branco
-      const localizacaoFinal =
-        localizacao.trim() === "" ? "Padrão" : localizacao;
-      const categoriaFinal = categoria.trim() === "" ? "Geral" : categoria;
+  try {
+    const localizacaoFinal =
+      localizacao.trim() === "" ? "Padrão" : localizacao;
+    const categoriaFinal = categoria.trim() === "" ? "Geral" : categoria;
 
-      if (componenteParaEditar) {
-        // --- EDIÇÃO ---
-        let novaQuantidade = componenteParaEditar.quantidade;
-        const valorMovimentar = parseInt(quantidadeMovimentar) || 0;
+    if (componenteParaEditar) {
+      // --- EDIÇÃO ---
+      let novaQuantidade = componenteParaEditar.quantidade;
+      const valorMovimentar = parseInt(quantidadeMovimentar) || 0;
 
-        if (valorMovimentar > 0) {
-          novaQuantidade =
-            tipoMovimentacao === "ENTRADA"
-              ? novaQuantidade + valorMovimentar
-              : novaQuantidade - valorMovimentar;
-        }
-
-        if (novaQuantidade < 0) {
-          toast.error("A quantidade em estoque não pode ser negativa.");
-          return;
-        }
-
-        const dadosComponente = {
-          ...componenteParaEditar,
-          nome,
-          // O 'codigoPatrimonio' não é mais enviado na edição
-          localizacao: localizacaoFinal,
-          categoria: categoriaFinal,
-          quantidade: novaQuantidade,
-        };
-
-        await api.put(
-          `/api/componentes/${componenteParaEditar.id}`,
-          dadosComponente
-        );
-
-        toast.success("Estoque atualizado com sucesso!");
-      } else {
-        // --- CRIAÇÃO ---
-        const dadosComponente = {
-          nome,
-          // O 'codigoPatrimonio' não é mais enviado na criação
-          quantidade: parseInt(quantidade),
-          localizacao: localizacaoFinal,
-          categoria: categoriaFinal,
-          observacoes: "",
-          nivelMinimoEstoque: 0,
-        };
-
-        await api.post("/api/componentes", dadosComponente);
-        toast.success("Componente adicionado com sucesso!");
+      if (valorMovimentar > 0) {
+        novaQuantidade =
+          tipoMovimentacao === "ENTRADA"
+            ? novaQuantidade + valorMovimentar
+            : novaQuantidade - valorMovimentar;
       }
 
-      onComponenteAdicionado();
-      onClose();
-    } catch (error) {
-      console.error("Erro ao salvar componente:", error);
-      // *** MELHORIA: Mostrar erro específico do backend ***
-      const errorMsg = error.response?.data?.message || "Falha ao salvar componente. Verifique os dados.";
-      toast.error(errorMsg);
-    }
-  };
+      if (novaQuantidade < 0) {
+        toast.error("A quantidade em estoque não pode ser negativa.");
+        return;
+      }
 
-  // --- JSX ---
+      const dadosComponente = {
+        id: componenteParaEditar.id,
+        nome,
+        codigoPatrimonio: componenteParaEditar.codigoPatrimonio,
+        quantidade: novaQuantidade,
+        localizacao: localizacaoFinal,
+        categoria: categoriaFinal,
+        // Removido observacoes e nivelMinimoEstoque
+      };
+
+      await api.put(
+        `/api/componentes/${componenteParaEditar.id}`,
+        dadosComponente
+      );
+
+      toast.success("Estoque atualizado com sucesso!");
+    } else {
+      // --- CRIAÇÃO ---
+      const dadosComponente = {
+        nome,
+        quantidade: parseInt(quantidade),
+        localizacao: localizacaoFinal,
+        categoria: categoriaFinal,
+        // Removido observacoes e nivelMinimoEstoque
+      };
+
+      await api.post("/api/componentes", dadosComponente);
+      toast.success("Componente adicionado com sucesso!");
+    }
+
+    onComponenteAdicionado();
+    onClose();
+  } catch (error) {
+    console.error("Erro ao salvar componente:", error);
+    const errorMsg =
+      error.response?.data?.message ||
+      "Falha ao salvar componente. Verifique os dados.";
+    toast.error(errorMsg);
+  }
+};
+
+
   return (
     <Dialog open={isVisible} onClose={onClose}>
       <Box component="form" onSubmit={handleSubmit}>
@@ -130,7 +128,6 @@ function ModalComponente({
         </DialogTitle>
 
         <DialogContent>
-          {/* Nome */}
           <TextField
             autoFocus
             margin="dense"
@@ -144,8 +141,7 @@ function ModalComponente({
             onChange={(e) => setNome(e.target.value)}
           />
 
-          {/* *** ALTERAÇÃO AQUI: CAMPO DE PATRIMÔNIO CONDICIONAL *** */}
-          {/* Mostra o código APENAS se estiver editando (e o mantém desabilitado) */}
+          {/* MOSTRA O CÓDIGO APENAS SE ESTIVER EDITANDO */}
           {componenteParaEditar && (
             <TextField
               margin="dense"
@@ -155,13 +151,10 @@ function ModalComponente({
               fullWidth
               variant="outlined"
               value={codigoPatrimonio}
-              disabled // Sempre desabilitado
+              disabled // Sempre desabilitado pois é gerado pelo sistema
             />
           )}
-          {/* *** FIM DA ALTERAÇÃO *** */}
 
-
-          {/* Localização (opcional) */}
           <TextField
             margin="dense"
             id="localizacao"
@@ -173,7 +166,6 @@ function ModalComponente({
             onChange={(e) => setLocalizacao(e.target.value)}
           />
 
-          {/* Categoria (opcional) */}
           <TextField
             margin="dense"
             id="categoria"
@@ -185,7 +177,6 @@ function ModalComponente({
             onChange={(e) => setCategoria(e.target.value)}
           />
 
-          {/* EDIÇÃO */}
           {componenteParaEditar ? (
             <>
               <Typography variant="body1" sx={{ mt: 2, mb: 1 }}>
@@ -220,7 +211,6 @@ function ModalComponente({
               />
             </>
           ) : (
-            // CRIAÇÃO
             <TextField
               margin="dense"
               id="quantidade"
