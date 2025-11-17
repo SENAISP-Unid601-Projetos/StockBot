@@ -12,7 +12,7 @@ import {
   TextField,
   Box,
   Typography, // Adicionado para mostrar a quantidade atual
-  MenuItem,   // Adicionado para o <select>
+  MenuItem, // Adicionado para o <select>
 } from "@mui/material";
 
 function ModalComponente({
@@ -24,13 +24,16 @@ function ModalComponente({
   // --- NOVOS ESTADOS ---
   const [nome, setNome] = useState("");
   const [codigoPatrimonio, setCodigoPatrimonio] = useState("");
-  
+
   // State 'quantidade' é usado APENAS para o modo de CRIAÇÃO
-  const [quantidade, setQuantidade] = useState(1); 
-  
+  const [quantidade, setQuantidade] = useState(1);
+
   // States novos, usados APENAS para o modo de EDIÇÃO
   const [tipoMovimentacao, setTipoMovimentacao] = useState("ENTRADA");
   const [quantidadeMovimentar, setQuantidadeMovimentar] = useState(0);
+
+  // --- 1. ADICIONAR NOVO ESTADO PARA O NÍVEL MÍNIMO ---
+  const [nivelMinimoEstoque, setNivelMinimoEstoque] = useState(1); // Começa com 1, como você pediu
 
   // --- useEffect ATUALIZADO ---
   // Popula o formulário de forma diferente para "Criar" vs "Editar"
@@ -39,17 +42,24 @@ function ModalComponente({
       // MODO DE EDIÇÃO
       setNome(componenteParaEditar.nome);
       setCodigoPatrimonio(componenteParaEditar.codigoPatrimonio);
-      
+
+      // --- 2. POPULAR O NÍVEL MÍNIMO NO MODO DE EDIÇÃO ---
+      // Garante que o valor vindo do backend seja usado
+      setNivelMinimoEstoque(componenteParaEditar.nivelMinimoEstoque || 0);
+
       // Reseta os campos de movimentação
       setTipoMovimentacao("ENTRADA");
       setQuantidadeMovimentar(0);
-      
+
       // Não mexemos no state 'quantidade', pois ele só é usado na criação
     } else {
       // MODO DE CRIAÇÃO
       setNome("");
       setCodigoPatrimonio("");
       setQuantidade(1); // Define a quantidade inicial para 1
+
+      // --- 3. GARANTIR O VALOR PADRÃO NO MODO DE CRIAÇÃO ---
+      setNivelMinimoEstoque(1); // Padrão é 1
     }
   }, [componenteParaEditar, isVisible]);
 
@@ -61,7 +71,7 @@ function ModalComponente({
     try {
       if (componenteParaEditar) {
         // --- LÓGICA DE EDIÇÃO (Movimentação) ---
-        
+
         let novaQuantidade = componenteParaEditar.quantidade;
         const valorMovimentar = parseInt(quantidadeMovimentar) || 0;
 
@@ -80,10 +90,13 @@ function ModalComponente({
 
         // Mantém todos os dados antigos e atualiza apenas os campos do formulário
         const dadosComponente = {
-          ...componenteParaEditar, 
+          ...componenteParaEditar,
           nome: nome,
           codigoPatrimonio: codigoPatrimonio,
           quantidade: novaQuantidade, // Envia a NOVA QUANTIDADE TOTAL calculada
+
+          // --- 4. ENVIAR O NÍVEL MÍNIMO ATUALIZADO ---
+          nivelMinimoEstoque: parseInt(nivelMinimoEstoque) || 0,
         };
 
         await api.put(
@@ -91,17 +104,20 @@ function ModalComponente({
           dadosComponente
         );
         toast.success("Estoque atualizado com sucesso!");
-
       } else {
         // --- LÓGICA DE CRIAÇÃO (Original) ---
         const dadosComponente = {
           nome,
           codigoPatrimonio,
-          quantidade: parseInt(quantidade),
+          // *** CORREÇÃO AQUI ***
+          // Garante que se o campo 'quantidade' estiver vazio (""), ele envie 0
+          quantidade: parseInt(quantidade) || 0, 
           localizacao: "Padrão",
           categoria: "Geral",
           observacoes: "",
-          nivelMinimoEstoque: 0 // Adicionando campo que faltava
+
+          // --- 5. ENVIAR O NÍVEL MÍNIMO NA CRIAÇÃO ---
+          nivelMinimoEstoque: parseInt(nivelMinimoEstoque) || 0,
         };
 
         await api.post("/api/componentes", dadosComponente);
@@ -150,17 +166,30 @@ function ModalComponente({
             variant="outlined"
             value={codigoPatrimonio}
             onChange={(e) => setCodigoPatrimonio(e.target.value)}
-            // No modo "Criar", o backend ignora este campo e gera um novo.
-            // No modo "Editar", ele permite a alteração.
           />
 
           {componenteParaEditar ? (
             // --- CAMPOS PARA O MODO DE EDIÇÃO ---
             <>
+              {/* --- 6. ADICIONAR CAMPO DE NÍVEL MÍNIMO NA EDIÇÃO --- */}
+              <TextField
+                margin="dense"
+                id="nivelMinimo"
+                label="Nível Mínimo de Estoque"
+                type="number"
+                fullWidth
+                variant="outlined"
+                value={nivelMinimoEstoque}
+                onChange={(e) => setNivelMinimoEstoque(e.target.value)}
+                InputProps={{ inputProps: { min: 0 } }}
+                helperText="Define o alerta de 'Estoque Baixo'"
+              />
+
               <Typography variant="body1" sx={{ mt: 2, mb: 1 }}>
-                Quantidade Atual: <strong>{componenteParaEditar.quantidade}</strong>
+                Quantidade Atual:{" "}
+                <strong>{componenteParaEditar.quantidade}</strong>
               </Typography>
-              
+
               <TextField
                 select // Transforma em um <select>
                 margin="dense"
@@ -184,23 +213,41 @@ function ModalComponente({
                 variant="outlined"
                 value={quantidadeMovimentar}
                 onChange={(e) => setQuantidadeMovimentar(e.target.value)}
-                InputProps={{ inputProps: { min: 0 } }} 
+                InputProps={{ inputProps: { min: 0 } }}
               />
             </>
           ) : (
-            // --- CAMPO PARA O MODO DE CRIAÇÃO ---
-            <TextField
-              required
-              margin="dense"
-              id="quantidade"
-              label="Quantidade Inicial"
-              type="number"
-              fullWidth
-              variant="outlined"
-              value={quantidade}
-              onChange={(e) => setQuantidade(parseInt(e.target.value))}
-              InputProps={{ inputProps: { min: 0 } }} // Garante que não seja negativo
-            />
+            // --- CAMPOS PARA O MODO DE CRIAÇÃO ---
+            <>
+              <TextField
+                required
+                margin="dense"
+                id="quantidade"
+                label="Quantidade Inicial"
+                type="number"
+                fullWidth
+                variant="outlined"
+                value={quantidade}
+                // *** CORREÇÃO AQUI ***
+                // Apenas define o valor (string), deixa o parseInt para o handleSubmit
+                onChange={(e) => setQuantidade(e.target.value)} 
+                InputProps={{ inputProps: { min: 0 } }} // Garante que não seja negativo
+              />
+
+              {/* --- 7. ADICIONAR CAMPO DE NÍVEL MÍNIMO NA CRIAÇÃO --- */}
+              <TextField
+                margin="dense"
+                id="nivelMinimo"
+                label="Nível Mínimo de Estoque"
+                type="number"
+                fullWidth
+                variant="outlined"
+                value={nivelMinimoEstoque}
+                onChange={(e) => setNivelMinimoEstoque(e.target.value)}
+                InputProps={{ inputProps: { min: 0 } }}
+                helperText="Define o alerta de 'Estoque Baixo'"
+              />
+            </>
           )}
         </DialogContent>
 
