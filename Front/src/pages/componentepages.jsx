@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { toast } from "react-toastify";
 
 import {
@@ -13,6 +13,7 @@ import {
   TableContainer,
   TableHead,
   TableRow,
+  TablePagination, // O componente de paginação!
   Typography,
   IconButton,
   Stack,
@@ -27,27 +28,60 @@ import ModalComponente from "../components/modalcomponente";
 import api from "../services/api";
 
 function ComponentesPage() {
+  // 2. Novos estados para controlar a paginação
   const [componentes, setComponentes] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [page, setPage] = useState(0); // A página atual (começa em 0)
+  const [rowsPerPage, setRowsPerPage] = useState(10); // Itens por página
+  const [totalElements, setTotalElements] = useState(0); // Total de registos no backend
   const [isModalVisible, setModalVisible] = useState(false);
   const [componenteEmEdicao, setComponenteEmEdicao] = useState(null);
 
-  const fetchData = async () => {
+  const fetchData = useCallback(async () => {
     setLoading(true);
     try {
-      const response = await api.get("/api/componentes");
-      setComponentes(response.data);
+      const response = await api.get(
+        `/api/componentes?page=${page}&size=${rowsPerPage}`
+      );
+
+      // 1. VEJA O QUE ESTÁ VINDO DA API (PRÓXIMO PASSO)
+      console.log("Resposta da API:", response.data); 
+
+      // 2. CORREÇÃO DEFENSIVA:
+      // Se response.data.content não existir, use um array vazio []
+      setComponentes(response.data.content || []); 
+      
+      // Faça o mesmo para totalElements, por segurança
+      setTotalElements(response.data.totalElements || 0);
+
     } catch (error) {
       console.error("Erro ao buscar componentes:", error);
       toast.error("Não foi possível carregar os componentes.");
+      setComponentes([]); // Em caso de erro, garanta um array vazio
     } finally {
       setLoading(false);
     }
-  };
-
+  }, [
+      page, 
+      rowsPerPage, 
+      setComponentes, 
+      setTotalElements, 
+      setLoading
+    ]);
+  // 2. O useEffect agora apenas chama o fetchData
   useEffect(() => {
     fetchData();
-  }, []);
+  }, [fetchData]); // A dependência agora é a própria função
+
+  // 4. Funções para lidar com as ações de paginação
+  const handleChangePage = (event, newPage) => {
+    setPage(newPage);
+  };
+
+  const handleChangeRowsPerPage = (event) => {
+    setRowsPerPage(parseInt(event.target.value, 10));
+    setPage(0); // Volta para a primeira página sempre que muda o número de itens
+  };
 
   const handleEdit = (componente) => {
     setComponenteEmEdicao(componente);
@@ -61,9 +95,12 @@ function ComponentesPage() {
       try {
         await api.delete(`/api/componentes/${id}`);
         toast.success("Componente excluído com sucesso!");
-        setComponentes((listaAtual) =>
-          listaAtual.filter((componente) => componente.id !== id)
-        );
+        
+        // 3. CHAME O FETCHDATA AQUI!
+        fetchData(); 
+        // Isso substitui a linha:
+        // setComponentes((listaAtual) => ...);
+
       } catch (error) {
         toast.error("Falha ao excluir o componente.");
         console.error(error);
@@ -162,6 +199,18 @@ function ComponentesPage() {
                   </TableBody>
                 </Table>
               </TableContainer>
+
+              {/* 5. O Componente de Paginação do MUI */}
+              <TablePagination
+                rowsPerPageOptions={[5, 10, 25]}
+                component="div"
+                count={totalElements}
+                rowsPerPage={rowsPerPage}
+                page={page}
+                onPageChange={handleChangePage}
+                onRowsPerPageChange={handleChangeRowsPerPage}
+                labelRowsPerPage="Itens por página:"
+              />
             </Paper>
           )}
         </Container>
@@ -172,10 +221,11 @@ function ComponentesPage() {
         <ModalComponente
           isVisible={isModalVisible}
           onClose={() => setModalVisible(false)}
-          onComponenteAdicionado={fetchData}
+          // 3. AGORA ISSO FUNCIONA!
+          onComponenteAdicionado={fetchData} 
           componenteParaEditar={componenteEmEdicao}
-        />
-      )}
+    />
+  )}
 
       {/* *** 2. FECHA O FRAGMENTO AQUI *** */}
     </>
