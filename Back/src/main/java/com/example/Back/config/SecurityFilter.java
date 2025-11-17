@@ -38,19 +38,24 @@ public class SecurityFilter extends OncePerRequestFilter {
         if (tokenJWT != null) {
             try {
                 var subject = tokenService.getSubject(tokenJWT);
-
-                // --- CORREÇÃO: Usamos findByEmail que retorna Optional<Usuario> ---
                 Optional<Usuario> optionalUsuario = usuarioRepository.findByEmail(subject);
 
                 if (optionalUsuario.isPresent()) {
                     Usuario usuario = optionalUsuario.get();
 
-                    // O objeto 'usuario' já implementa UserDetails, então passamos direto
+                    // --- LOGS DE DEBUG (Aparecerão no Render) ---
+                    System.out.println("LOGIN DEBUG: Usuário encontrado: " + usuario.getEmail());
+                    System.out.println("LOGIN DEBUG: Role no Banco: " + usuario.getRole());
+                    System.out.println("LOGIN DEBUG: Autoridades geradas: " + usuario.getAuthorities());
+                    // -------------------------------------------
+
                     var authentication = new UsernamePasswordAuthenticationToken(usuario, null, usuario.getAuthorities());
                     SecurityContextHolder.getContext().setAuthentication(authentication);
+                } else {
+                    System.out.println("LOGIN DEBUG: Token válido, mas usuário não encontrado no banco: " + subject);
                 }
             } catch (Exception e) {
-                // Se houver erro no token, limpamos o contexto para evitar acessos indevidos
+                System.out.println("LOGIN DEBUG: Erro ao validar token: " + e.getMessage());
                 SecurityContextHolder.clearContext();
             }
         }
