@@ -123,10 +123,6 @@ function PedidosPage() {
         >
           Solicitar Compra de Novo Item
         </Typography>
-        <Typography variant="body1" color="text.secondary" sx={{ mb: 3 }}>
-          Use este formulário para solicitar a compra de um item que NÃO existe
-          no estoque (Ex: "Makita", "Novos Computadores").
-        </Typography>
 
         <Paper sx={{ p: 5, mb: 4, boxShadow: 3 }}>
           <Box component="form" onSubmit={handleSubmit} noValidate>
