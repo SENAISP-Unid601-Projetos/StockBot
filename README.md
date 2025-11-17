@@ -20,7 +20,7 @@ Antes de começar, você vai precisar ter as seguintes ferramentas instaladas em
 Este projeto é dividido em duas partes principais (front-end e back-end):
 
 * **Front-end (Web):**
-    * **React.js** (Possivelmente com [Vite](https://vitejs.dev/))
+    * **React.js** ( com [Vite](https://vitejs.dev/))
     * JavaScript (ou TypeScript)
 * **Back-end (API):**
     * Java
