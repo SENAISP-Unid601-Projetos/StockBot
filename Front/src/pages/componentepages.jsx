@@ -43,7 +43,9 @@ function ComponentesPage() {
     setLoading(true);
     try {
       // Envia o termo para o backend filtrar
-      const response = await api.get(`/api/componentes?termo=${encodeURIComponent(termo)}`);
+      const response = await api.get(
+        `/api/componentes?termo=${encodeURIComponent(termo)}`
+      );
       setComponentes(response.data);
     } catch (error) {
       console.error("Erro ao buscar componentes:", error);
@@ -101,9 +103,26 @@ function ComponentesPage() {
 
   return (
     <>
-      <Box component="main" sx={{ flexGrow: 1, p: 3, minHeight: "100vh", backgroundColor: "background.default" }}>
+      <Box
+        component="main"
+        sx={{
+          flexGrow: 1,
+          p: 3,
+          minHeight: "100vh",
+          backgroundColor: "background.default",
+        }}
+      >
         <Container maxWidth="lg">
-          <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mb: 4, flexWrap: "wrap", gap: 2 }}>
+          <Box
+            sx={{
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+              mb: 4,
+              flexWrap: "wrap",
+              gap: 2,
+            }}
+          >
             <Typography variant="h4" component="h1" fontWeight="bold">
               Gerenciamento de Itens
             </Typography>
@@ -128,11 +147,13 @@ function ComponentesPage() {
             {isUserAdmin && (
               <Button
                 variant="contained"
-                startIcon={<AddIcon />}
                 onClick={handleAdd}
-                sx={{ backgroundColor: "#ce0000", "&:hover": { backgroundColor: "#a40000" } }}
+                sx={{
+                  backgroundColor: "#ce0000",
+                  "&:hover": { backgroundColor: "#a40000" },
+                }}
               >
-                Adicionar Item
+                Novo Item
               </Button>
             )}
           </Box>
@@ -147,38 +168,64 @@ function ComponentesPage() {
                 <Table stickyHeader aria-label="tabela de componentes">
                   <TableHead>
                     <TableRow>
-                      <TableCell sx={{ fontWeight: "bold" }}>Nome</TableCell>
-                      <TableCell sx={{ fontWeight: "bold" }}>
+                      <TableCell align="center" sx={{ fontWeight: "bold" }}>
+                        Nome
+                      </TableCell>
+                      <TableCell align="center" sx={{ fontWeight: "bold" }}>
                         Patrimônio
                       </TableCell>
-                      <TableCell sx={{ fontWeight: "bold" }}>
+                      <TableCell align="center" sx={{ fontWeight: "bold" }}>
                         Quantidade
                       </TableCell>
-                      <TableCell sx={{ fontWeight: "bold" }}>
+                      <TableCell align="center" sx={{ fontWeight: "bold" }}>
                         Localização
                       </TableCell>
-                      <TableCell sx={{ fontWeight: "bold" }}>
+                      <TableCell align="center" sx={{ fontWeight: "bold" }}>
                         Categoria
                       </TableCell>
-                      <TableCell sx={{ fontWeight: "bold" }}>Ações</TableCell>
+                      <TableCell align="center" sx={{ fontWeight: "bold" }}>
+                        Ações
+                      </TableCell>
                     </TableRow>
                   </TableHead>
                   <TableBody>
                     {componentes.length > 0 ? (
                       componentes.map((componente) => (
                         <TableRow hover key={componente.id}>
-                          <TableCell>{componente.nome}</TableCell>
-                          <TableCell>{componente.codigoPatrimonio}</TableCell>
-                          <TableCell>{componente.quantidade}</TableCell>
-                          <TableCell>{componente.localizacao || "-"}</TableCell>
-                          <TableCell>{componente.categoria || "-"}</TableCell>
+                          <TableCell align="center">
+                            {componente.nome}
+                          </TableCell>
+                          <TableCell align="center">
+                            {componente.codigoPatrimonio}
+                          </TableCell>
+                          <TableCell align="center">
+                            {componente.quantidade}
+                          </TableCell>
+                          <TableCell align="center">
+                            {componente.localizacao || "-"}
+                          </TableCell>
+                          <TableCell align="center">
+                            {componente.categoria || "-"}
+                          </TableCell>
                           {isUserAdmin && (
                             <TableCell align="right">
-                              <Stack direction="row" spacing={1} justifyContent="flex-end">
-                                <IconButton color="info" size="small" onClick={() => handleEdit(componente)}>
+                              <Stack
+                                direction="row"
+                                spacing={1}
+                                justifyContent="center"
+                              >
+                                <IconButton
+                                  color="info"
+                                  size="small"
+                                  onClick={() => handleEdit(componente)}
+                                >
                                   <EditIcon />
                                 </IconButton>
-                                <IconButton color="error" size="small" onClick={() => handleDelete(componente.id)}>
+                                <IconButton
+                                  color="error"
+                                  size="small"
+                                  onClick={() => handleDelete(componente.id)}
+                                >
                                   <DeleteIcon />
                                 </IconButton>
                               </Stack>
