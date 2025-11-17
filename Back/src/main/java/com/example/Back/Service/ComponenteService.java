@@ -1,8 +1,12 @@
 package com.example.Back.Service;
 
-import com.example.Back.Dto.*;
-import com.example.Back.Entity.*;
-import com.example.Back.Repository.*;
+import com.example.Back.Dto.ComponenteDTO;
+import com.example.Back.Entity.Componente;
+import com.example.Back.Entity.Empresa;
+import com.example.Back.Entity.Historico;
+import com.example.Back.Entity.TipoMovimentacao;
+import com.example.Back.Repository.ComponenteRepository;
+import com.example.Back.Repository.HistoricoRepository;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

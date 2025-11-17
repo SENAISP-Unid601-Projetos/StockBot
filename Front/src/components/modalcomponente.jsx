@@ -22,7 +22,6 @@ function ModalComponente({
 }) {
   // --- ESTADOS ---
   const [nome, setNome] = useState("");
-  const [codigoPatrimonio, setCodigoPatrimonio] = useState("");
   const [localizacao, setLocalizacao] = useState("");
   const [categoria, setCategoria] = useState("");
   const [quantidade, setQuantidade] = useState(1);
@@ -35,7 +34,6 @@ function ModalComponente({
     if (componenteParaEditar) {
       // EDIÇÃO
       setNome(componenteParaEditar.nome);
-      setCodigoPatrimonio(componenteParaEditar.codigoPatrimonio);
       setLocalizacao(componenteParaEditar.localizacao);
       setCategoria(componenteParaEditar.categoria);
       setTipoMovimentacao("ENTRADA");
@@ -43,7 +41,6 @@ function ModalComponente({
     } else {
       // CRIAÇÃO
       setNome("");
-      setCodigoPatrimonio("");
       setLocalizacao("");
       setCategoria("");
       setQuantidade(1);
@@ -52,71 +49,69 @@ function ModalComponente({
 
   // --- handleSubmit ---
   const handleSubmit = async (event) => {
-  event.preventDefault();
+    event.preventDefault();
 
-  try {
-    const localizacaoFinal =
-      localizacao.trim() === "" ? "Padrão" : localizacao;
-    const categoriaFinal = categoria.trim() === "" ? "Geral" : categoria;
+    try {
+      const localizacaoFinal =
+        localizacao.trim() === "" ? "Padrão" : localizacao;
+      const categoriaFinal = categoria.trim() === "" ? "Geral" : categoria;
 
-    if (componenteParaEditar) {
-      // --- EDIÇÃO ---
-      let novaQuantidade = componenteParaEditar.quantidade;
-      const valorMovimentar = parseInt(quantidadeMovimentar) || 0;
+      if (componenteParaEditar) {
+        // --- EDIÇÃO ---
+        let novaQuantidade = componenteParaEditar.quantidade;
+        const valorMovimentar = parseInt(quantidadeMovimentar) || 0;
 
-      if (valorMovimentar > 0) {
-        novaQuantidade =
-          tipoMovimentacao === "ENTRADA"
-            ? novaQuantidade + valorMovimentar
-            : novaQuantidade - valorMovimentar;
+        if (valorMovimentar > 0) {
+          novaQuantidade =
+            tipoMovimentacao === "ENTRADA"
+              ? novaQuantidade + valorMovimentar
+              : novaQuantidade - valorMovimentar;
+        }
+
+        if (novaQuantidade < 0) {
+          toast.error("A quantidade em estoque não pode ser negativa.");
+          return;
+        }
+
+        const dadosComponente = {
+          id: componenteParaEditar.id,
+          nome,
+          quantidade: novaQuantidade,
+          localizacao: localizacaoFinal,
+          categoria: categoriaFinal,
+          // Removido observacoes e nivelMinimoEstoque
+        };
+
+        await api.put(
+          `/api/componentes/${componenteParaEditar.id}`,
+          dadosComponente
+        );
+
+        toast.success("Estoque atualizado com sucesso!");
+      } else {
+        // --- CRIAÇÃO ---
+        const dadosComponente = {
+          nome,
+          quantidade: parseInt(quantidade),
+          localizacao: localizacaoFinal,
+          categoria: categoriaFinal,
+          // Removido observacoes e nivelMinimoEstoque
+        };
+
+        await api.post("/api/componentes", dadosComponente);
+        toast.success("Componente adicionado com sucesso!");
       }
 
-      if (novaQuantidade < 0) {
-        toast.error("A quantidade em estoque não pode ser negativa.");
-        return;
-      }
-
-      const dadosComponente = {
-        id: componenteParaEditar.id,
-        nome,
-        codigoPatrimonio: componenteParaEditar.codigoPatrimonio,
-        quantidade: novaQuantidade,
-        localizacao: localizacaoFinal,
-        categoria: categoriaFinal,
-        // Removido observacoes e nivelMinimoEstoque
-      };
-
-      await api.put(
-        `/api/componentes/${componenteParaEditar.id}`,
-        dadosComponente
-      );
-
-      toast.success("Estoque atualizado com sucesso!");
-    } else {
-      // --- CRIAÇÃO ---
-      const dadosComponente = {
-        nome,
-        quantidade: parseInt(quantidade),
-        localizacao: localizacaoFinal,
-        categoria: categoriaFinal,
-        // Removido observacoes e nivelMinimoEstoque
-      };
-
-      await api.post("/api/componentes", dadosComponente);
-      toast.success("Componente adicionado com sucesso!");
+      onComponenteAdicionado();
+      onClose();
+    } catch (error) {
+      console.error("Erro ao salvar componente:", error);
+      const errorMsg =
+        error.response?.data?.message ||
+        "Falha ao salvar componente. Verifique os dados.";
+      toast.error(errorMsg);
     }
-
-    onComponenteAdicionado();
-    onClose();
-  } catch (error) {
-    console.error("Erro ao salvar componente:", error);
-    const errorMsg =
-      error.response?.data?.message ||
-      "Falha ao salvar componente. Verifique os dados.";
-    toast.error(errorMsg);
-  }
-};
-
+  };
 
   return (
     <Dialog open={isVisible} onClose={onClose}>
@@ -142,18 +137,6 @@ function ModalComponente({
           />
 
           {/* MOSTRA O CÓDIGO APENAS SE ESTIVER EDITANDO */}
-          {componenteParaEditar && (
-            <TextField
-              margin="dense"
-              id="codigoPatrimonio"
-              label="Código de Patrimônio"
-              type="text"
-              fullWidth
-              variant="outlined"
-              value={codigoPatrimonio}
-              disabled // Sempre desabilitado pois é gerado pelo sistema
-            />
-          )}
 
           <TextField
             margin="dense"

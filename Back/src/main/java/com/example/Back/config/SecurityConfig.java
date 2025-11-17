@@ -26,7 +26,6 @@ public class SecurityConfig {
 
     private final SecurityFilter securityFilter;
 
-    // MELHORIA: Injeção de dependências via construtor
     public SecurityConfig(SecurityFilter securityFilter) {
         this.securityFilter = securityFilter;
     }
@@ -34,41 +33,55 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         return http
-                .cors(cors -> cors.configurationSource(corsConfigurationSource())) // <-- MELHORIA: CORS integrado
+                .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .csrf(csrf -> csrf.disable())
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(authorize -> authorize
+
+                        // Auth público
                         .requestMatchers(HttpMethod.POST, "/api/auth/**").permitAll()
+
+                        // Usuários (somente ADMIN)
                         .requestMatchers("/api/users/**").hasRole("ADMIN")
-                        .requestMatchers(HttpMethod.POST, "/api/pedidos-compra").authenticated() // Usuários podem criar pedidos
-                        .requestMatchers(HttpMethod.GET, "/api/pedidos-compra/me").authenticated() // Usuários podem ver seus pedidos
-                        .requestMatchers(HttpMethod.GET, "/api/pedidos-compra/pendentes").hasRole("ADMIN") // Admins veem pendentes
-                        .requestMatchers(HttpMethod.PUT, "/api/pedidos-compra/**/aprovar").hasRole("ADMIN") // Admins aprovam
-                        .requestMatchers(HttpMethod.PUT, "/api/pedidos-compra/**/recusar").hasRole("ADMIN") // Admins recusam
-                        // --- FIM DAS LINHAS NOVAS ---
+
+                        // Pedidos de compra
+                        .requestMatchers(HttpMethod.POST, "/api/pedidos-compra").authenticated()
+                        .requestMatchers(HttpMethod.GET, "/api/pedidos-compra/me").authenticated()
+                        .requestMatchers(HttpMethod.GET, "/api/pedidos-compra/pendentes").hasRole("ADMIN")
+
+                        // ENDPOINTS CORRIGIDOS — sem uso ilegal de ** no meio
+                        .requestMatchers(HttpMethod.PUT, "/api/pedidos-compra/{id}/aprovar").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.PUT, "/api/pedidos-compra/{id}/recusar").hasRole("ADMIN")
+
+                        // Todo o resto requer autenticação
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(securityFilter, UsernamePasswordAuthenticationFilter.class)
                 .build();
     }
 
-    // MELHORIA: Bean de configuração do CORS
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        // Permite requisições da origem do seu frontend React
-        configuration.setAllowedOrigins(Arrays.asList("http://localhost:5173", "https://stockbot-front.onrender.com"));
+
+        configuration.setAllowedOrigins(Arrays.asList(
+                "http://localhost:5173",
+                "https://stockbot-front.onrender.com"
+        ));
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(Arrays.asList("Authorization", "Cache-Control", "Content-Type"));
         configuration.setAllowCredentials(true);
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-        source.registerCorsConfiguration("/**", configuration); // Aplica a todos os endpoints
+        source.registerCorsConfiguration("/**", configuration);
+
         return source;
     }
 
     @Bean
-    public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration) throws Exception {
+    public AuthenticationManager authenticationManager(
+            AuthenticationConfiguration authenticationConfiguration
+    ) throws Exception {
         return authenticationConfiguration.getAuthenticationManager();
     }
 
