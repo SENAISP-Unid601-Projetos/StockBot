@@ -34,10 +34,10 @@ function HistoricoPage() {
   const fetchData = async () => {
     setLoading(true);
     try {
-      // CORREÇÃO AQUI: Adicione /api no início da URL
       const response = await api.get(
-        `/api/historico?page=${page}&size=${rowsPerPage}` // <-- Adicionado /api/
+        `/api/historico?page=${page}&size=${rowsPerPage}` 
       );
+
 
       setHistorico(response.data.content || []);
       setTotalElements(response.data.totalElements);
