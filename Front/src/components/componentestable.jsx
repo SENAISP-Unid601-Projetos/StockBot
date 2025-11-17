@@ -26,6 +26,7 @@ function ComponentesTable({ componentes, onEdit, onDelete, isAdmin }) {
         <Table stickyHeader aria-label="tabela de componentes">
           <TableHead>
             <TableRow>
+              <TableCell sx={{ fontWeight: "bold" }}>Id</TableCell>
               <TableCell sx={{ fontWeight: "bold" }}>Nome</TableCell>
               <TableCell sx={{ fontWeight: "bold" }}>Patrimônio</TableCell>
               <TableCell sx={{ fontWeight: "bold" }}>Localização</TableCell>

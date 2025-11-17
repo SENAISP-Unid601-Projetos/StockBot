@@ -131,7 +131,7 @@ function ComponentesPage() {
             <TextField
               variant="outlined"
               size="small"
-              placeholder="Buscar por nome ou patrimônio..."
+              placeholder="Buscar por nome ou id"
               value={termoBusca}
               onChange={handleBuscaChange}
               InputProps={{
@@ -163,35 +163,34 @@ function ComponentesPage() {
               <CircularProgress />
             </Box>
           ) : (
-            <Paper sx={{ width: "100%", overflow: "hidden", boxShadow: 3 }}>
+            <Paper sx={{ width: "100%", overflow: "hidden", boxShadow: 5 }}>
               <TableContainer>
                 <Table stickyHeader aria-label="tabela de componentes">
                   <TableHead>
-                    <TableRow>
-                      <TableCell align="center" sx={{ fontWeight: "bold" }}>
-                        Nome
-                      </TableCell>
-                      <TableCell align="center" sx={{ fontWeight: "bold" }}>
-                        Patrimônio
-                      </TableCell>
-                      <TableCell align="center" sx={{ fontWeight: "bold" }}>
-                        Quantidade
-                      </TableCell>
-                      <TableCell align="center" sx={{ fontWeight: "bold" }}>
-                        Localização
-                      </TableCell>
-                      <TableCell align="center" sx={{ fontWeight: "bold" }}>
-                        Categoria
-                      </TableCell>
-                      <TableCell align="center" sx={{ fontWeight: "bold" }}>
-                        Ações
-                      </TableCell>
+                    <TableRow
+                      sx={{
+                        // O seletor "& th" aplica o estilo a todas as células de cabeçalho dentro desta linha
+                        "& th": {
+                          backgroundColor: "#2a3c61ff", // Cor de fundo preta
+                          color: "#ffffff", // Texto branco (essencial para contraste)
+                          fontWeight: "bold",
+                        },
+                      }}
+                    >
+                      <TableCell align="center">Id</TableCell>
+                      <TableCell align="center">Nome</TableCell>
+                      <TableCell align="center">Patrimônio</TableCell>
+                      <TableCell align="center">Quantidade</TableCell>
+                      <TableCell align="center">Localização</TableCell>
+                      <TableCell align="center">Categoria</TableCell>
+                      <TableCell align="center">Ações</TableCell>
                     </TableRow>
                   </TableHead>
                   <TableBody>
                     {componentes.length > 0 ? (
                       componentes.map((componente) => (
                         <TableRow hover key={componente.id}>
+                          <TableCell align="center">{componente.id}</TableCell>
                           <TableCell align="center">
                             {componente.nome}
                           </TableCell>
