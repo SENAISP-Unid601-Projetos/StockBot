@@ -16,10 +16,7 @@ public class ComponenteDTO {
     private int quantidade;
     private String localizacao;
     private String categoria;
-    private String observacoes;
 
-    // 1. ADICIONA O CAMPO QUE FALTAVA
-    private int nivelMinimoEstoque;
 
     // 2. ATUALIZA O CONSTRUTOR AUXILIAR
 //    Este construtor converte uma Entidade para este DTO
@@ -30,9 +27,7 @@ public class ComponenteDTO {
         this.quantidade = componente.getQuantidade();
         this.localizacao = componente.getLocalizacao();
         this.categoria = componente.getCategoria();
-        this.observacoes = componente.getObservacoes();
-// Adiciona a linha que faltava para o novo campo
-        this.nivelMinimoEstoque = componente.getNivelMinimoEstoque();
+
     }
 }
 

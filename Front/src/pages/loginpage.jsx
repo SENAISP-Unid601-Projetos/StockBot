@@ -3,9 +3,6 @@ import { useNavigate, Link } from "react-router-dom";
 import api from "../services/api";
 import "./loginpage.css";
 import ParticlesBackground from "../components/ParticlesBackground";
-import { toast } from "react-toastify";
-
-const apiUrl = "http://localhost:8080/api/auth";
 
 function LoginPage() {
   const [email, setEmail] = useState("");

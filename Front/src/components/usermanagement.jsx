@@ -38,7 +38,7 @@ function UserManagement({ users, onDeleteUser }) {
                     color:
                       user.role === "ADMIN"
                         ? "var(--vermelhoSenai)"
-                        : "#000000",
+                        : "#0944f5ff",
                     // Borda subtil para definir a "caixa" no fundo claro
                     border: "1px solid var(--cinzaMedio, #ccc)",
                   }}

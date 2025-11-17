@@ -2,7 +2,6 @@ import { useState, useEffect } from "react";
 import api from "../services/api";
 import { toast } from "react-toastify";
 
-// 1. IMPORTAÇÕES DE COMPONENTES DO MUI PARA O DIÁLOGO
 import {
   Button,
   Dialog,
@@ -23,9 +22,8 @@ function ModalComponente({
 }) {
   // --- ESTADOS ---
   const [nome, setNome] = useState("");
-  const [codigoPatrimonio, setCodigoPatrimonio] = useState("");
-  const [localizacao, setLocalizacao] = useState(""); // opcional
-  const [categoria, setCategoria] = useState(""); // opcional
+  const [localizacao, setLocalizacao] = useState("");
+  const [categoria, setCategoria] = useState("");
   const [quantidade, setQuantidade] = useState(1);
 
   const [tipoMovimentacao, setTipoMovimentacao] = useState("ENTRADA");
@@ -36,7 +34,6 @@ function ModalComponente({
     if (componenteParaEditar) {
       // EDIÇÃO
       setNome(componenteParaEditar.nome);
-      setCodigoPatrimonio(componenteParaEditar.codigoPatrimonio);
       setLocalizacao(componenteParaEditar.localizacao);
       setCategoria(componenteParaEditar.categoria);
       setTipoMovimentacao("ENTRADA");
@@ -44,7 +41,6 @@ function ModalComponente({
     } else {
       // CRIAÇÃO
       setNome("");
-      setCodigoPatrimonio("");
       setLocalizacao("");
       setCategoria("");
       setQuantidade(1);
@@ -56,7 +52,6 @@ function ModalComponente({
     event.preventDefault();
 
     try {
-      // valores padrão caso usuário deixe em branco
       const localizacaoFinal =
         localizacao.trim() === "" ? "Padrão" : localizacao;
       const categoriaFinal = categoria.trim() === "" ? "Geral" : categoria;
@@ -79,12 +74,12 @@ function ModalComponente({
         }
 
         const dadosComponente = {
-          ...componenteParaEditar,
+          id: componenteParaEditar.id,
           nome,
-          codigoPatrimonio,
+          quantidade: novaQuantidade,
           localizacao: localizacaoFinal,
           categoria: categoriaFinal,
-          quantidade: novaQuantidade,
+          // Removido observacoes e nivelMinimoEstoque
         };
 
         await api.put(
@@ -97,12 +92,10 @@ function ModalComponente({
         // --- CRIAÇÃO ---
         const dadosComponente = {
           nome,
-          codigoPatrimonio,
           quantidade: parseInt(quantidade),
           localizacao: localizacaoFinal,
           categoria: categoriaFinal,
-          observacoes: "",
-          nivelMinimoEstoque: 0,
+          // Removido observacoes e nivelMinimoEstoque
         };
 
         await api.post("/api/componentes", dadosComponente);
@@ -113,11 +106,13 @@ function ModalComponente({
       onClose();
     } catch (error) {
       console.error("Erro ao salvar componente:", error);
-      toast.error("Falha ao salvar componente. Verifique os dados.");
+      const errorMsg =
+        error.response?.data?.message ||
+        "Falha ao salvar componente. Verifique os dados.";
+      toast.error(errorMsg);
     }
   };
 
-  // --- JSX ---
   return (
     <Dialog open={isVisible} onClose={onClose}>
       <Box component="form" onSubmit={handleSubmit}>
@@ -128,7 +123,6 @@ function ModalComponente({
         </DialogTitle>
 
         <DialogContent>
-          {/* Nome */}
           <TextField
             autoFocus
             margin="dense"
@@ -142,23 +136,8 @@ function ModalComponente({
             onChange={(e) => setNome(e.target.value)}
           />
 
-          {/* === ADICIONE ESTE BLOCO === */}
-          <TextField
-            margin="dense"
-            id="codigoPatrimonio"
-            label="Código de Patrimônio"
-            type="text"
-            fullWidth
-            variant="outlined"
-            required
-            value={codigoPatrimonio}
-            onChange={(e) => setCodigoPatrimonio(e.target.value)}
-            // Desabilitar a edição do código previne erros de duplicidade
-            disabled={!!componenteParaEditar} 
-          />
-          {/* === FIM DO BLOCO === */}
+          {/* MOSTRA O CÓDIGO APENAS SE ESTIVER EDITANDO */}
 
-          {/* Localização (opcional) */}
           <TextField
             margin="dense"
             id="localizacao"
@@ -170,7 +149,6 @@ function ModalComponente({
             onChange={(e) => setLocalizacao(e.target.value)}
           />
 
-          {/* Categoria (opcional) */}
           <TextField
             margin="dense"
             id="categoria"
@@ -182,7 +160,6 @@ function ModalComponente({
             onChange={(e) => setCategoria(e.target.value)}
           />
 
-          {/* EDIÇÃO */}
           {componenteParaEditar ? (
             <>
               <Typography variant="body1" sx={{ mt: 2, mb: 1 }}>
@@ -217,7 +194,6 @@ function ModalComponente({
               />
             </>
           ) : (
-            // CRIAÇÃO
             <TextField
               margin="dense"
               id="quantidade"
