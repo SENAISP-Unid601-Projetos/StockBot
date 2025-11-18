@@ -1,15 +1,15 @@
 package com.example.Back.Entity;
 
-import jakarta.persistence.
-        *;
+import jakarta.persistence.*;
 import lombok.Data;
 import java.time.LocalDateTime;
 
-@Entity
-@Data // Esta anotação já cria TODOS os getters e setters para nós\!
-public class Requisicao {
+// 1. IMPORTAR A ENTIDADE DO UTILIZADOR
+import com.example.Back.Entity.Usuario;
 
-// --- CAMPOS (Os "dados" que a entidade guarda) ---
+@Entity
+@Data
+public class Requisicao {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -26,4 +26,15 @@ public class Requisicao {
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "empresa_id", nullable = false)
     private Empresa empresa;
-    }
+
+    // --- 2. CAMPOS ADICIONADOS ---
+    @Column(nullable = true) // Pode ser nulo se a quantidade não for aplicável
+    private Integer quantidade;
+
+    @Column(nullable = true)
+    private String justificativa;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "solicitante_id", nullable = true) // O solicitante pode ser o "Sistema" (nulo) ou um utilizador
+    private Usuario solicitante;
+}
