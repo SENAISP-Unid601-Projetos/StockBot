@@ -3,7 +3,7 @@ import api from "../services/api";
 import { toast } from "react-toastify";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
-import { useNavigate } from "react-router-dom"; // 1. Importar o hook de navegação
+import { useNavigate } from "react-router-dom";
 
 import {
   Alert,
@@ -11,50 +11,36 @@ import {
   Button,
   CircularProgress,
   Container,
-  Grid,
   Typography,
-  Paper, // Para a tabela
+  Paper,
   Table,
   TableBody,
   TableCell,
   TableContainer,
   TableHead,
   TableRow,
-  TablePagination, // Para a paginação
-  Chip, // Para o status
+  TablePagination,
+  Chip,
 } from "@mui/material";
 import PrintIcon from "@mui/icons-material/Print";
-import SearchIcon from "@mui/icons-material/Search"; // <--- Importado
-import ShoppingCartIcon from "@mui/icons-material/ShoppingCart"; // 2. Importar ícone para o botão
-
-import ActionList from "../components/actionList";
+import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
 
 function ReposicaoPage() {
   const [componentes, setComponentes] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [threshold, setThreshold] = useState(5);
-  const [termoBusca, setTermoBusca] = useState(""); // <--- Estado da busca
-  // 3. Remover o estado 'threshold'. Não precisamos mais do limite global.
-  // const [threshold, setThreshold] = useState(5);
-
-  // 4. Adicionar estados de paginação (copiado de componentepages.jsx)
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);
-  const navigate = useNavigate(); // Hook para navegação
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchData = async () => {
       try {
         setLoading(true);
-        const [componentesResponse, thresholdResponse] = await Promise.all([
-          api.get("/api/componentes"), // Busca todos
-          api.get("/api/settings/lowStockThreshold").catch(() => ({ data: 5 })),
-        ]);
-
-        if (Array.isArray(componentesResponse.data)) {
-          setComponentes(componentesResponse.data);
+        // Carrega os dados
+        const response = await api.get("/api/componentes");
+        if (Array.isArray(response.data)) {
+          setComponentes(response.data);
         }
-        setThreshold(thresholdResponse.data);
       } catch (error) {
         toast.error("Não foi possível carregar os dados.");
       } finally {
@@ -62,70 +48,59 @@ function ReposicaoPage() {
       }
     };
     fetchData();
-  }, []); // 6. Remover 'threshold' das dependências
+  }, []);
 
-  // 7. Lógica principal: filtrar usando o nível mínimo INDIVIDUAL
+  // Filtra itens que atingiram o nível mínimo
   const itensParaRepor = componentes.filter(
-    (comp) => comp.quantidade <= comp.nivelMinimoEstoque
+    (comp) => comp.quantidade <= (comp.nivelMinimoEstoque || 0)
   );
   const necessitaReposicao = itensParaRepor.length > 0;
 
-  // 8. Handlers de Paginação (copiado de componentepages.jsx)
+  // Handlers de Paginação
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
   };
 
   const handleChangeRowsPerPage = (event) => {
     setRowsPerPage(parseInt(event.target.value, 10));
-    setPage(0); // Volta para a primeira página
+    setPage(0);
   };
 
-  // 9. Lógica de paginação no frontend
+  // Dados paginados
   const totalElements = itensParaRepor.length;
   const inicio = page * rowsPerPage;
   const fim = inicio + rowsPerPage;
   const itensPaginados = itensParaRepor.slice(inicio, fim);
 
-  // 10. Atualizar o PDF para usar a nova lógica e colunas
+  // Gerar PDF
   const handleGerarPedidoPDF = () => {
     const doc = new jsPDF();
     doc.setFontSize(18);
     doc.text("Relatório de Reposição de Estoque", 14, 22);
 
-    // Usar 'itensParaRepor' (a lista completa, não apenas a paginada)
     const tableData = itensParaRepor.map((comp) => [
       comp.nome || "Sem nome",
       comp.codigoPatrimonio || "-",
       comp.quantidade <= 0 ? "ESGOTADO" : "ESTOQUE BAIXO",
       comp.quantidade || 0,
-      comp.nivelMinimoEstoque,
-      comp.nivelMinimoEstoque - comp.quantidade, // Quantidade a Repor
+      comp.nivelMinimoEstoque || 0,
+      (comp.nivelMinimoEstoque || 0) - (comp.quantidade || 0),
     ]);
 
     autoTable(doc, {
-      head: [
-        [
-          "Nome",
-          "Patrimônio",
-          "Status",
-          "Qtd. Atual",
-          "Nível Mínimo",
-          "Repor Qtd.",
-        ],
-      ],
+      head: [["Nome", "Patrimônio", "Status", "Qtd. Atual", "Nível Mínimo", "Repor Qtd."]],
       body: tableData,
       startY: 30,
       styles: { fontSize: 10 },
-      headStyles: { fillColor: [66, 66, 66] }, // Cor escura para o cabeçalho
-      // Adiciona cores às linhas com base no status
+      headStyles: { fillColor: [66, 66, 66] },
       didParseCell: function (data) {
         if (data.column.index === 2 && data.cell.section === "body") {
           if (data.cell.raw === "ESGOTADO") {
-            data.cell.styles.textColor = [211, 47, 47]; // Vermelho
+            data.cell.styles.textColor = [211, 47, 47];
             data.cell.styles.fontStyle = "bold";
           }
           if (data.cell.raw === "ESTOQUE BAIXO") {
-            data.cell.styles.textColor = [237, 108, 2]; // Laranja
+            data.cell.styles.textColor = [237, 108, 2];
           }
         }
       },
@@ -133,38 +108,20 @@ function ReposicaoPage() {
     doc.save("relatorio-reposicao.pdf");
   };
 
-  // 11. Handler para o novo botão "Solicitar"
   const handleSolicitarClick = () => {
-    // Redireciona para a página de pedidos manuais
     navigate("/pedidos");
-    toast.info(
-      "Redirecionando para a página de Pedidos. Use-a para solicitar um novo item."
-    );
+    toast.info("Redirecionando para a página de Pedidos.");
   };
 
-  if (loading) {
-    return (
-      (comp.nome && comp.nome.toLowerCase().includes(termo)) ||
-      (comp.codigoPatrimonio && comp.codigoPatrimonio.toLowerCase().includes(termo))
-    );
-  };
+  // --- AQUI ESTAVA O ERRO: REMOVIDO O BLOCO IF ERRADO ---
 
-  const itensEmFalta = componentesFiltrados.filter((comp) => comp.quantidade <= 0);
-  const itensEstoqueBaixo = componentesFiltrados.filter(
-    (comp) => comp.quantidade > 0 && comp.quantidade <= threshold
-  );
-
-  // Verifica se há algo para repor no total (para o botão PDF)
-  const totalParaRepor = componentes.some((comp) => comp.quantidade <= threshold);
-
-  if (loading) return <CircularProgress sx={{display: 'block', margin: '20px auto'}} />;
+  if (loading) return <CircularProgress sx={{ display: "block", margin: "20px auto" }} />;
 
   return (
     <Box component="main" sx={{ flexGrow: 1, p: 3 }}>
       <Container maxWidth="lg">
         <Box display="flex" justifyContent="space-between" alignItems="center" mb={3} flexWrap="wrap" gap={2}>
           <Typography variant="h4" component="h1" fontWeight="bold">Relatório de Reposição</Typography>
-
           <Button
             variant="contained"
             startIcon={<PrintIcon />}
@@ -177,12 +134,10 @@ function ReposicaoPage() {
 
         {!necessitaReposicao && (
           <Alert severity="success" sx={{ mb: 3 }}>
-            Estoque em dia! Nenhum item necessitando reposição com base no seu
-            nível mínimo.
+            Estoque em dia! Nenhum item necessitando reposição.
           </Alert>
         )}
 
-        {/* 12. Substituir o <Grid> e <ActionList> pela Tabela */}
         {necessitaReposicao && (
           <Paper sx={{ width: "100%", overflow: "hidden", boxShadow: 3 }}>
             <TableContainer>
@@ -190,19 +145,11 @@ function ReposicaoPage() {
                 <TableHead>
                   <TableRow>
                     <TableCell sx={{ fontWeight: "bold" }}>Nome</TableCell>
-                    <TableCell sx={{ fontWeight: "bold" }}>
-                      Patrimônio
-                    </TableCell>
+                    <TableCell sx={{ fontWeight: "bold" }}>Patrimônio</TableCell>
                     <TableCell sx={{ fontWeight: "bold" }}>Status</TableCell>
-                    <TableCell sx={{ fontWeight: "bold" }} align="center">
-                      Qtd. Atual
-                    </TableCell>
-                    <TableCell sx={{ fontWeight: "bold" }} align="center">
-                      Nível Mínimo
-                    </TableCell>
-                    <TableCell sx={{ fontWeight: "bold" }} align="center">
-                      Repor Qtd.
-                    </TableCell>
+                    <TableCell sx={{ fontWeight: "bold" }} align="center">Qtd. Atual</TableCell>
+                    <TableCell sx={{ fontWeight: "bold" }} align="center">Nível Mínimo</TableCell>
+                    <TableCell sx={{ fontWeight: "bold" }} align="center">Repor Qtd.</TableCell>
                     <TableCell sx={{ fontWeight: "bold" }}>Ações</TableCell>
                   </TableRow>
                 </TableHead>
@@ -213,22 +160,16 @@ function ReposicaoPage() {
                       <TableCell>{comp.codigoPatrimonio}</TableCell>
                       <TableCell>
                         <Chip
-                          label={
-                            comp.quantidade <= 0
-                              ? "ESGOTADO"
-                              : "ESTOQUE BAIXO"
-                          }
+                          label={comp.quantidade <= 0 ? "ESGOTADO" : "ESTOQUE BAIXO"}
                           color={comp.quantidade <= 0 ? "error" : "warning"}
                           size="small"
                           sx={{ fontWeight: "bold" }}
                         />
                       </TableCell>
                       <TableCell align="center">{comp.quantidade}</TableCell>
-                      <TableCell align="center">
-                        {comp.nivelMinimoEstoque}
-                      </TableCell>
+                      <TableCell align="center">{comp.nivelMinimoEstoque}</TableCell>
                       <TableCell align="center" sx={{ fontWeight: "bold" }}>
-                        {comp.nivelMinimoEstoque - comp.quantidade}
+                        {(comp.nivelMinimoEstoque || 0) - (comp.quantidade || 0)}
                       </TableCell>
                       <TableCell>
                         <Button
@@ -236,7 +177,6 @@ function ReposicaoPage() {
                           size="small"
                           startIcon={<ShoppingCartIcon />}
                           onClick={handleSolicitarClick}
-                          title="Ir para a página de solicitação manual"
                         >
                           Solicitar
                         </Button>
@@ -247,7 +187,6 @@ function ReposicaoPage() {
               </Table>
             </TableContainer>
 
-            {/* 13. Adicionar o componente de paginação */}
             <TablePagination
               rowsPerPageOptions={[10, 25, 50]}
               component="div"
