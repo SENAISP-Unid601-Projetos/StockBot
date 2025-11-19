@@ -1,17 +1,23 @@
 /* src/pages/loginpage.css */
-.login-container { /* Mantém */
+.login-container {
+  /* Mantém */
   display: flex;
   justify-content: center;
   align-items: center;
   height: 100vh;
-  background-color: var(--cinzaClaro); /* Verifique se --cinzaClaro está definido em index.css ou colors.css */
+  background-color: var(
+    --cinzaClaro
+  ); /* Verifique se --cinzaClaro está definido em index.css ou colors.css */
 }
 
-.form-wrapper { /* Mantém */
+.form-wrapper {
+  /* Mantém */
   background-color: var(--branco); /* Verifique se --branco está definido */
   padding: 2rem 3rem;
-  border-radius: var(--border-radius-padrao); /* Verifique se --border-radius-padrao está definido */
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  border-radius: var(
+    --border-radius-padrao
+  ); /* Verifique se --border-radius-padrao está definido */
+  box-shadow: 0 4px 20px rgba(2, 2, 2, 0.357);
   width: 100%;
   max-width: 400px;
 }
@@ -20,7 +26,7 @@
 .auth-form h2 {
   text-align: center;
   margin-bottom: 1.5rem;
-  color: var(--azulEscuro); /* Verifique se --azulEscuro está definido */
+  color:whitesmoke; /* Título em branco */
 }
 
 .auth-form label {
@@ -36,6 +42,8 @@
   border: 1px solid var(--cinzaMedio); /* Verifique se --cinzaMedio está definido */
   border-radius: var(--border-radius-padrao);
   font-size: 1rem;
+  background-color: lightgray; /* Fundo claro para melhor visibilidade, dos campos  */
+  color: black; /* Texto em preto para melhor contraste */
 }
 
 .auth-form button {
@@ -43,26 +51,33 @@
   padding: 0.75rem;
   border: none;
   border-radius: var(--border-radius-padrao);
-  background-color: var(--vermelhoSenai); /* Verifique se --vermelhoSenai está definido */
+  background-color: var(
+    --vermelhoSenai
+  ); /* Verifique se --vermelhoSenai está definido */
   color: var(--branco);
   font-size: 1rem;
   font-weight: bold;
   cursor: pointer;
   transition: background-color 0.2s;
+  color: white;
 }
 
-.auth-form button:hover:not(:disabled) { /* Adicionado :not(:disabled) */
+.auth-form button:hover:not(:disabled) {
+  /* Adicionado :not(:disabled) */
   opacity: 0.9;
 }
 
-.auth-form button:disabled { /* Estilo para botão desabilitado */
-    cursor: not-allowed;
-    opacity: 0.6;
+.auth-form button:disabled {
+  /* Estilo para botão desabilitado */
+  cursor: not-allowed;
+  opacity: 0.6;
 }
 
 /* Estilos de erro e links (já devem estar corretos) */
 .error-message {
-  color: var(--vermelho-alerta); /* Verifique se --vermelho-alerta está definido */
+  color: var(
+    --vermelho-alerta
+  ); /* Verifique se --vermelho-alerta está definido */
   background-color: rgba(220, 53, 69, 0.1);
   padding: 0.75rem;
   border-radius: var(--border-radius-padrao);
@@ -80,7 +95,7 @@
 
 .login-link p,
 .register-link p {
-  color: #555;
+  color: white;
 }
 
 .login-link a,
@@ -93,4 +108,20 @@
 .login-link a:hover,
 .register-link a:hover {
   text-decoration: underline;
+}
+.login-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  position: relative;
+  overflow: hidden;
+}
+
+.form-wrapper {
+  background: rgba(0, 0, 0, 0.7);
+  padding: 2rem;
+  border-radius: 10px;
+  z-index: 10;
+  color: white;
 }

@@ -1,23 +1,40 @@
-import React, { useState, useMemo } from "react"; // Removido useContext e createContext
-import { ThemeProvider as MuiThemeProvider, createTheme } from "@mui/material/styles";
+// src/ThemeContext.jsx
+
+import React, { useState, useMemo, useEffect } from "react";
+import {
+  ThemeProvider as MuiThemeProvider,
+  createTheme,
+} from "@mui/material/styles";
 import CssBaseline from "@mui/material/CssBaseline";
 import { ColorModeContext } from "./useColorMode.js";
 
-// Provedor que gerencia o estado e aplica o tema MUI
-export function ThemeProvider({ children }) { // Exporta apenas o componente
-  const [mode, setMode] = useState(() => localStorage.getItem('themeMode') || 'light');
+export function ThemeProvider({ children }) {
+  const [mode, setMode] = useState(
+    () => localStorage.getItem("themeMode") || "light"
+  );
+
+  // **** BLOCO useEffect CORRIGIDO ****
+  useEffect(() => {
+    // Adiciona uma verificação para garantir que document.body existe
+    if (document.body) {
+      const bodyClassList = document.body.classList;
+      bodyClassList.remove(mode === "light" ? "dark" : "light");
+      bodyClassList.add(mode);
+    }
+  }, [mode]); // Executa sempre que 'mode' mudar
+  // **** FIM DO BLOCO useEffect ****
 
   const colorMode = useMemo(
     () => ({
       toggleColorMode: () => {
         setMode((prevMode) => {
-          const newMode = prevMode === 'light' ? 'dark' : 'light';
-          localStorage.setItem('themeMode', newMode);
+          const newMode = prevMode === "light" ? "dark" : "light";
+          localStorage.setItem("themeMode", newMode);
           return newMode;
         });
       },
     }),
-    [],
+    []
   );
 
   const theme = useMemo(
@@ -25,21 +42,20 @@ export function ThemeProvider({ children }) { // Exporta apenas o componente
       createTheme({
         palette: {
           mode,
-          ...(mode === 'light'
+          ...(mode === "light"
             ? {
-                primary: { main: '#C00000' },
-                background: { default: '#f4f4f4', paper: '#ffffff' },
+                primary: { main: "#C00000" },
+                background: { default: "#f4f4f4", paper: "#ffffff" },
               }
             : {
-                primary: { main: '#C00000' },
-                background: { default: '#121212', paper: '#1e1e1e' },
+                primary: { main: "#C00000" },
+                background: { default: "#121212", paper: "#1e1e1e" },
               }),
         },
       }),
-    [mode],
+    [mode]
   );
 
-  // O Provider usa o ColorModeContext importado
   return (
     <ColorModeContext.Provider value={colorMode}>
       <MuiThemeProvider theme={theme}>

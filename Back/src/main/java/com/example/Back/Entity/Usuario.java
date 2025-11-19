@@ -28,8 +28,9 @@ public class Usuario implements UserDetails {
     @Column(nullable = false)
     private String senha;
 
-    @Column(nullable = false)
-    private String dominioEmpresa;
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "empresa_id", nullable = false)
+    private Empresa empresa;
 
     // CORRIGIDO: O tipo do campo agora é o nosso enum oficial UserRole
     @Enumerated(EnumType.STRING)
@@ -37,10 +38,13 @@ public class Usuario implements UserDetails {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        // CORRIGIDO: A verificação agora usa o enum UserRole
+        // Retorna a role específica do usuário, prefixada com ROLE_
+        if (this.role == UserRole.ADMIN) {
             return List.of(new SimpleGrantedAuthority("ROLE_ADMIN"));
+        } else {
+            return List.of(new SimpleGrantedAuthority("ROLE_USER"));
         }
-
+    }
 
     @Override
     public String getPassword() { return this.senha; }

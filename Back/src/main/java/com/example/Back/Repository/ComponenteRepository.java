@@ -16,8 +16,13 @@ public interface ComponenteRepository extends JpaRepository<Componente, Long> {
 
     // MÉTODO NOVO PARA A PESQUISA
     // Procura o 'termo' no nome OU no código de património, ignorando maiúsculas/minúsculas
-    @Query("SELECT c FROM Componente c WHERE " +
+    @Query("SELECT c FROM Componente c WHERE c.empresa.id = :empresaId AND (" +
             "LOWER(c.nome) LIKE LOWER(CONCAT('%', :termo, '%')) OR " +
-            "LOWER(c.codigoPatrimonio) LIKE LOWER(CONCAT('%', :termo, '%'))")
-    List<Componente> searchByTermo(@Param("termo") String termo);
+            "LOWER(c.codigoPatrimonio) LIKE LOWER(CONCAT('%', :termo, '%')))")
+    List<Componente> searchByTermoAndEmpresaId(@Param("termo") String termo, @Param("empresaId") Long empresaId);
+
+    // Adicione estes novos métodos:
+    List<Componente> findAllByEmpresaId(Long empresaId);
+    Optional<Componente> findByIdAndEmpresaId(Long id, Long empresaId);
+    boolean existsByCodigoPatrimonioAndEmpresaId(String codigoPatrimonio, Long empresaId);
 }
