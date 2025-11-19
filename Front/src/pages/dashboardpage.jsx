@@ -9,7 +9,6 @@ import {
   CircularProgress,
   Container,
   Grid,
-  Paper,
   Typography,
 } from "@mui/material";
 import PictureAsPdfIcon from "@mui/icons-material/PictureAsPdf";
@@ -118,9 +117,12 @@ function DashboardPage() {
         p: 3,
         backgroundColor: "background.default",
         minHeight: "100vh",
+        overflowX: "hidden", // Evita scroll horizontal indesejado
       }}
     >
-      <Container maxWidth="xl">
+      {/* Container fluido para ocupar toda a largura */}
+      <Container maxWidth={false} disableGutters sx={{ px: 3 }}>
+        {/* --- CABEÇALHO --- */}
         <Box
           sx={{
             display: "flex",
@@ -147,65 +149,57 @@ function DashboardPage() {
             <CircularProgress />
           </Box>
         ) : (
-          <Grid container spacing={3}>
-            {/* --- LINHA 1: KPI CARDS (4 COLUNAS) --- */}
-            <Grid item xs={12}>
-              <Grid container spacing={3}>
-                
-                {/* KPI 1: Total de Itens */}
-                <Grid item xs={12} sm={6} md={3}>
-                  <KpiCard
-                    title="Total de Itens"
-                    value={componentes.length}
-                    description="Tipos de itens cadastrados"
-                    // Removido 'items' e 'isCritical' desnecessários no novo KpiCard
-                  />
-                </Grid>
-
-                {/* KPI 2: Unidades em Estoque */}
-                <Grid item xs={12} sm={6} md={3}>
-                  <KpiCard
-                    title="Unidades em Estoque"
-                    value={totalUnidades}
-                    description="Total de unidades no inventário"
-                  />
-                </Grid>
-
-                {/* KPI 3: Itens em Falta (CRÍTICO - Vermelho) */}
-                <Grid item xs={12} sm={6} md={3}>
-                  <KpiCard
-                    title="Itens em Falta"
-                    value={itensEmFalta.length}
-                    description="Itens com estoque zerado"
-                    isCritical={true} // Ativa a cor de alerta
-                  />
-                </Grid>
-                
-                {/* KPI 4 (NOVO): Estoque Baixo (AVISO - Laranja) */}
-                <Grid item xs={12} sm={6} md={3}>
-                  <KpiCard
-                    title="Estoque Baixo"
-                    value={itensEstoqueBaixo.length}
-                    description={`Itens abaixo do limite (≤ ${threshold})`}
-                    isCritical={itensEstoqueBaixo.length > 0 && itensEmFalta.length === 0} // Apenas aviso se não houver falta
-                    // Usando 'isCritical' temporariamente, mas um futuro "isWarning" seria melhor
-                  />
-                </Grid>
-              </Grid>
-            </Grid>
+          <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
             
-            {/* --- LINHA 3: Gráfico de Categoria + Lista de Ações --- */}
-            <Grid item xs={12}>
-              <Grid container spacing={3}>
-                
-                {/* GRÁFICO DE CATEGORIA (2/3 da largura) */}
-                <Grid item xs={12} lg={8}>
-                  <CategoryChart componentes={componentes} />
-                </Grid>
+            {/* --- BLOCO 1: OS 4 CARDS (LINHA SUPERIOR) --- */}
+            <Grid container spacing={3}>
+              <Grid item xs={12} sm={6} md={3}>
+                <KpiCard
+                  title="Total de Itens"
+                  value={componentes.length}
+                  description="Tipos de itens cadastrados"
+                />
+              </Grid>
+              <Grid item xs={12} sm={6} md={3}>
+                <KpiCard
+                  title="Unidades em Estoque"
+                  value={totalUnidades}
+                  description="Total de unidades no inventário"
+                />
+              </Grid>
+              <Grid item xs={12} sm={6} md={3}>
+                <KpiCard
+                  title="Itens em Falta"
+                  value={itensEmFalta.length}
+                  description="Itens com estoque zerado"
+                  isCritical={true}
+                />
+              </Grid>
+              <Grid item xs={12} sm={6} md={3}>
+                <KpiCard
+                  title="Estoque Baixo"
+                  value={itensEstoqueBaixo.length}
+                  description={`Itens abaixo do limite (≤ ${threshold})`}
+                  isCritical={itensEstoqueBaixo.length > 0 && itensEmFalta.length === 0} 
+                />
               </Grid>
             </Grid>
 
-          </Grid>
+            {/* --- BLOCO 2: GRÁFICO (LINHA DO MEIO - TOTALMENTE SEPARADA) --- */}
+            <Box sx={{ width: '100%' }}>
+               {/* Passamos width 100% para garantir que o componente ocupe tudo */}
+               <CategoryChart componentes={componentes} />
+            </Box>
+
+            {/* --- BLOCO 3: LISTA DE AÇÕES (LINHA INFERIOR - TOTALMENTE SEPARADA) --- */}
+            <Box sx={{ width: '100%' }}>
+               <ActionList
+                 title={`Itens com Estoque Baixo (≤ ${threshold})`}
+                 items={itensEstoqueBaixo}
+               />
+            </Box>
+
+          </Box>
         )}
       </Container>
     </Box>
