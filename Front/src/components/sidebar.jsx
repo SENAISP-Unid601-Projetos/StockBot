@@ -94,28 +94,28 @@ function Sidebar() {
       </List>
 
       <ListItem disablePadding>
-          <ListItemButton
-            component={NavLink}
-            to="/pedidos"
-            sx={{
-              color: "rgba(255, 255, 255, 0.7)",
-              borderRadius: 2,
-              "&:hover": { backgroundColor: "rgba(255, 255, 255, 0.08)" },
-              "&.active": {
-                backgroundColor: "primary.main",
-                color: "white",
-                ".MuiListItemIcon-root": { color: "white" },
-              },
-            }}
+        <ListItemButton
+          component={NavLink}
+          to="/pedidos"
+          sx={{
+            color: "rgba(255, 255, 255, 0.7)",
+            borderRadius: 2,
+            "&:hover": { backgroundColor: "rgba(255, 255, 255, 0.08)" },
+            "&.active": {
+              backgroundColor: "primary.main",
+              color: "white",
+              ".MuiListItemIcon-root": { color: "white" },
+            },
+          }}
+        >
+          <ListItemIcon
+            sx={{ color: "rgba(255, 255, 255, 0.7)", minWidth: 40 }}
           >
-            <ListItemIcon
-              sx={{ color: "rgba(255, 255, 255, 0.7)", minWidth: 40 }}
-            >
-              <ShoppingCart size={20} />
-            </ListItemIcon>
-            <ListItemText primary="Fazer Pedido de Compra" />
-          </ListItemButton>
-        </ListItem>
+            <ShoppingCart size={20} />
+          </ListItemIcon>
+          <ListItemText primary="Pedido de Compra" />
+        </ListItemButton>
+      </ListItem>
 
       <Box sx={{ flexGrow: 1 }} />
 
@@ -139,40 +139,14 @@ function Sidebar() {
             sx={{ m: 0, flexGrow: 1 }}
           />
         </ListItem>
-
-        <> {/* <-- 2. Adicione um fragmento para agrupar os links de admin */}
-            
-            {/* 3. ADICIONE ESTE BLOCO NOVO PARA "APROVAÇÕES" */}
-            <ListItem disablePadding>
-              <ListItemButton
-                component={NavLink}
-                to="/aprovacoes"
-                sx={{
-                  color: "rgba(255, 255, 255, 0.7)",
-                  borderRadius: 2,
-                  "&:hover": { backgroundColor: "rgba(255, 255, 255, 0.08)" },
-                  "&.active": {
-                    backgroundColor: "primary.main",
-                    color: "white",
-                    ".MuiListItemIcon-root": { color: "white" },
-                  },
-                }}
-              >
-                <ListItemIcon
-                  sx={{ color: "rgba(255, 255, 255, 0.7)", minWidth: 40 }}
-                >
-                  <CheckSquare size={20} />
-                </ListItemIcon>
-                <ListItemText primary="Aprovações" />
-              </ListItemButton>
-            </ListItem>
-
-        {/* Link de Configurações (só para ADMIN) */}
-        {isUserAdmin && (
+        <>
+          {" "}
+          {/* <-- 2. Adicione um fragmento para agrupar os links de admin */}
+          {/* 3. ADICIONE ESTE BLOCO NOVO PARA "APROVAÇÕES" */}
           <ListItem disablePadding>
             <ListItemButton
               component={NavLink}
-              to="/configuracoes"
+              to="/aprovacoes"
               sx={{
                 color: "rgba(255, 255, 255, 0.7)",
                 borderRadius: 2,
@@ -187,18 +161,52 @@ function Sidebar() {
               <ListItemIcon
                 sx={{ color: "rgba(255, 255, 255, 0.7)", minWidth: 40 }}
               >
-                <Settings size={20} />
+                <CheckSquare size={20} />
               </ListItemIcon>
-              <ListItemText primary="Configurações" />
+              <ListItemText primary="Aprovações" />
             </ListItemButton>
           </ListItem>
-        )}
-      </> {/* <-- 4. Feche o fragmento */}
-
+          {/* Link de Configurações (só para ADMIN) */}
+          {isUserAdmin && (
+            <ListItem disablePadding>
+              <ListItemButton
+                component={NavLink}
+                to="/configuracoes"
+                sx={{
+                  color: "rgba(255, 255, 255, 0.7)",
+                  borderRadius: 2,
+                  "&:hover": { backgroundColor: "rgba(255, 255, 255, 0.08)" },
+                  "&.active": {
+                    backgroundColor: "primary.main",
+                    color: "white",
+                    ".MuiListItemIcon-root": { color: "white" },
+                  },
+                }}
+              >
+                <ListItemIcon
+                  sx={{ color: "rgba(255, 255, 255, 0.7)", minWidth: 40 }}
+                >
+                  <Settings size={20} />
+                </ListItemIcon>
+                <ListItemText primary="Configurações" />
+              </ListItemButton>
+            </ListItem>
+          )}
+        </>{" "}
+        {/* <-- 4. Feche o fragmento */}
         {/* Botão Sair */}
         <ListItem disablePadding>
-          <ListItemButton onClick={handleLogout} sx={{ color: 'rgba(255, 255, 255, 0.7)', borderRadius: 2, '&:hover': { backgroundColor: 'rgba(255, 255, 255, 0.08)' } }}>
-            <ListItemIcon sx={{ color: 'rgba(255, 255, 255, 0.7)', minWidth: 40 }}>
+          <ListItemButton
+            onClick={handleLogout}
+            sx={{
+              color: "rgba(255, 255, 255, 0.7)",
+              borderRadius: 2,
+              "&:hover": { backgroundColor: "rgba(255, 255, 255, 0.08)" },
+            }}
+          >
+            <ListItemIcon
+              sx={{ color: "rgba(255, 255, 255, 0.7)", minWidth: 40 }}
+            >
               <LogOut size={20} />
             </ListItemIcon>
             <ListItemText primary="Sair" />
