@@ -83,6 +83,7 @@ public class ComponenteService {
         componenteExistente.setQuantidade(dto.getQuantidade());
         componenteExistente.setLocalizacao(dto.getLocalizacao());
         componenteExistente.setCategoria(dto.getCategoria());
+        componenteExistente.setNivelMinimoEstoque(Math.max(0, dto.getNivelMinimoEstoque()));
         // ---------------------------------------------------------------
 
         Componente componenteAtualizado = componenteRepository.save(componenteExistente);
@@ -141,7 +142,8 @@ public class ComponenteService {
                 componente.getCodigoPatrimonio(),
                 componente.getQuantidade(),
                 componente.getLocalizacao(),
-                componente.getCategoria()
+                componente.getCategoria(),
+                componente.getNivelMinimoEstoque()
         );
     }
 
@@ -152,6 +154,7 @@ public class ComponenteService {
         componente.setQuantidade(dto.getQuantidade());
         componente.setLocalizacao(dto.getLocalizacao());
         componente.setCategoria(dto.getCategoria());
+        componente.setNivelMinimoEstoque(Math.max(1, dto.getNivelMinimoEstoque()));
         return componente;
     }
 }

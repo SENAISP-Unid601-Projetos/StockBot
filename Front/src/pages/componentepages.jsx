@@ -95,7 +95,7 @@ function ComponentesPage() {
   useEffect(() => {
     setIsUserAdmin(isAdmin());
         fetchData(); // Busca inicial
-      }, []);
+      }, [fetchData]);
   // 4. Funções para lidar com as ações de paginação do MUI.
   // Chamada quando o usuário clica para mudar de página.
   const handleChangePage = (event, newPage) => {

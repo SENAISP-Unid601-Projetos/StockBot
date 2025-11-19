@@ -28,6 +28,9 @@ public class Componente {
     private String localizacao;
     private String categoria;
 
+    @Column(nullable = false) // Garante que nunca é nulo
+    private int nivelMinimoEstoque = 1; // Valor padrão 1 (pode ser ajustado)
+
     @OneToMany(mappedBy = "componente", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Historico> historicos;
 
