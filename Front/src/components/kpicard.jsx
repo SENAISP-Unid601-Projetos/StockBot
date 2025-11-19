@@ -4,20 +4,16 @@ import {
   CardContent,
   Typography,
   Box,
-  List,
-  ListItem,
-  ListItemIcon, // <-- NOVO
-  ListItemText,
-  Divider,
+  // List, ListItem, ListItemIcon, ListItemText, Divider, FiberManualRecordIcon, removidos pois não são mais necessários
 } from "@mui/material";
-import FiberManualRecordIcon from "@mui/icons-material/FiberManualRecord"; // <-- NOVO
+// Ícones removidos
 
 function KpiCard({
   title,
   value,
   description,
   isCritical = false,
-  items = [],
+  // 'items' foi removido da desestruturação, pois não é mais usado
 }) {
   return (
     <Card
@@ -47,6 +43,7 @@ function KpiCard({
           component="div"
           fontWeight="bold"
           sx={{
+            // Usa a cor vermelha se for crítico e o valor for maior que zero
             color: isCritical && value > 0 ? "error.main" : "text.primary",
           }}
         >
@@ -57,51 +54,8 @@ function KpiCard({
           {description}
         </Typography>
 
-        {/* --- PARTE 2: A LISTA DE NOMES --- */}
-        {items && items.length > 0 && (
-          <Box
-            sx={{
-              flexGrow: 1, // Faz o box crescer
-              overflowY: "auto", // Adiciona scroll vertical
-              mt: 2, // Adiciona margem
-
-              // --- ESTILO DA SCROLLBAR (para Webkit: Chrome/Edge/Safari) ---
-              "&::-webkit-scrollbar": {
-                width: "6px",
-              },
-              "&::-webkit-scrollbar-track": {
-                background: "transparent",
-              },
-              "&::-webkit-scrollbar-thumb": {
-                backgroundColor: "rgba(128, 128, 128, 0.5)", // Cor cinza sutil
-                borderRadius: "3px",
-              },
-              "&::-webkit-scrollbar-thumb:hover": {
-                backgroundColor: "rgba(128, 128, 128, 0.7)",
-              },
-            }}
-          >
-            <Divider />
-            <List dense={true}>
-              {items.map((item) => (
-                <ListItem key={item.id} sx={{ py: 0, px: 1 }}>
-                  {" "}
-                  {/* Ajuste de padding */}
-                  {/* --- ÍCONE DE MARCADOR --- */}
-                  <ListItemIcon sx={{ minWidth: "24px" }}>
-                    <FiberManualRecordIcon
-                      sx={{ fontSize: "0.6rem", color: "text.secondary" }}
-                    />
-                  </ListItemIcon>
-                  <ListItemText
-                    primary={item.nome}
-                    secondary={`Qtd: ${item.quantidade}`}
-                  />
-                </ListItem>
-              ))}
-            </List>
-          </Box>
-        )}
+        {/* --- PARTE 2: A LISTA DE NOMES (REMOVIDA) --- */}
+        
       </CardContent>
     </Card>
   );
