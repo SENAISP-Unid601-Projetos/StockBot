@@ -148,58 +148,84 @@ function DashboardPage() {
           </Box>
         ) : (
           <Grid container spacing={3}>
-            {/* KPI Cards */}
-            {/* A CORREÇÃO ESTÁ AQUI: 
-              Note que o <Grid> abaixo (e os seguintes) NÃO têm a prop "item".
-              Eles estão diretamente dentro de um <Grid container>.
-            */}
-            <Grid container spacing={2}>
-              <Grid xs={12} sm={6} md={4}>
-                <KpiCard
-                  title="Total de Itens"
-                  value={componentes.length}
-                  description="Tipos de itens cadastrados"
-                  items={componentes}
-                />
-              </Grid>
+            {/* --- LINHA 1: KPI CARDS (4 COLUNAS) --- */}
+            <Grid item xs={12}>
+              <Grid container spacing={3}>
+                
+                {/* KPI 1: Total de Itens */}
+                <Grid item xs={12} sm={6} md={3}>
+                  <KpiCard
+                    title="Total de Itens"
+                    value={componentes.length}
+                    description="Tipos de itens cadastrados"
+                    // Removido 'items' e 'isCritical' desnecessários no novo KpiCard
+                  />
+                </Grid>
 
-              <Grid xs={12} sm={6} md={4}>
-                <KpiCard
-                  title="Unidades em Estoque"
-                  value={totalUnidades}
-                  description="Total de unidades no inventário"
-                />
-              </Grid>
+                {/* KPI 2: Unidades em Estoque */}
+                <Grid item xs={12} sm={6} md={3}>
+                  <KpiCard
+                    title="Unidades em Estoque"
+                    value={totalUnidades}
+                    description="Total de unidades no inventário"
+                  />
+                </Grid>
 
-              <Grid xs={12} sm={6} md={4}>
-                <KpiCard
-                  title="Itens em Falta"
-                  value={itensEmFalta.length}
-                  description="Itens com estoque zerado"
-                  isCritical={true}
-                  items={itensEmFalta}
-                />
+                {/* KPI 3: Itens em Falta (CRÍTICO - Vermelho) */}
+                <Grid item xs={12} sm={6} md={3}>
+                  <KpiCard
+                    title="Itens em Falta"
+                    value={itensEmFalta.length}
+                    description="Itens com estoque zerado"
+                    isCritical={true} // Ativa a cor de alerta
+                  />
+                </Grid>
+                
+                {/* KPI 4 (NOVO): Estoque Baixo (AVISO - Laranja) */}
+                <Grid item xs={12} sm={6} md={3}>
+                  <KpiCard
+                    title="Estoque Baixo"
+                    value={itensEstoqueBaixo.length}
+                    description={`Itens abaixo do limite (≤ ${threshold})`}
+                    isCritical={itensEstoqueBaixo.length > 0 && itensEmFalta.length === 0} // Apenas aviso se não houver falta
+                    // Usando 'isCritical' temporariamente, mas um futuro "isWarning" seria melhor
+                  />
+                </Grid>
               </Grid>
             </Grid>
 
-            {/* Chart + Action List */}
-            {/* A CORREÇÃO TAMBÉM ESTÁ AQUI: */}
-            <Grid container spacing={2}>
-              <Grid xs={12} lg={8}>
-                <Paper sx={{ p: 2, height: "100%" }}>
+            {/* --- LINHA 2: Gráfico Principal (12 COLUNAS para simplificar) --- */}
+            <Grid item xs={12}>
+              <Paper sx={{ p: 2, height: "100%", boxShadow: 3 }}>
+                {/* Poderia ser um gráfico de movimentação de estoque aqui */}
+                <Typography variant="h6" component="h3" gutterBottom>
+                    Gráfico de Movimentação (Em Breve)
+                </Typography>
+                <Box sx={{ height: 300, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                    <Typography color="text.secondary">Gráfico de Linha de Entradas/Saídas</Typography>
+                </Box>
+              </Paper>
+            </Grid>
+            
+            {/* --- LINHA 3: Gráfico de Categoria + Lista de Ações --- */}
+            <Grid item xs={12}>
+              <Grid container spacing={3}>
+                
+                {/* GRÁFICO DE CATEGORIA (2/3 da largura) */}
+                <Grid item xs={12} lg={8}>
                   <CategoryChart componentes={componentes} />
-                </Paper>
-              </Grid>
+                </Grid>
 
-              <Grid xs={12} lg={4}>
-                <Paper sx={{ p: 2, height: "100%" }}>
+                {/* LISTA DE AÇÕES (1/3 da largura) */}
+                <Grid item xs={12} lg={4}>
                   <ActionList
                     title={`Itens com Stock Baixo (≤ ${threshold})`}
                     items={itensEstoqueBaixo}
                   />
-                </Paper>
+                </Grid>
               </Grid>
             </Grid>
+
           </Grid>
         )}
       </Container>
