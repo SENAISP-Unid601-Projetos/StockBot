@@ -193,19 +193,6 @@ function DashboardPage() {
                 </Grid>
               </Grid>
             </Grid>
-
-            {/* --- LINHA 2: Gráfico Principal (12 COLUNAS para simplificar) --- */}
-            <Grid item xs={12}>
-              <Paper sx={{ p: 2, height: "100%", boxShadow: 3 }}>
-                {/* Poderia ser um gráfico de movimentação de estoque aqui */}
-                <Typography variant="h6" component="h3" gutterBottom>
-                    Gráfico de Movimentação (Em Breve)
-                </Typography>
-                <Box sx={{ height: 300, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                    <Typography color="text.secondary">Gráfico de Linha de Entradas/Saídas</Typography>
-                </Box>
-              </Paper>
-            </Grid>
             
             {/* --- LINHA 3: Gráfico de Categoria + Lista de Ações --- */}
             <Grid item xs={12}>
