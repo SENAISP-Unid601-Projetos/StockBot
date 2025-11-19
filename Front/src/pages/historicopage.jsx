@@ -116,7 +116,7 @@ function HistoricoPage() {
             }}
             sx={{
               minWidth: "300px",
-              backgroundColor: "rgba(255,255,255,0.5)",
+              backgroundColor: "background.paper",
               borderRadius: 1,
             }}
           />
