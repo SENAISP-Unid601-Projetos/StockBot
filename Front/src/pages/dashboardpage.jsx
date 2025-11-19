@@ -1,136 +1,225 @@
-import { useState, useEffect } from 'react';
-import api from '../services/api';
+import React, { useState, useEffect } from "react";
+import api from "../services/api";
+import { toast } from "react-toastify";
 
-// Imports para o PDF
-import jsPDF from 'jspdf';
-import autoTable from 'jspdf-autotable'; // MUDANÇA 1: Importa a função diretamente
+// Imports do MUI
+import {
+  Box,
+  Container,
+  Grid,
+  Paper,
+  Typography,
+  Button,
+  List,
+  ListItem,
+  ListItemIcon,
+  ListItemText,
+  Divider,
+  Skeleton,
+} from "@mui/material";
 
-// Imports dos seus componentes
-import Sidebar from '../components/sidebar';
-import KpiCard from '../components/kpicard';
-import ActionList from '../components/actionList';
-import CategoryChart from '../components/categoriachart';
-import { toast } from 'react-toastify';
-import { ClipLoader } from 'react-spinners';
+// Ícones
+import PictureAsPdfIcon from "@mui/icons-material/PictureAsPdf";
+import WarningAmberIcon from "@mui/icons-material/WarningAmber";
+
+// Imports do Recharts (Gráficos Bonitos)
+import {
+  ComposedChart,
+  Bar,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  Legend,
+  ResponsiveContainer,
+} from "recharts";
+
+// Seus Componentes
+import KpiCard from "../components/kpicard";
 
 function DashboardPage() {
-  const [componentes, setComponentes] = useState([]);
+  // Estados para armazenar os dados que vêm do Back-end
+  const [kpis, setKpis] = useState({
+    totalItens: 0,
+    totalUnidades: 0,
+    itensEmFalta: 0,
+  });
+  const [statsCategorias, setStatsCategorias] = useState([]);
+  const [estoqueBaixo, setEstoqueBaixo] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  const fetchData = async () => {
-    try {
-      const response = await api.get('/api/componentes');
-      if (Array.isArray(response.data)) {
-        setComponentes(response.data);
-      }
-    } catch (error) {
-      console.error("Erro ao buscar dados!", error);
-      toast.error("Não foi possível carregar os dados do dashboard.");
-    } finally {
-      setLoading(false);
-    }
-  };
-
+  // Função que carrega tudo
   useEffect(() => {
+    const fetchData = async () => {
+      try {
+        // Chamamos as 3 rotas otimizadas do Back-end em paralelo
+        const [resKpis, resStats, resBaixo] = await Promise.all([
+          api.get("/dashboard/kpis"),
+          api.get("/dashboard/stats-categorias"),
+          api.get("/dashboard/estoque-baixo"),
+        ]);
+
+        setKpis(resKpis.data);
+        setStatsCategorias(resStats.data);
+        setEstoqueBaixo(resBaixo.data);
+      } catch (error) {
+        console.error("Erro ao carregar dashboard:", error);
+        toast.error("Erro ao carregar dados do dashboard");
+      } finally {
+        setLoading(false);
+      }
+    };
+
     fetchData();
   }, []);
 
-  const handleGeneratePdf = async () => {
-    toast.info("A gerar o relatório em PDF...");
-    try {
-      const [historicoResponse, componentesResponse] = await Promise.all([
-        api.get('/api/historico'),
-        api.get('/api/componentes')
-      ]);
-      const historicoData = historicoResponse.data;
-      const componentesData = componentesResponse.data;
-      
-      const mapaComponentes = new Map(componentesData.map(comp => [comp.id, comp.nome]));
-      const historicoProcessado = historicoData
-        .map(item => ({
-          ...item,
-          nomeComponente: mapaComponentes.get(item.componenteId) || 'N/A'
-        }))
-        .sort((a, b) => new Date(b.dataHora) - new Date(a.dataHora));
-
-      const doc = new jsPDF();
-      
-      doc.setFontSize(18);
-      doc.text("Relatório de Movimentações de Stock", 14, 22);
-      doc.setFontSize(11);
-      doc.setTextColor(100);
-      doc.text(`Gerado em: ${new Date().toLocaleDateString('pt-BR')}`, 14, 30);
-
-      const tableColumn = ["Data/Hora", "Componente", "Tipo", "Qtd.", "Utilizador"];
-      const tableRows = [];
-      historicoProcessado.forEach(item => {
-        const itemData = [
-          new Date(item.dataHora).toLocaleString('pt-BR'),
-          item.nomeComponente,
-          item.tipo,
-          item.quantidade,
-          item.usuario
-        ];
-        tableRows.push(itemData);
-      });
-
-      // MUDANÇA 2: Usa a função autoTable diretamente, passando o 'doc'
-      autoTable(doc, {
-        head: [tableColumn],
-        body: tableRows,
-        startY: 40,
-      });
-
-      doc.save('relatorio-historico.pdf');
-      toast.success("Relatório gerado com sucesso!");
-
-    } catch (error) {
-      console.error("Erro ao gerar PDF:", error);
-      toast.error("Não foi possível gerar o relatório.");
-    }
+  // Função simples de PDF (Imprimir tela)
+  const handleGeneratePdf = () => {
+    window.print();
   };
 
-  const totalUnidades = componentes.reduce((total, comp) => total + comp.quantidade, 0);
-  const itensEmFalta = componentes.filter(comp => comp.quantidade <= 0);
-  const itensEstoqueBaixo = componentes.filter(comp => comp.quantidade > 0 && comp.quantidade <= 5);
+  if (loading) {
+    return (
+      <Container maxWidth="xl" sx={{ mt: 4 }}>
+        <Grid container spacing={3}>
+          <Grid item xs={12} md={4}>
+            <Skeleton variant="rectangular" height={140} />
+          </Grid>
+          <Grid item xs={12} md={4}>
+            <Skeleton variant="rectangular" height={140} />
+          </Grid>
+          <Grid item xs={12} md={4}>
+            <Skeleton variant="rectangular" height={140} />
+          </Grid>
+        </Grid>
+      </Container>
+    );
+  }
 
   return (
-    <div className="app-container">
-      <Sidebar />
-      <main className="main-content">
-        <div className="header-dashboard">
-          <div className="header-title">
-            <h1>Dashboard</h1>
-            <p>Olá, Utilizador! Aqui está um resumo inteligente do seu stock.</p>
-          </div>
-          <button className="action-button" onClick={handleGeneratePdf}>
+    <Box
+      component="main"
+      sx={{
+        flexGrow: 1,
+        py: 3,
+        backgroundColor: "background.default",
+        minHeight: "100vh",
+      }}
+    >
+      <Container maxWidth="xl">
+        {/* Cabeçalho com Botão PDF */}
+        <Box sx={{ display: "flex", justifyContent: "space-between", mb: 4 }}>
+          <Typography variant="h4" fontWeight="bold">
+            Dashboard
+          </Typography>
+          <Button
+            variant="contained"
+            startIcon={<PictureAsPdfIcon />}
+            onClick={handleGeneratePdf}
+          >
             Gerar Relatório
-          </button>
-        </div>
+          </Button>
+        </Box>
 
-        {loading ? (
-          <div className="loading-spinner-container">
-            <ClipLoader color={"var(--vermelhoSenai)"} loading={loading} size={50} />
-          </div>
-        ) : (
-          <>
-            <div className="dashboard-grid">
-              <KpiCard title="Total de Componentes" value={componentes.length} description="Componentes cadastrados" />
-              <KpiCard title="Itens em Stock" value={totalUnidades} description="Unidades totais" />
-              <KpiCard title="Itens em Falta" value={itensEmFalta.length} description="Ação imediata necessária" isCritical={true} />
-            </div>
-            <div className="section-title"><h2>Ação Imediata</h2></div>
-            <div className="action-grid">
-              <ActionList title="Itens em Falta (Stock Zerado)" items={itensEmFalta} />
-              <ActionList title="Itens com Stock Baixo" items={itensEstoqueBaixo} />
-            </div>
-            <div className="charts-grid" style={{ marginTop: '2rem' }}>
-              <CategoryChart componentes={componentes} />
-            </div>
-          </>
-        )}
-      </main>
-    </div>
+        <Grid container spacing={3}>
+          {/* --- 1. OS CARDS (KPIs) --- */}
+          <Grid item xs={12} md={4}>
+            <KpiCard title="Total de Tipos de Itens" value={kpis.totalItens} />
+          </Grid>
+          <Grid item xs={12} md={4}>
+            <KpiCard title="Total de Unidades" value={kpis.totalUnidades} />
+          </Grid>
+          <Grid item xs={12} md={4}>
+            <KpiCard
+              title="Itens Zerados (Falta)"
+              value={kpis.itensEmFalta}
+              isCritical={kpis.itensEmFalta > 0}
+            />
+          </Grid>
+
+          {/* --- 2. O GRÁFICO (Recharts) --- */}
+          <Grid item xs={12} lg={8}>
+            <Paper sx={{ p: 3, height: 400, boxShadow: 3 }}>
+              <Typography variant="h6" gutterBottom fontWeight="bold">
+                Distribuição por Categoria
+              </Typography>
+              <ResponsiveContainer width="100%" height="100%">
+                <ComposedChart
+                  data={statsCategorias}
+                  margin={{ top: 20, right: 30, bottom: 20, left: 20 }}
+                >
+                  <CartesianGrid stroke="#f5f5f5" />
+                  <XAxis dataKey="categoria" />
+                  <YAxis />
+                  <Tooltip />
+                  <Legend />
+                  <Bar
+                    dataKey="quantidade"
+                    name="Quantidade de Itens"
+                    barSize={40}
+                    fill="#1976d2"
+                    radius={[4, 4, 0, 0]}
+                  />
+                </ComposedChart>
+              </ResponsiveContainer>
+            </Paper>
+          </Grid>
+
+          {/* --- 3. A LISTA DE ALERTA (Estoque Baixo) --- */}
+          <Grid item xs={12} lg={4}>
+            <Paper sx={{ p: 0, height: 400, boxShadow: 3, overflow: "auto" }}>
+              <Box
+                sx={{
+                  p: 2,
+                  bgcolor: "#fff3e0",
+                  borderBottom: "1px solid #ffe0b2",
+                }}
+              >
+                <Typography variant="h6" fontWeight="bold" color="warning.dark">
+                  ⚠️ Alerta: Estoque Baixo
+                </Typography>
+              </Box>
+
+              <List>
+                {estoqueBaixo.length === 0 ? (
+                  <Typography sx={{ p: 2, color: "text.secondary" }}>
+                    Tudo certo! Nenhum item com estoque crítico.
+                  </Typography>
+                ) : (
+                  estoqueBaixo.map((item) => (
+                    <React.Fragment key={item.id}>
+                      <ListItem>
+                        <ListItemIcon>
+                          <WarningAmberIcon color="warning" />
+                        </ListItemIcon>
+                        <ListItemText
+                          primary={item.nome}
+                          secondary={
+                            <>
+                              <Typography variant="caption" display="block">
+                                Patrimônio: {item.codigoPatrimonio || "N/A"}
+                              </Typography>
+                              <Typography
+                                variant="caption"
+                                fontWeight="bold"
+                                color="error"
+                              >
+                                Restam apenas: {item.quantidade}
+                              </Typography>
+                            </>
+                          }
+                        />
+                      </ListItem>
+                      <Divider variant="inset" component="li" />
+                    </React.Fragment>
+                  ))
+                )}
+              </List>
+            </Paper>
+          </Grid>
+        </Grid>
+      </Container>
+    </Box>
   );
 }
 

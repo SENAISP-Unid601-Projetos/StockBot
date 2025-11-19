@@ -1,60 +1,110 @@
-// src/components/categoriachart.jsx
-import { Doughnut } from 'react-chartjs-2';
-import { Chart as ChartJS, ArcElement, Tooltip, Legend } from 'chart.js';
-import '../styles/categoriachart.css'; // Certifique-se de que o ficheiro CSS está corretamente nomeado
+// src/components/categoriachart.jsx (VERSÃO PROFISSIONAL)
+import { useState, useEffect } from "react";
+import { Doughnut } from "react-chartjs-2";
+import { Chart as ChartJS, ArcElement, Tooltip, Legend, Title } from "chart.js";
+import { Box, CircularProgress, Typography } from "@mui/material";
+import api from "../services/api";
 
 // Registra os plugins necessários do Chart.js
-ChartJS.register(ArcElement, Tooltip, Legend);
+ChartJS.register(ArcElement, Tooltip, Legend, Title);
 
-function CategoryChart({ componentes }) {
+// Função para gerar cores aleatórias (para o gráfico)
+const generateColor = (num) => {
+  const colors = [];
+  for (let i = 0; i < num; i++) {
+    colors.push(`hsl(${(i * 360) / num}, 70%, 50%)`);
+  }
+  return colors;
+};
 
-  // MUDANÇA: Agora processamos os dados por NOME do componente, não por categoria.
-  const dadosGrafico = {};
-  componentes.forEach(comp => {
-    // Usamos o nome do componente como chave e somamos a sua quantidade
-    dadosGrafico[comp.nome] = (dadosGrafico[comp.nome] || 0) + comp.quantidade;
-  });
+function CategoryChart() {
+  const [chartData, setChartData] = useState(null);
+  const [loading, setLoading] = useState(true);
 
-  // Prepara os dados para o formato que o Chart.js entende
-  const chartData = {
-    labels: Object.keys(dadosGrafico), // Os nomes dos componentes
-    datasets: [
-      {
-        label: 'Quantidade em Stock',
-        data: Object.values(dadosGrafico), // As quantidades de cada componente
-        backgroundColor: [ // Adicionei mais cores para mais componentes
-          '#002D5B', '#C00000', '#FFD700', '#2ecc71', '#9b59b6',
-          '#3498db', '#e67e22', '#1abc9c', '#e74c3c', '#f1c40f'
-        ],
-        borderColor: '#ffffff',
-        borderWidth: 2,
-        hoverOffset: 8
-      },
-    ],
-  };
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        // 1. CHAMA A NOVA API (QUE JÁ TRAZ OS DADOS PRONTOS)
+        const response = await api.get("/dashboard/stats-categorias");
+        const data = response.data; // (Vem como [ { categoria: "...", quantidadeTotal: ... } ])
 
-  // Opções para customizar a aparência do gráfico
+        // 2. Transforma os dados para o Chart.js
+        const labels = data.map((item) => item.categoria || "Sem Categoria");
+        const quantities = data.map((item) => item.quantidade);
+
+        setChartData({
+          labels: labels,
+          datasets: [
+            {
+              label: "Quantidade Total",
+              data: quantities,
+              backgroundColor: generateColor(labels.length),
+              borderColor: "#ffffff",
+              borderWidth: 1,
+            },
+          ],
+        });
+      } catch (error) {
+        console.error("Erro ao buscar dados do gráfico:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchData();
+  }, []); // Roda só uma vez
+
   const chartOptions = {
     responsive: true,
-    maintainAspectRatio: false,
+    maintainAspectRatio: false, // Essencial para o layout do MUI
     plugins: {
       legend: {
-        position: 'top',
+        position: "right", // Posição da legenda
       },
       title: {
-        display: true,
-        text: 'Distribuição de Quantidade por Componente', // Título atualizado
-        font: {
-          size: 18
-        }
+        display: false, // O título já está no 'DashboardPage.jsx'
       },
     },
   };
 
+  // --- Renderização ---
+  if (loading) {
+    return (
+      <Box
+        sx={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          height: "100%",
+        }}
+      >
+        <CircularProgress />
+      </Box>
+    );
+  }
+
+  if (!chartData || chartData.labels.length === 0) {
+    return (
+      <Box
+        sx={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          height: "100%",
+        }}
+      >
+        <Typography color="text.secondary">
+          Não há dados de estoque para exibir.
+        </Typography>
+      </Box>
+    );
+  }
+
   return (
-    <div className="chart-card">
+    // Box flexível para preencher o espaço (necessário para 'maintainAspectRatio: false')
+    <Box sx={{ position: "relative", height: "100%", width: "100%" }}>
       <Doughnut data={chartData} options={chartOptions} />
-    </div>
+    </Box>
   );
 }
 

@@ -1,62 +1,37 @@
-// src/components/ActionList.jsx
-import '../styles/actionlist.css'; // Certifique-se de que o ficheiro CSS está corretamente nomeado
+// src/components/ActionList.jsx (REFORMADO)
+import React from "react";
+import { Box, List, Paper, Typography } from "@mui/material";
 
-// O componente recebe um título e um array de itens
-function ActionList({ title, items }) {
-  console.log("🎬 ActionList renderizando...");
-  console.log("📋 Props recebidas - title:", title);
-  console.log("📦 Props recebidas - items:", items);
-  console.log("🔢 Quantidade de items:", items ? items.length : "null/undefined");
-
-  // Verifica se items é válido antes de tentar acessar length
-  if (!items) {
-    console.warn("⚠️  A prop 'items' é null ou undefined");
-  } else if (!Array.isArray(items)) {
-    console.error("❌ A prop 'items' não é um array:", typeof items);
-  }
+// 1. As props agora são "title" e "children"
+function ActionList({ title, children }) {
+  // 2. Verificamos se algum "filho" (children) foi passado
+  const hasItems = React.Children.count(children) > 0;
 
   return (
-    <div className="action-card">
-      <h3>{title}</h3>
-      <ul>
-        {/* Verificamos se a lista de itens tem algo.
-          Se tiver, usamos .map() para transformar cada item em um <li>.
-          Se não, mostramos uma mensagem.
-        */}
-        {items && Array.isArray(items) && items.length > 0 ? (
-          items.map(item => {
-            console.log("📝 Processando item:", item);
-            
-            // Verifica se o item tem a estrutura esperada
-            if (!item || typeof item !== 'object') {
-              console.error("❌ Item inválido:", item);
-              return null;
-            }
-            
-            if (!item.id) {
-              console.warn("⚠️  Item sem ID:", item);
-            }
-            
-            return (
-               <li key={item.id || index}>
-                {item.nome || "Nome não disponível"}
-                <span className={`badge ${item.quantidade <= 0 ? 'red' : 'orange'}`}>
-                  {item.quantidade} un.
-                </span>
-              </li>
-            );
-          })
-        ) : (
-          <li>
-            <p style={{ textAlign: 'center' }}>
-              {!items ? "Dados não carregados" : 
-               !Array.isArray(items) ? "Formato de dados inválido" : 
-               "Nenhum item encontrado."}
-            </p>
-          </li>
-        )}
-      </ul>
-    </div>
+    <Paper sx={{ p: 2, height: "100%", boxShadow: 3 }}>
+      <Typography variant="h6" component="h3" gutterBottom>
+        {title}
+      </Typography>
+
+      {hasItems ? (
+        // 3. Se temos filhos, renderizamos eles dentro da lista
+        <List>{children}</List>
+      ) : (
+        // 4. Se não, mostramos o placeholder (nenhuma mudança aqui)
+        <Box
+          sx={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            height: "80%",
+          }}
+        >
+          <Typography variant="body2" color="text.secondary">
+            Nenhum item nesta categoria.
+          </Typography>
+        </Box>
+      )}
+    </Paper>
   );
 }
 

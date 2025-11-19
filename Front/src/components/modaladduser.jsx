@@ -1,96 +1,184 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import api from "../services/api";
-import '../styles/modaladduser.css'; // Certifique-se de que o ficheiro CSS está corretamente nomeado
+import { toast } from "react-toastify";
+
+// Imports do React Hook Form
+import { useForm, Controller } from "react-hook-form";
+import { yupResolver } from "@hookform/resolvers/yup";
+import * as yup from "yup";
+
+// Imports do MUI
+import {
+  Button,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
+  TextField,
+  Box,
+  CircularProgress,
+  FormControl,
+  InputLabel,
+  Select,
+  MenuItem,
+} from "@mui/material";
+
+// IMPORTANTE: Importa o helper para pegar o domínio do admin
+import { getLoggedUser } from "../services/authService";
+
+// Schema de validação (Agora com NOME)
+const schema = yup.object().shape({
+  nome: yup.string().required("O nome é obrigatório"),
+  email: yup.string().email("Email inválido").required("O email é obrigatório"),
+  senha: yup
+    .string()
+    .min(6, "Mínimo 6 caracteres")
+    .required("Senha obrigatória"),
+  role: yup.string().required("Função obrigatória"),
+});
 
 function ModalAddUser({ isVisible, onClose, onUserAdded }) {
-  const [email, setEmail] = useState("");
-  const [senha, setSenha] = useState("");
-  const [role, setRole] = useState("USER"); // Cargo padrão
-  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
 
-  if (!isVisible) return null;
+  const {
+    control,
+    handleSubmit,
+    reset,
+    formState: { errors },
+  } = useForm({
+    resolver: yupResolver(schema),
+    defaultValues: {
+      nome: "",
+      email: "",
+      senha: "",
+      role: "USER",
+    },
+  });
 
-  const handleSubmit = async (event) => {
-    event.preventDefault();
-    setError("");
+  useEffect(() => {
+    if (!isVisible) reset();
+  }, [isVisible, reset]);
 
-    // Validação no frontend - senha deve ter pelo menos 6 caracteres
-    if (senha.length < 6) {
-      setError("A senha deve ter no mínimo 6 caracteres.");
+  const onSubmit = async (data) => {
+    setLoading(true);
+
+    // 1. PEGA O USUÁRIO ADMIN LOGADO
+    const adminUser = getLoggedUser();
+
+    if (!adminUser || !adminUser.dominio) {
+      toast.error("Erro: Não foi possível identificar o domínio da empresa.");
+      setLoading(false);
       return;
     }
 
-    const novoUsuario = { email, senha, role };
+    // 2. CRIA O PAYLOAD COM O DOMÍNIO
+    const payload = {
+      ...data,
+      dominio: adminUser.dominio, // <-- AQUI ESTÁ A CORREÇÃO MÁGICA
+    };
 
     try {
-      await api.post("/api/users", novoUsuario);
-      onUserAdded(); // Atualiza a lista na página principal
-      onClose(); // Fecha o modal
-      // Limpa os campos para a próxima vez
-      setEmail("");
-      setSenha("");
-      setRole("USER");
-    } catch (err) {
-      console.error("Erro ao criar utilizador:", err);
-
-      // Tratamento específico para diferentes tipos de erro
-      if (err.response?.status === 403) {
-        setError(
-          "Acesso negado. Apenas administradores podem criar utilizadores."
-        );
-      } else if (err.response?.status === 400) {
-        // Erro de validação do backend
-        if (
-          err.response?.data?.includes("senha") ||
-          err.response?.data?.includes("6")
-        ) {
-          setError("A senha deve ter no mínimo 6 caracteres.");
-        } else {
-          setError("Dados inválidos. Verifique o email e a senha.");
-        }
-      } else if (err.response?.status === 409) {
-        setError("Este email já está em uso.");
-      } else {
-        setError(
-          err.response?.data?.message ||
-            "Ocorreu um erro ao criar o utilizador."
-        );
-      }
+      await api.post("/users", payload);
+      toast.success("Usuário criado com sucesso!");
+      onUserAdded();
+      onClose();
+    } catch (error) {
+      console.error("Erro ao criar usuário:", error);
+      toast.error(error.response?.data?.message || "Falha ao criar usuário.");
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
-    <div className="modal-overlay" onClick={onClose}>
-      <div className="modal-content" onClick={(e) => e.stopPropagation()}>
-        <button className="close-button" onClick={onClose}>
-          &times;
-        </button>
-        <h2>Adicionar Novo Utilizador</h2>
-        <form onSubmit={handleSubmit}>
-          <input
-            type="email"
-            placeholder="E-mail do utilizador"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            required
+    <Dialog open={isVisible} onClose={onClose}>
+      <Box component="form" onSubmit={handleSubmit(onSubmit)}>
+        <DialogTitle fontWeight="bold">Adicionar Novo Usuário</DialogTitle>
+        <DialogContent>
+          {/* Campo NOME (Novo) */}
+          <Controller
+            name="nome"
+            control={control}
+            render={({ field }) => (
+              <TextField
+                {...field}
+                autoFocus
+                required
+                margin="dense"
+                label="Nome Completo"
+                fullWidth
+                error={!!errors.nome}
+                helperText={errors.nome?.message}
+              />
+            )}
           />
-          <input
-            type="password"
-            placeholder="Senha provisória (mínimo 6 caracteres)"
-            value={senha}
-            onChange={(e) => setSenha(e.target.value)}
-            required
-            minLength={6}
+
+          {/* Campo EMAIL */}
+          <Controller
+            name="email"
+            control={control}
+            render={({ field }) => (
+              <TextField
+                {...field}
+                required
+                margin="dense"
+                label="Email"
+                type="email"
+                fullWidth
+                error={!!errors.email}
+                helperText={errors.email?.message}
+              />
+            )}
           />
-          <select value={role} onChange={(e) => setRole(e.target.value)}>
-            <option value="USER">Utilizador Padrão</option>
-            <option value="ADMIN">Administrador</option>
-          </select>
-          <button type="submit">Criar Utilizador</button>
-          {error && <p className="error-message">{error}</p>}
-        </form>
-      </div>
-    </div>
+
+          {/* Campo SENHA */}
+          <Controller
+            name="senha"
+            control={control}
+            render={({ field }) => (
+              <TextField
+                {...field}
+                required
+                margin="dense"
+                label="Senha Provisória"
+                type="password"
+                fullWidth
+                error={!!errors.senha}
+                helperText={errors.senha?.message}
+              />
+            )}
+          />
+
+          {/* Campo ROLE */}
+          <Controller
+            name="role"
+            control={control}
+            render={({ field }) => (
+              <FormControl fullWidth required margin="dense">
+                <InputLabel id="role-label">Função</InputLabel>
+                <Select
+                  {...field}
+                  labelId="role-label"
+                  label="Função"
+                  error={!!errors.role}
+                >
+                  <MenuItem value="USER">User (Usuário Padrão)</MenuItem>
+                  <MenuItem value="ADMIN">Admin (Administrador)</MenuItem>
+                </Select>
+              </FormControl>
+            )}
+          />
+        </DialogContent>
+        <DialogActions sx={{ p: 2 }}>
+          <Button onClick={onClose} disabled={loading}>
+            Cancelar
+          </Button>
+          <Button type="submit" variant="contained" disabled={loading}>
+            {loading ? <CircularProgress size={24} /> : "Criar"}
+          </Button>
+        </DialogActions>
+      </Box>
+    </Dialog>
   );
 }
 

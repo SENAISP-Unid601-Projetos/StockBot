@@ -1,13 +1,15 @@
-import axios from 'axios';
+import axios from "axios";
+
+const API_URL = import.meta.env.VITE_API_URL || "http://localhost:8080/api";
 
 const api = axios.create({
-  baseURL: 'http://localhost:8080',
+  baseURL: API_URL,
 });
 
-// Seu interceptor de requisição (perfeito, sem alterações)
+// Interceptor de Requisição (Está 100% correto)
 api.interceptors.request.use(
   (config) => {
-    const token = localStorage.getItem('jwt-token');
+    const token = localStorage.getItem("jwt-token");
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
@@ -18,32 +20,31 @@ api.interceptors.request.use(
   }
 );
 
-// --- SUGESTÃO: Adicionar Interceptor de Resposta ---
+// Interceptor de Resposta (A CORREÇÃO ESTÁ AQUI)
+// Interceptor de Resposta (VERSÃO DEBUG)
 api.interceptors.response.use(
-  // 1. O que fazer com respostas de SUCESSO (status 2xx)
   (response) => {
-    // Apenas retorna a resposta
     return response;
   },
-  // 2. O que fazer com respostas de ERRO
   (error) => {
-    // Se o erro for 401 (Não Autorizado)
-    if (error.response && error.response.status === 401) {
-      // a. Limpe o token do localStorage
-      localStorage.removeItem('jwt-token');
+    console.log("🔍 Interceptor de erro:", {
+      status: error.response?.status,
+      url: error.config?.url,
+      pathname: window.location.pathname,
+    });
 
-      // b. Redirecione o usuário para a página de login
-      //    (Evita que ele fique em uma tela que exige autenticação)
-      window.location.href = '/login'; 
-      
-      // Você também pode mostrar uma mensagem de "Sessão expirada".
+    // 🚨 TEMPORARIAMENTE COMENTA O REDIRECT
+    /*
+    if (error.response && (error.response.status === 401 || error.response.status === 403)) {
+      if (window.location.pathname !== '/login') {
+        localStorage.removeItem('jwt-token');
+        localStorage.removeItem('user-data');
+        window.location.href = '/login'; 
+      }
     }
+    */
 
-    // Para outros erros, apenas rejeita a promessa para que
-    // o bloco .catch() do seu componente possa lidar com eles.
     return Promise.reject(error);
   }
 );
-
-
 export default api;

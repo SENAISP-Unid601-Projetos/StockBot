@@ -1,59 +1,85 @@
-import "../styles/historicolog.css"; // Certifique-se de que o ficheiro CSS está corretamente nomeado
+import React from "react"; // 1. Importe o React (necessário para o <React.Fragment>)
+import { Paper, Typography } from "@mui/material";
+import {
+  Timeline,
+  TimelineItem,
+  TimelineSeparator,
+  TimelineConnector,
+  TimelineContent,
+  TimelineDot,
+  TimelineOppositeContent,
+} from "@mui/lab";
 import { ArrowDownCircle, ArrowUpCircle } from "lucide-react";
 
-// Este componente recebe a lista de histórico já processada
 function HistoricoLog({ historicoProcessado }) {
-  // Função para formatar a data para o padrão brasileiro
+  // ✅ 2. AQUI ESTÁ A FUNÇÃO CORRIGIDA E IMPLEMENTADA
   const formatarData = (dataString) => {
-    if (!dataString) return "Data inválida";
-    const options = {
+    if (!dataString) {
+      return "Data indisponível";
+    }
+    const data = new Date(dataString);
+    if (isNaN(data.getTime())) {
+      return "Data inválida";
+    }
+
+    // Formata para o padrão pt-BR (ex: 22/10/2025, 16:30)
+    return data.toLocaleString("pt-BR", {
       day: "2-digit",
       month: "2-digit",
       year: "numeric",
       hour: "2-digit",
       minute: "2-digit",
-    };
-    return new Date(dataString).toLocaleString("pt-BR", options);
+    });
   };
 
+  if (historicoProcessado.length === 0) {
+    return (
+      <Typography sx={{ p: 2, textAlign: "center" }}>
+        Nenhuma movimentação encontrada.
+      </Typography>
+    );
+  }
+
+  // O resto do seu componente (que estava perfeito)
   return (
-    <div className="historico-container">
-      {historicoProcessado.length === 0 ? (
-        <p className="empty-message">Nenhuma movimentação encontrada.</p>
-      ) : (
-        <ul className="timeline">
-          {historicoProcessado.map((item) => (
-            <li key={item.id} className="timeline-item">
-              <div className={`timeline-icon ${item.tipo?.toLowerCase()}`}>
-                {item.tipo === "ENTRADA" ? (
-                  <ArrowUpCircle />
-                ) : (
-                  <ArrowDownCircle />
-                )}
-              </div>
-              <div className="timeline-content">
-                <span className="timeline-header">
-                  <strong>
-                    {item.nomeComponente ||
-                      `Componente ID: ${item.componenteId}`}
-                  </strong>
-                  <span className="timeline-user">
-                    por {item.usuario || "Sistema"}
-                  </span>
-                </span>
-                <p>
-                  {item.tipo === "ENTRADA" ? "Entrada de" : "Saída de"}{" "}
-                  <strong>{item.quantidade}</strong> unidade(s).
-                </p>
-                <span className="timeline-date">
-                  {formatarData(item.dataHora)}
-                </span>
-              </div>
-            </li>
-          ))}
-        </ul>
-      )}
-    </div>
+    <Timeline position="alternate">
+      {historicoProcessado.map((item) => (
+        <TimelineItem key={item.id}>
+          <TimelineOppositeContent color="text.secondary" sx={{ pt: "12px" }}>
+            {formatarData(item.dataHora)}
+          </TimelineOppositeContent>
+
+          <TimelineSeparator>
+            <TimelineDot
+              color={item.tipo === "ENTRADA" ? "success" : "error"}
+              variant="outlined"
+            >
+              {item.tipo === "ENTRADA" ? (
+                <ArrowUpCircle size={20} />
+              ) : (
+                <ArrowDownCircle size={20} />
+              )}
+            </TimelineDot>
+            <TimelineConnector />
+          </TimelineSeparator>
+
+          <TimelineContent sx={{ py: "12px", px: 2 }}>
+            <Paper elevation={3} sx={{ p: 2 }}>
+              <Typography variant="h6" component="h3">
+                {item.nomeComponente || `ID: ${item.componenteId}`}
+              </Typography>
+              <Typography variant="body2" sx={{ mb: 1 }}>
+                {item.tipo === "ENTRADA" ? "Entrada de" : "Saída de"}{" "}
+                <strong>{item.quantidade}</strong> unidade(s).
+              </Typography>
+              <Typography variant="caption" color="text.secondary">
+                por {item.usuario || "Sistema"}
+              </Typography>
+            </Paper>
+          </TimelineContent>
+        </TimelineItem>
+      ))}
+    </Timeline>
   );
 }
 
