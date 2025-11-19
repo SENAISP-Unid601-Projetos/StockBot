@@ -16,6 +16,7 @@ public class ComponenteDTO {
     private int quantidade;
     private String localizacao;
     private String categoria;
+    private int nivelMinimoEstoque;
 
 
     // 2. ATUALIZA O CONSTRUTOR AUXILIAR
@@ -27,6 +28,7 @@ public class ComponenteDTO {
         this.quantidade = componente.getQuantidade();
         this.localizacao = componente.getLocalizacao();
         this.categoria = componente.getCategoria();
+        this.nivelMinimoEstoque = componente.getNivelMinimoEstoque();
 
     }
 }
