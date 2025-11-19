@@ -202,14 +202,6 @@ function DashboardPage() {
                 <Grid item xs={12} lg={8}>
                   <CategoryChart componentes={componentes} />
                 </Grid>
-
-                {/* LISTA DE AÇÕES (1/3 da largura) */}
-                <Grid item xs={12} lg={4}>
-                  <ActionList
-                    title={`Itens com Stock Baixo (≤ ${threshold})`}
-                    items={itensEstoqueBaixo}
-                  />
-                </Grid>
               </Grid>
             </Grid>
 
