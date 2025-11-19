@@ -147,7 +147,7 @@ function ReposicaoPage() {
       (comp.nome && comp.nome.toLowerCase().includes(termo)) ||
       (comp.codigoPatrimonio && comp.codigoPatrimonio.toLowerCase().includes(termo))
     );
-  });
+  };
 
   const itensEmFalta = componentesFiltrados.filter((comp) => comp.quantidade <= 0);
   const itensEstoqueBaixo = componentesFiltrados.filter(
