@@ -194,7 +194,7 @@ function DashboardPage() {
               <Grid xs={12} lg={4}>
                 <Paper sx={{ p: 2, height: "100%" }}>
                   <ActionList
-                    title={`Itens com Stock Baixo (≤ ${threshold})`}
+                    title={`Itens com Estoque Baixo (≤ ${threshold})`}
                     items={itensEstoqueBaixo}
                   />
                 </Paper>
