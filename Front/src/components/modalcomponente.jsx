@@ -28,6 +28,7 @@ function ModalComponente({
 
   const [tipoMovimentacao, setTipoMovimentacao] = useState("ENTRADA");
   const [quantidadeMovimentar, setQuantidadeMovimentar] = useState(0);
+  const [nivelMinimoEstoque, setNivelMinimoEstoque] = useState(1);
 
   // --- useEffect ---
   useEffect(() => {
@@ -38,12 +39,14 @@ function ModalComponente({
       setCategoria(componenteParaEditar.categoria);
       setTipoMovimentacao("ENTRADA");
       setQuantidadeMovimentar(0);
+      setNivelMinimoEstoque(componenteParaEditar.nivelMinimoEstoque || 0);
     } else {
       // CRIAÇÃO
       setNome("");
       setLocalizacao("");
       setCategoria("");
       setQuantidade(1);
+      setNivelMinimoEstoque(1);
     }
   }, [componenteParaEditar, isVisible]);
 
@@ -79,7 +82,7 @@ function ModalComponente({
           quantidade: novaQuantidade,
           localizacao: localizacaoFinal,
           categoria: categoriaFinal,
-          // Removido observacoes e nivelMinimoEstoque
+          nivelMinimoEstoque: parseInt(nivelMinimoEstoque) || 0,
         };
 
         await api.put(
@@ -95,8 +98,8 @@ function ModalComponente({
           quantidade: parseInt(quantidade),
           localizacao: localizacaoFinal,
           categoria: categoriaFinal,
-          // Removido observacoes e nivelMinimoEstoque
-        };
+           nivelMinimoEstoque: parseInt(nivelMinimoEstoque) || 0,
+      };
 
         await api.post("/api/componentes", dadosComponente);
         toast.success("Componente adicionado com sucesso!");
@@ -135,9 +138,6 @@ function ModalComponente({
             value={nome}
             onChange={(e) => setNome(e.target.value)}
           />
-
-          {/* MOSTRA O CÓDIGO APENAS SE ESTIVER EDITANDO */}
-
           <TextField
             margin="dense"
             id="localizacao"
@@ -162,6 +162,20 @@ function ModalComponente({
 
           {componenteParaEditar ? (
             <>
+              {/* --- 6. ADICIONAR CAMPO DE NÍVEL MÍNIMO NA EDIÇÃO --- */}
+              <TextField
+                margin="dense"
+                id="nivelMinimo"
+                label="Nível Mínimo de Estoque"
+                type="number"
+                fullWidth
+                variant="outlined"
+                value={nivelMinimoEstoque}
+                onChange={(e) => setNivelMinimoEstoque(e.target.value)}
+                InputProps={{ inputProps: { min: 0 } }}
+                helperText="Define o alerta de 'Estoque Baixo'"
+              />
+
               <Typography variant="body1" sx={{ mt: 2, mb: 1 }}>
                 Quantidade Atual:{" "}
                 <strong>{componenteParaEditar.quantidade}</strong>
@@ -194,18 +208,37 @@ function ModalComponente({
               />
             </>
           ) : (
-            <TextField
-              margin="dense"
-              id="quantidade"
-              label="Quantidade Inicial"
-              type="number"
-              fullWidth
-              variant="outlined"
-              required
-              value={quantidade}
-              onChange={(e) => setQuantidade(parseInt(e.target.value))}
-              InputProps={{ inputProps: { min: 0 } }}
-            />
+            // --- CAMPOS PARA O MODO DE CRIAÇÃO ---
+            <>
+              <TextField
+                required
+                margin="dense"
+                id="quantidade"
+                label="Quantidade Inicial"
+                type="number"
+                fullWidth
+                variant="outlined"
+                value={quantidade}
+                // *** CORREÇÃO AQUI ***
+                // Apenas define o valor (string), deixa o parseInt para o handleSubmit
+                onChange={(e) => setQuantidade(e.target.value)}
+                InputProps={{ inputProps: { min: 0 } }} // Garante que não seja negativo
+              />
+
+              {/* --- 7. ADICIONAR CAMPO DE NÍVEL MÍNIMO NA CRIAÇÃO --- */}
+              <TextField
+                margin="dense"
+                id="nivelMinimo"
+                label="Nível Mínimo de Estoque"
+                type="number"
+                fullWidth
+                variant="outlined"
+                value={nivelMinimoEstoque}
+                onChange={(e) => setNivelMinimoEstoque(e.target.value)}
+                InputProps={{ inputProps: { min: 0 } }}
+                helperText="Define o alerta de 'Estoque Baixo'"
+              />
+            </>
           )}
         </DialogContent>
 

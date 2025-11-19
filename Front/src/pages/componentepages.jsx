@@ -14,6 +14,7 @@ import {
   TableContainer,
   TableHead,
   TableRow,
+  TablePagination, // O componente de paginação!
   Typography,
   IconButton,
   Stack,
@@ -33,25 +34,59 @@ import { isAdmin } from "../services/authService"; // Importado
 function ComponentesPage() {
   const [componentes, setComponentes] = useState([]);
   const [loading, setLoading] = useState(true);
+  // 'page' armazena o índice da página atual (começa em 0).
+  const [page, setPage] = useState(0);
+  // 'rowsPerPage' armazena quantos itens são exibidos por página.
+  const [rowsPerPage, setRowsPerPage] = useState(10);
+  // 'totalElements' armazena o número total de itens no backend (para a paginação).
+  const [totalElements, setTotalElements] = useState(0);
+  // 'isModalVisible' controla se o modal de adição/edição está aberto.
   const [isModalVisible, setModalVisible] = useState(false);
   const [componenteEmEdicao, setComponenteEmEdicao] = useState(null);
   const [isUserAdmin, setIsUserAdmin] = useState(false); // Estado para admin
   const [termoBusca, setTermoBusca] = useState(""); // Estado da busca
 
-  // Busca dados com parâmetro opcional
-  const fetchData = async (termo = "") => {
+  const fetchData = useCallback(async () => {
     setLoading(true);
     try {
-      // Envia o termo para o backend filtrar
-      const response = await api.get(`/api/componentes?termo=${encodeURIComponent(termo)}`);
-      setComponentes(response.data);
+      // 1. A API de componentes NÃO é paginada no backend.
+      // Removemos os parâmetros ?page= e &size= da URL.
+      const response = await api.get("/api/componentes");
+
+      // 2. A resposta (response.data) É o próprio array de componentes.
+      // Guardamos ele em 'todosComponentes'. Usamos '|| []' como segurança.
+      const todosComponentes = response.data || [];
+
+      // 3. O total de elementos (para a paginação) é o tamanho do array COMPLETO.
+      setTotalElements(todosComponentes.length);
+
+      // 4. Nós simulamos a paginação manualmente no frontend.
+      // Calcula o índice inicial da "fatia" do array.
+      const inicio = page * rowsPerPage;
+      // Calcula o índice final.
+      const fim = inicio + rowsPerPage;
+      // Atualiza o estado 'componentes' apenas com os itens da página atual.
+      setComponentes(todosComponentes.slice(inicio, fim));
+
     } catch (error) {
       console.error("Erro ao buscar componentes:", error);
       toast.error("Não foi possível carregar os componentes.");
+      setComponentes([]); // Garante um array vazio em caso de erro.
+      setTotalElements(0); // Zera a paginação.
     } finally {
-      setLoading(false);
+      // Executa dando certo ou errado.
+      setLoading(false); // Desativa o ícone de carregamento.
     }
-  };
+  }, [
+      // 5. Dependências do useCallback.
+      // A função 'fetchData' será recriada se qualquer um destes valores mudar.
+      // Isso é crucial para a paginação funcionar no frontend.
+      page,
+      rowsPerPage,
+      setComponentes,
+      setTotalElements,
+      setLoading
+    ]);
 
   // Debounce para não chamar a API a cada tecla digitada
   // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -59,9 +94,21 @@ function ComponentesPage() {
 
   useEffect(() => {
     setIsUserAdmin(isAdmin());
-    fetchData(); // Busca inicial
-  }, []);
+        fetchData(); // Busca inicial
+      }, []);
+  // 4. Funções para lidar com as ações de paginação do MUI.
+  // Chamada quando o usuário clica para mudar de página.
+  const handleChangePage = (event, newPage) => {
+    setPage(newPage); // Atualiza o estado da página, o que aciona o 'fetchData'.
+  };
 
+  // Chamada quando o usuário muda o número de "itens por página".
+  const handleChangeRowsPerPage = (event) => {
+    setRowsPerPage(parseInt(event.target.value, 10)); // Atualiza o N° de itens.
+    setPage(0); // Volta para a primeira página.
+  };
+
+  // Chamada quando o usuário clica no ícone de editar.
   // Efeito para buscar quando o termo muda
   useEffect(() => {
     debouncedFetchData(termoBusca);
@@ -72,8 +119,8 @@ function ComponentesPage() {
   };
 
   const handleEdit = (componente) => {
-    setComponenteEmEdicao(componente);
-    setModalVisible(true);
+    setComponenteEmEdicao(componente); // Define o item a ser editado.
+    setModalVisible(true); // Abre o modal.
   };
 
   const handleDelete = async (id) => {
@@ -84,15 +131,21 @@ function ComponentesPage() {
         await api.delete(`/api/componentes/${id}`);
         toast.success("Componente excluído com sucesso!");
         fetchData(termoBusca); // Recarrega mantendo a busca atual
+
+        // 3. CHAME O FETCHDATA AQUI!
+        // Recarrega os dados da página atual para refletir a exclusão.
+        fetchData();
+
       } catch (error) {
         toast.error("Falha ao excluir o componente.");
+        console.error(error);
       }
     }
   };
 
   const handleAdd = () => {
-    setComponenteEmEdicao(null);
-    setModalVisible(true);
+    setComponenteEmEdicao(null); // Garante que não há item em edição (modo "criação").
+    setModalVisible(true); // Abre o modal.
   };
 
   const handleComponenteAdicionado = () => {
@@ -101,9 +154,26 @@ function ComponentesPage() {
 
   return (
     <>
-      <Box component="main" sx={{ flexGrow: 1, p: 3, minHeight: "100vh", backgroundColor: "background.default" }}>
+      <Box
+        component="main" // Define a tag HTML (semanticamente, é o conteúdo principal).
+        sx={{ // 'sx' é a prop do MUI para estilos CSS.
+          flexGrow: 1, // Permite que o conteúdo cresça e ocupe o espaço.
+          p: 3, // Adiciona padding (espaçamento interno).
+          minHeight: "100vh", // Altura mínima de 100% da tela.
+          backgroundColor: "background.default", // Usa a cor de fundo do tema.
+        }}
+      >
         <Container maxWidth="lg">
-          <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mb: 4, flexWrap: "wrap", gap: 2 }}>
+          <Box
+            sx={{
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+              mb: 4,
+              flexWrap: "wrap",
+              gap: 2,
+            }}
+          >
             <Typography variant="h4" component="h1" fontWeight="bold">
               Gerenciamento de Itens
             </Typography>
@@ -112,7 +182,7 @@ function ComponentesPage() {
             <TextField
               variant="outlined"
               size="small"
-              placeholder="Buscar por nome ou patrimônio..."
+              placeholder="Buscar por nome ou id"
               value={termoBusca}
               onChange={handleBuscaChange}
               InputProps={{
@@ -128,11 +198,13 @@ function ComponentesPage() {
             {isUserAdmin && (
               <Button
                 variant="contained"
-                startIcon={<AddIcon />}
                 onClick={handleAdd}
-                sx={{ backgroundColor: "#ce0000", "&:hover": { backgroundColor: "#a40000" } }}
+                sx={{
+                  backgroundColor: "#ce0000",
+                  "&:hover": { backgroundColor: "#a40000" },
+                }}
               >
-                Adicionar Item
+                Novo Item
               </Button>
             )}
           </Box>
@@ -142,43 +214,68 @@ function ComponentesPage() {
               <CircularProgress />
             </Box>
           ) : (
-            <Paper sx={{ width: "100%", overflow: "hidden", boxShadow: 3 }}>
+            <Paper sx={{ width: "100%", overflow: "hidden", boxShadow: 5 }}>
               <TableContainer>
                 <Table stickyHeader aria-label="tabela de componentes">
                   <TableHead>
-                    <TableRow>
-                      <TableCell sx={{ fontWeight: "bold" }}>Nome</TableCell>
-                      <TableCell sx={{ fontWeight: "bold" }}>
-                        Patrimônio
-                      </TableCell>
-                      <TableCell sx={{ fontWeight: "bold" }}>
-                        Quantidade
-                      </TableCell>
-                      <TableCell sx={{ fontWeight: "bold" }}>
-                        Localização
-                      </TableCell>
-                      <TableCell sx={{ fontWeight: "bold" }}>
-                        Categoria
-                      </TableCell>
-                      <TableCell sx={{ fontWeight: "bold" }}>Ações</TableCell>
+                    <TableRow
+                      sx={{
+                        // O seletor "& th" aplica o estilo a todas as células de cabeçalho dentro desta linha
+                        "& th": {
+                          backgroundColor: "#2a3c61ff", // Cor de fundo preta
+                          color: "#ffffff", // Texto branco (essencial para contraste)
+                          fontWeight: "bold",
+                        },
+                      }}
+                    >
+                      <TableCell align="center">Id</TableCell>
+                      <TableCell align="center">Nome</TableCell>
+                      <TableCell align="center">Patrimônio</TableCell>
+                      <TableCell align="center">Quantidade</TableCell>
+                      <TableCell align="center">Localização</TableCell>
+                      <TableCell align="center">Categoria</TableCell>
+                      <TableCell align="center">Ações</TableCell>
                     </TableRow>
                   </TableHead>
                   <TableBody>
                     {componentes.length > 0 ? (
                       componentes.map((componente) => (
                         <TableRow hover key={componente.id}>
-                          <TableCell>{componente.nome}</TableCell>
-                          <TableCell>{componente.codigoPatrimonio}</TableCell>
-                          <TableCell>{componente.quantidade}</TableCell>
-                          <TableCell>{componente.localizacao || "-"}</TableCell>
-                          <TableCell>{componente.categoria || "-"}</TableCell>
+                          <TableCell align="center">{componente.id}</TableCell>
+                          <TableCell align="center">
+                            {componente.nome}
+                          </TableCell>
+                          <TableCell align="center">
+                            {componente.codigoPatrimonio}
+                          </TableCell>
+                          <TableCell align="center">
+                            {componente.quantidade}
+                          </TableCell>
+                          <TableCell align="center">
+                            {componente.localizacao || "-"}
+                          </TableCell>
+                          <TableCell align="center">
+                            {componente.categoria || "-"}
+                          </TableCell>
                           {isUserAdmin && (
                             <TableCell align="right">
-                              <Stack direction="row" spacing={1} justifyContent="flex-end">
-                                <IconButton color="info" size="small" onClick={() => handleEdit(componente)}>
+                              <Stack
+                                direction="row"
+                                spacing={1}
+                                justifyContent="center"
+                              >
+                                <IconButton
+                                  color="info"
+                                  size="small"
+                                  onClick={() => handleEdit(componente)}
+                                >
                                   <EditIcon />
                                 </IconButton>
-                                <IconButton color="error" size="small" onClick={() => handleDelete(componente.id)}>
+                                <IconButton
+                                  color="error"
+                                  size="small"
+                                  onClick={() => handleDelete(componente.id)}
+                                >
                                   <DeleteIcon />
                                 </IconButton>
                               </Stack>
@@ -198,6 +295,18 @@ function ComponentesPage() {
                   </TableBody>
                 </Table>
               </TableContainer>
+
+              {/* 5. O Componente de Paginação do MUI */}
+              <TablePagination
+                rowsPerPageOptions={[5, 10, 25]} // Opções de "itens por página".
+                component="div" // Renderiza como <div>.
+                count={totalElements} // N° total de itens (para calcular as páginas).
+                rowsPerPage={rowsPerPage} // N° de itens por página selecionado.
+                page={page} // Página atual.
+                onPageChange={handleChangePage} // Função p/ mudar de página.
+                onRowsPerPageChange={handleChangeRowsPerPage} // Função p/ mudar N° de itens.
+                labelRowsPerPage="Itens por página:" // Texto customizado.
+              />
             </Paper>
           )}
         </Container>

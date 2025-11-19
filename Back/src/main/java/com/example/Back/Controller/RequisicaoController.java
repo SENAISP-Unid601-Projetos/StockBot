@@ -1,5 +1,6 @@
 package com.example.Back.Controller;
 
+import com.example.Back.Dto.RequisicaoDTO;
 import com.example.Back.Entity.Requisicao; // Importar
 import com.example.Back.Service.RequisicaoService; // Importar
 import org.springframework.http.ResponseEntity;
@@ -25,8 +26,8 @@ public class RequisicaoController {
      */
     @GetMapping("/pendentes")
     @PreAuthorize("isAuthenticated()") // Acessível por ADMIN e USER
-    public ResponseEntity<List<Requisicao>> getRequisicoesPendentes() {
-        List<Requisicao> requisicoes = requisicaoService.findPendentesByEmpresa();
+    public ResponseEntity<List<RequisicaoDTO>> getRequisicoesPendentes() {
+        List<RequisicaoDTO> requisicoes = requisicaoService.findPendentesByEmpresa();
         return ResponseEntity.ok(requisicoes);
     }
 

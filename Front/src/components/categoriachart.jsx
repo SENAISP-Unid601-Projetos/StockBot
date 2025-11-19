@@ -20,7 +20,7 @@ function CategoryChart({ componentes }) {
     labels: Object.keys(dadosGrafico),
     datasets: [
       {
-        label: 'Quantidade em Stock',
+        label: 'Quantidade em estoque',
         data: Object.values(dadosGrafico),
         backgroundColor: [
           theme.palette.primary.main,
