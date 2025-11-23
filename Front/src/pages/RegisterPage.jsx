@@ -1,112 +1,190 @@
 import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import axios from 'axios';
-import './loginpage.css'; // Reutiliza o CSS
+import { useForm } from 'react-hook-form';
+import { yupResolver } from '@hookform/resolvers/yup';
+import * as yup from 'yup';
+import { toast, ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+import { 
+    CircularProgress, 
+    Box, 
+    TextField, 
+    Button, 
+    Typography, 
+    Container, 
+    Card,
+    InputAdornment,
+    IconButton
+} from '@mui/material';
+import { AppRegistration, Visibility, VisibilityOff, Business } from '@mui/icons-material';
 
 const apiUrl = 'http://localhost:8080/api/auth';
 
+// 1. SCHEMA DE VALIDAÇÃO (Regras do Jogo)
+const schema = yup.object().shape({
+    dominioEmpresa: yup.string()
+        .required('O domínio da empresa é obrigatório')
+        .matches(/^[a-zA-Z0-9-]+$/, 'Sem espaços ou caracteres especiais (use traços)'),
+    email: yup.string()
+        .email('Digite um e-mail válido')
+        .required('O e-mail é obrigatório'),
+    senha: yup.string()
+        .required('A senha é obrigatória')
+        .min(6, 'A senha deve ter no mínimo 6 caracteres'),
+    confirmarSenha: yup.string()
+        .required('Confirme sua senha')
+        .oneOf([yup.ref('senha')], 'As senhas não coincidem'), // O Yup faz a mágica da comparação aqui
+});
+
 function RegisterPage() {
-  const [email, setEmail] = useState('');
-  const [senha, setSenha] = useState('');
-  const [confirmarSenha, setConfirmarSenha] = useState('');
-  const [dominioEmpresa, setDominioEmpresa] = useState('');
-  const [error, setError] = useState('');
-  const [loading, setLoading] = useState(false);
-  const navigate = useNavigate();
+    const navigate = useNavigate();
+    const [loading, setLoading] = useState(false);
+    const [showPassword, setShowPassword] = useState(false);
 
-  const handleRegister = async (event) => {
-    event.preventDefault();
-    setError('');
+    // Configuração do Hook Form
+    const { register, handleSubmit, formState: { errors } } = useForm({
+        resolver: yupResolver(schema),
+    });
 
-    if (senha !== confirmarSenha) {
-      setError('As senhas não coincidem.');
-      return;
-    }
+    const onSubmit = async (data) => {
+        setLoading(true);
+        try {
+            // Enviamos apenas o necessário para o Back-end (ignoramos confirmarSenha)
+            await axios.post(`${apiUrl}/register`, { 
+                email: data.email, 
+                senha: data.senha, 
+                dominioEmpresa: data.dominioEmpresa 
+            });
 
-    if (senha.length < 6) {
-      setError('A senha deve ter no mínimo 6 caracteres.');
-      return;
-    }
+            toast.success("Cadastro realizado com sucesso! Faça o login.", { theme: "colored" });
+            
+            // Espera 2 segundos para o usuário ler a mensagem antes de trocar de tela
+            setTimeout(() => navigate('/login'), 2000);
 
-    setLoading(true);
-    try {
-      await axios.post(`${apiUrl}/register`, { email, senha, dominioEmpresa });
+        } catch (error) {
+            console.error('Erro no cadastro:', error);
+            const msg = error.response?.data?.message || 'Erro ao realizar cadastro. Tente novamente.';
+            toast.error(msg);
+        } finally {
+            setLoading(false);
+        }
+    };
 
-      alert('Cadastro realizado com sucesso! Você já pode fazer o login.');
-      navigate('/login');
+    return (
+        <Container component="main" maxWidth="xs" sx={{ mt: 8, mb: 4, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <ToastContainer position="top-right" autoClose={3000} />
+            
+            <Card elevation={6} sx={{ p: 4, width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', borderRadius: 3 }}>
+                
+                <Box sx={{ p: 2, bgcolor: 'secondary.main', borderRadius: '50%', mb: 2 }}>
+                    <AppRegistration sx={{ fontSize: 32, color: 'white' }} />
+                </Box>
 
-    } catch (error) {
-      console.error('Erro no cadastro:', error);
-      if (error.response && error.response.data) {
-        setError(error.response.data.message || 'Erro ao realizar o cadastro. Verifique os dados.');
-      } else {
-        setError('Não foi possível conectar ao servidor.');
-      }
-    } finally {
-      setLoading(false);
-    }
-  };
+                <Typography component="h1" variant="h5" sx={{ mb: 3, fontWeight: 'bold' }}>
+                    Criar Nova Conta
+                </Typography>
 
-  return (
-    <div className="login-container">
-      <div className="form-wrapper">
-        <form className="auth-form" onSubmit={handleRegister}>
-          <h2>Criar Conta no StockBot</h2>
+                <Box component="form" onSubmit={handleSubmit(onSubmit)} noValidate sx={{ width: '100%' }}>
+                    
+                    {/* Campo Domínio */}
+                    <TextField
+                        margin="normal"
+                        required
+                        fullWidth
+                        id="dominio"
+                        label="Domínio da Empresa"
+                        placeholder="Ex: minha-empresa"
+                        disabled={loading}
+                        {...register('dominioEmpresa')}
+                        error={!!errors.dominioEmpresa}
+                        helperText={errors.dominioEmpresa?.message}
+                        InputProps={{
+                            startAdornment: (
+                                <InputAdornment position="start">
+                                    <Business color="action" />
+                                </InputAdornment>
+                            ),
+                        }}
+                    />
 
-          <label htmlFor="dominio">Domínio da Empresa</label>
-          <input
-            type="text"
-            id="dominio"
-            value={dominioEmpresa}
-            onChange={(e) => setDominioEmpresa(e.target.value)}
-            required
-            disabled={loading}
-          />
+                    {/* Campo Email */}
+                    <TextField
+                        margin="normal"
+                        required
+                        fullWidth
+                        id="email"
+                        label="E-mail"
+                        autoComplete="email"
+                        disabled={loading}
+                        {...register('email')}
+                        error={!!errors.email}
+                        helperText={errors.email?.message}
+                    />
 
-          <label htmlFor="email">E-mail</label>
-          <input
-            type="email"
-            id="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            required
-            disabled={loading}
-          />
+                    {/* Campo Senha */}
+                    <TextField
+                        margin="normal"
+                        required
+                        fullWidth
+                        label="Senha"
+                        type={showPassword ? 'text' : 'password'}
+                        id="senha"
+                        disabled={loading}
+                        {...register('senha')}
+                        error={!!errors.senha}
+                        helperText={errors.senha?.message}
+                        InputProps={{
+                            endAdornment: (
+                                <InputAdornment position="end">
+                                    <IconButton
+                                        onClick={() => setShowPassword(!showPassword)}
+                                        edge="end"
+                                    >
+                                        {showPassword ? <VisibilityOff /> : <Visibility />}
+                                    </IconButton>
+                                </InputAdornment>
+                            ),
+                        }}
+                    />
 
-          <label htmlFor="password">Senha (mín. 6 caracteres)</label>
-          <input
-            type="password"
-            id="password"
-            value={senha}
-            onChange={(e) => setSenha(e.target.value)}
-            required
-            disabled={loading}
-          />
+                    {/* Campo Confirmar Senha */}
+                    <TextField
+                        margin="normal"
+                        required
+                        fullWidth
+                        label="Confirmar Senha"
+                        type="password"
+                        id="confirmarSenha"
+                        disabled={loading}
+                        {...register('confirmarSenha')}
+                        error={!!errors.confirmarSenha}
+                        helperText={errors.confirmarSenha?.message}
+                    />
 
-          <label htmlFor="confirm-password">Confirmar Senha</label>
-          <input
-            type="password"
-            id="confirm-password"
-            value={confirmarSenha}
-            onChange={(e) => setConfirmarSenha(e.target.value)}
-            required
-            disabled={loading}
-          />
+                    <Button
+                        type="submit"
+                        fullWidth
+                        variant="contained"
+                        color="secondary" // Cor diferente do Login para diferenciar
+                        sx={{ mt: 3, mb: 2, py: 1.5, fontWeight: 'bold' }}
+                        disabled={loading}
+                    >
+                        {loading ? <CircularProgress size={24} color="inherit" /> : 'REGISTRAR'}
+                    </Button>
 
-          {error && <p className="error-message">{error}</p>}
-
-          <button type="submit" disabled={loading}>
-             {}
-            {loading ? 'A registrar...' : 'Registrar'}
-          </button>
-        </form>
-
-        <div className="login-link">
-          <p>Já tem uma conta? <Link to="/login">Faça o login</Link></p>
-        </div>
-      </div>
-    </div>
-  );
+                    <Box display="flex" justifyContent="center" mt={2}>
+                        <Typography variant="body2">
+                            Já tem uma conta?{' '}
+                            <Link to="/login" style={{ textDecoration: 'none', fontWeight: 'bold', color: '#9c27b0' }}>
+                                Faça login
+                            </Link>
+                        </Typography>
+                    </Box>
+                </Box>
+            </Card>
+        </Container>
+    );
 }
 
 export default RegisterPage;
