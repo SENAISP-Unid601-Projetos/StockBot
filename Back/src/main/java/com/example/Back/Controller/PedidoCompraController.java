@@ -21,11 +21,8 @@ public class PedidoCompraController {
         this.pedidoCompraService = pedidoCompraService;
     }
 
-    /**
-     * Endpoint para criar um novo pedido de compra (usado pelo formulário).
-     */
     @PostMapping
-    @PreAuthorize("isAuthenticated()") // Qualquer utilizador logado pode pedir
+    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<Void> createPedido(@RequestBody @Valid PedidoCompraCreateDTO dto) {
         try {
             pedidoCompraService.createPedido(dto);
@@ -35,9 +32,6 @@ public class PedidoCompraController {
         }
     }
 
-    /**
-     * Endpoint para listar os pedidos do próprio utilizador (usado pela tabela).
-     */
     @GetMapping("/me")
     @PreAuthorize("isAuthenticated()")
     public ResponseEntity<List<MeusPedidosCompraDTO>> getMeusPedidos() {
@@ -45,19 +39,21 @@ public class PedidoCompraController {
         return ResponseEntity.ok(pedidos);
     }
 
-    /**
-     * Endpoint para listar pedidos de compra pendentes (para Admin).
-     */
     @GetMapping("/pendentes")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<List< RequisicaoDTO>> getPedidosPendentes() {
+    public ResponseEntity<List<RequisicaoDTO>> getPedidosPendentes() {
         List<RequisicaoDTO> pedidos = pedidoCompraService.findPendentesByEmpresa();
         return ResponseEntity.ok(pedidos);
     }
 
-    /**
-     * Endpoint para APROVAR um pedido de compra. (ADMIN)
-     */
+    // NOVO: Endpoint para listar Aprovados (Recebimento)
+    @GetMapping("/aprovados")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<List<RequisicaoDTO>> getPedidosAprovados() {
+        List<RequisicaoDTO> pedidos = pedidoCompraService.findAprovadosByEmpresa();
+        return ResponseEntity.ok(pedidos);
+    }
+
     @PutMapping("/{id}/aprovar")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Void> aprovarPedido(@PathVariable Long id) {
@@ -65,13 +61,10 @@ public class PedidoCompraController {
             pedidoCompraService.aprovarPedidoCompra(id);
             return ResponseEntity.ok().build();
         } catch (RuntimeException e) {
-            return ResponseEntity.badRequest().body(null); // Retorna 400 se algo der errado
+            return ResponseEntity.badRequest().build();
         }
     }
 
-    /**
-     * Endpoint para RECUSAR um pedido de compra. (ADMIN)
-     */
     @PutMapping("/{id}/recusar")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Void> recusarPedido(@PathVariable Long id) {
@@ -79,7 +72,19 @@ public class PedidoCompraController {
             pedidoCompraService.recusarPedidoCompra(id);
             return ResponseEntity.ok().build();
         } catch (RuntimeException e) {
-            return ResponseEntity.badRequest().body(null); // Retorna 400 se algo der errado
+            return ResponseEntity.badRequest().build();
+        }
+    }
+
+    // NOVO: Endpoint para Confirmar Recebimento
+    @PutMapping("/{id}/receber")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<Void> receberPedido(@PathVariable Long id) {
+        try {
+            pedidoCompraService.confirmarRecebimento(id);
+            return ResponseEntity.ok().build();
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().build();
         }
     }
 }

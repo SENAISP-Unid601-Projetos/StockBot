@@ -23,13 +23,35 @@ public class AuthService {
     private final TokenService tokenService;
     private final PasswordEncoder passwordEncoder;
     private final EmpresaRepository empresaRepository;
+    private final EmailService emailService;
 
-    public AuthService(AuthenticationManager authenticationManager, UsuarioRepository usuarioRepository, TokenService tokenService, PasswordEncoder passwordEncoder, EmpresaRepository empresaRepository) {
+    public AuthService(AuthenticationManager authenticationManager, UsuarioRepository usuarioRepository, TokenService tokenService, PasswordEncoder passwordEncoder, EmpresaRepository empresaRepository, EmailService emailService) {
         this.authenticationManager = authenticationManager;
         this.usuarioRepository = usuarioRepository;
         this.tokenService = tokenService;
         this.passwordEncoder = passwordEncoder;
         this.empresaRepository = empresaRepository;
+        this.emailService = emailService;
+    }
+
+    @Transactional
+    public void recuperarSenha(String email) {
+        Usuario usuario = usuarioRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("E-mail não encontrado no sistema."));
+
+        // Gera uma senha temporária aleatória (8 caracteres)
+        String novaSenha = java.util.UUID.randomUUID().toString().substring(0, 8);
+
+        // Atualiza no banco
+        usuario.setSenha(passwordEncoder.encode(novaSenha));
+        usuarioRepository.save(usuario);
+
+        // Envia por e-mail
+        String mensagem = "Olá,\n\nSua senha foi resetada com sucesso.\n" +
+                "Sua nova senha temporária é: " + novaSenha + "\n\n" +
+                "Por favor, acesse o sistema e troque sua senha imediatamente em Configurações.";
+
+        emailService.enviarEmailTexto(email, "Recuperação de Senha - StockBot", mensagem);
     }
 
     @Transactional(readOnly = true)

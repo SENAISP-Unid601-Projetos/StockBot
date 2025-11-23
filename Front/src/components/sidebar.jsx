@@ -11,7 +11,7 @@ import {
   Typography,
   useTheme,
   Switch,
-  FormControlLabel, // <-- 1. Importar Switch e FormControlLabel
+  FormControlLabel,
 } from "@mui/material";
 import {
   LayoutDashboard,
@@ -21,13 +21,14 @@ import {
   Settings,
   LogOut,
   Moon,
-  Sun, // <-- 2. Importar Ícones de Tema
+  Sun,
   CheckSquare,
   ShoppingCart,
+  PackageCheck, // <-- 1. NOVO ÍCONE PARA RECEBIMENTO
 } from "lucide-react";
 
 import { isAdmin } from "../services/authService";
-import { useColorMode } from "../useColorMode.js"; // <-- 3. Importar o hook do tema
+import { useColorMode } from "../useColorMode.js";
 
 const menuItems = [
   { text: "Dashboard", icon: <LayoutDashboard size={20} />, path: "/" },
@@ -41,7 +42,7 @@ const drawerWidth = 250;
 function Sidebar() {
   const navigate = useNavigate();
   const theme = useTheme();
-  const { toggleColorMode } = useColorMode(); // <-- 4. Usar o hook
+  const { toggleColorMode } = useColorMode();
   const [isUserAdmin, setIsUserAdmin] = useState(false);
 
   useEffect(() => {
@@ -53,7 +54,6 @@ function Sidebar() {
     navigate("/login");
   };
 
-  // Define o estado do switch com base no tema atual
   const isDarkMode = theme.palette.mode === "dark";
 
   const drawerContent = (
@@ -64,6 +64,7 @@ function Sidebar() {
         </Typography>
       </Box>
 
+      {/* MENU GERAL (Para todos) */}
       <List sx={{ p: 1 }}>
         {menuItems.map((item) => (
           <ListItem key={item.text} disablePadding>
@@ -91,36 +92,37 @@ function Sidebar() {
             </ListItemButton>
           </ListItem>
         ))}
-      </List>
 
-      <ListItem disablePadding>
-        <ListItemButton
-          component={NavLink}
-          to="/pedidos"
-          sx={{
-            color: "rgba(255, 255, 255, 0.7)",
-            borderRadius: 2,
-            "&:hover": { backgroundColor: "rgba(255, 255, 255, 0.08)" },
-            "&.active": {
-              backgroundColor: "primary.main",
-              color: "white",
-              ".MuiListItemIcon-root": { color: "white" },
-            },
-          }}
-        >
-          <ListItemIcon
-            sx={{ color: "rgba(255, 255, 255, 0.7)", minWidth: 40 }}
+        {/* Link Pedidos (Para todos) */}
+        <ListItem disablePadding>
+          <ListItemButton
+            component={NavLink}
+            to="/pedidos"
+            sx={{
+              color: "rgba(255, 255, 255, 0.7)",
+              borderRadius: 2,
+              "&:hover": { backgroundColor: "rgba(255, 255, 255, 0.08)" },
+              "&.active": {
+                backgroundColor: "primary.main",
+                color: "white",
+                ".MuiListItemIcon-root": { color: "white" },
+              },
+            }}
           >
-            <ShoppingCart size={20} />
-          </ListItemIcon>
-          <ListItemText primary="Pedido de Compra" />
-        </ListItemButton>
-      </ListItem>
+            <ListItemIcon
+              sx={{ color: "rgba(255, 255, 255, 0.7)", minWidth: 40 }}
+            >
+              <ShoppingCart size={20} />
+            </ListItemIcon>
+            <ListItemText primary="Pedido de Compra" />
+          </ListItemButton>
+        </ListItem>
+      </List>
 
       <Box sx={{ flexGrow: 1 }} />
 
       <List sx={{ p: 1, mt: "auto" }}>
-        {/* 5. SWITCH DO MODO ESCURO MOVIDO PARA AQUI */}
+        {/* Switch Modo Escuro */}
         <ListItem sx={{ color: "rgba(255, 255, 255, 0.7)" }}>
           <ListItemIcon
             sx={{ color: "rgba(255, 255, 255, 0.7)", minWidth: 40 }}
@@ -139,35 +141,61 @@ function Sidebar() {
             sx={{ m: 0, flexGrow: 1 }}
           />
         </ListItem>
-        <>
-          {" "}
-          {/* <-- 2. Adicione um fragmento para agrupar os links de admin */}
-          {/* 3. ADICIONE ESTE BLOCO NOVO PARA "APROVAÇÕES" */}
-          <ListItem disablePadding>
-            <ListItemButton
-              component={NavLink}
-              to="/aprovacoes"
-              sx={{
-                color: "rgba(255, 255, 255, 0.7)",
-                borderRadius: 2,
-                "&:hover": { backgroundColor: "rgba(255, 255, 255, 0.08)" },
-                "&.active": {
-                  backgroundColor: "primary.main",
-                  color: "white",
-                  ".MuiListItemIcon-root": { color: "white" },
-                },
-              }}
-            >
-              <ListItemIcon
-                sx={{ color: "rgba(255, 255, 255, 0.7)", minWidth: 40 }}
+
+        {/* --- MENU ADMINISTRATIVO (Apenas Admin) --- */}
+        {isUserAdmin && (
+          <>
+            {/* Aprovações */}
+            <ListItem disablePadding>
+              <ListItemButton
+                component={NavLink}
+                to="/aprovacoes"
+                sx={{
+                  color: "rgba(255, 255, 255, 0.7)",
+                  borderRadius: 2,
+                  "&:hover": { backgroundColor: "rgba(255, 255, 255, 0.08)" },
+                  "&.active": {
+                    backgroundColor: "primary.main",
+                    color: "white",
+                    ".MuiListItemIcon-root": { color: "white" },
+                  },
+                }}
               >
-                <CheckSquare size={20} />
-              </ListItemIcon>
-              <ListItemText primary="Aprovações" />
-            </ListItemButton>
-          </ListItem>
-          {/* Link de Configurações (só para ADMIN) */}
-          {isUserAdmin && (
+                <ListItemIcon
+                  sx={{ color: "rgba(255, 255, 255, 0.7)", minWidth: 40 }}
+                >
+                  <CheckSquare size={20} />
+                </ListItemIcon>
+                <ListItemText primary="Aprovações" />
+              </ListItemButton>
+            </ListItem>
+
+            {/* 2. Recebimento (NOVO) */}
+            <ListItem disablePadding>
+              <ListItemButton
+                component={NavLink}
+                to="/recebimento"
+                sx={{
+                  color: "rgba(255, 255, 255, 0.7)",
+                  borderRadius: 2,
+                  "&:hover": { backgroundColor: "rgba(255, 255, 255, 0.08)" },
+                  "&.active": {
+                    backgroundColor: "primary.main",
+                    color: "white",
+                    ".MuiListItemIcon-root": { color: "white" },
+                  },
+                }}
+              >
+                <ListItemIcon
+                  sx={{ color: "rgba(255, 255, 255, 0.7)", minWidth: 40 }}
+                >
+                  <PackageCheck size={20} />
+                </ListItemIcon>
+                <ListItemText primary="Recebimento" />
+              </ListItemButton>
+            </ListItem>
+
+            {/* Configurações */}
             <ListItem disablePadding>
               <ListItemButton
                 component={NavLink}
@@ -191,9 +219,9 @@ function Sidebar() {
                 <ListItemText primary="Configurações" />
               </ListItemButton>
             </ListItem>
-          )}
-        </>{" "}
-        {/* <-- 4. Feche o fragmento */}
+          </>
+        )}
+
         {/* Botão Sair */}
         <ListItem disablePadding>
           <ListItemButton

@@ -36,6 +36,10 @@ public class PedidoCompra {
     @JoinColumn(name = "empresa_id", nullable = false)
     private Empresa empresa;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "componente_existente_id", nullable = true)
+    private Componente componenteExistente;
+
     @PrePersist
     protected void onCreate() {
         // Se a data ainda não tiver sido definida, define agora com a hora atual

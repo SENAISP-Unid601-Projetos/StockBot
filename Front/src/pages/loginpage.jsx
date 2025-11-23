@@ -88,6 +88,11 @@ function LoginPage() {
             {loading ? "A entrar..." : "Entrar"}
           </button>
         </form>
+          
+          {/* LINK NOVO */}
+          <div style={{textAlign: 'center', marginTop: '10px'}}>
+            <Link to="/recuperar-senha" style={{color: '#ccc', fontSize: '0.9rem'}}>Esqueceu a senha?</Link>
+          </div>
 
         {/* // <-- ADICIONAR ESTE BLOCO DE VOLTA */}
         <div className="register-link">
