@@ -250,9 +250,7 @@ function DashboardPage() {
                 <Box sx={{ position: "absolute", top: 16, right: 16, zIndex: 10 }}>
                   <Tooltip title="Filtrar Itens do Gráfico">
                     <IconButton onClick={handleFilterClick} color="primary" size="small">
-                      <Badge badgeContent={selectedNames.length} color="secondary">
-                        <FilterListIcon />
-                      </Badge>
+                      <FilterListIcon />
                     </IconButton>
                   </Tooltip>
 
