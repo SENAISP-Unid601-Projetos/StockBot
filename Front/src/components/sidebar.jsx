@@ -11,7 +11,7 @@ import {
   Typography,
   useTheme,
   Switch,
-  FormControlLabel, // <-- 1. Importar Switch e FormControlLabel
+  FormControlLabel,
 } from "@mui/material";
 import {
   LayoutDashboard,
@@ -21,13 +21,13 @@ import {
   Settings,
   LogOut,
   Moon,
-  Sun, // <-- 2. Importar Ícones de Tema
+  Sun,
   CheckSquare,
   ShoppingCart,
 } from "lucide-react";
 
 import { isAdmin } from "../services/authService";
-import { useColorMode } from "../useColorMode.js"; // <-- 3. Importar o hook do tema
+import { useColorMode } from "../useColorMode.js";
 
 const menuItems = [
   { text: "Dashboard", icon: <LayoutDashboard size={20} />, path: "/" },
@@ -40,8 +40,8 @@ const drawerWidth = 250;
 
 function Sidebar() {
   const navigate = useNavigate();
-  const theme = useTheme();
-  const { toggleColorMode } = useColorMode(); // <-- 4. Usar o hook
+  const theme = useTheme(); // O tema agora contém as cores da sidebar
+  const { toggleColorMode } = useColorMode();
   const [isUserAdmin, setIsUserAdmin] = useState(false);
 
   useEffect(() => {
@@ -53,13 +53,18 @@ function Sidebar() {
     navigate("/login");
   };
 
-  // Define o estado do switch com base no tema atual
   const isDarkMode = theme.palette.mode === "dark";
 
   const drawerContent = (
     <div style={{ display: "flex", flexDirection: "column", height: "100%" }}>
       <Box sx={{ p: 2, textAlign: "center" }}>
-        <Typography variant="h5" component="h2" fontWeight="bold" color="white">
+        <Typography
+          variant="h5"
+          component="h2"
+          fontWeight="bold"
+          // Usa a cor de texto ativa definida no tema da sidebar
+          color={theme.palette.sidebar.textActive}
+        >
           StockBot
         </Typography>
       </Box>
@@ -71,19 +76,28 @@ function Sidebar() {
               component={NavLink}
               to={item.path}
               sx={{
-                color: "rgba(255, 255, 255, 0.7)",
+                // --- CORES CONECTADAS AO TEMA ---
+                color: theme.palette.sidebar.text,
                 borderRadius: 2,
-                "&:hover": { backgroundColor: "rgba(255, 255, 255, 0.08)" },
+                "&:hover": {
+                  backgroundColor: theme.palette.sidebar.hover,
+                },
                 "&.active": {
                   backgroundColor: "primary.main",
-                  color: "white",
+                  color: theme.palette.sidebar.textActive,
                   fontWeight: "bold",
-                  ".MuiListItemIcon-root": { color: "white" },
+                  ".MuiListItemIcon-root": {
+                    color: theme.palette.sidebar.textActive,
+                  },
                 },
               }}
             >
               <ListItemIcon
-                sx={{ color: "rgba(255, 255, 255, 0.7)", minWidth: 40 }}
+                sx={{
+                  // Cor do ícone vinda do tema
+                  color: theme.palette.sidebar.icon,
+                  minWidth: 40,
+                }}
               >
                 {item.icon}
               </ListItemIcon>
@@ -94,36 +108,37 @@ function Sidebar() {
       </List>
 
       <ListItem disablePadding>
-          <ListItemButton
-            component={NavLink}
-            to="/pedidos"
-            sx={{
-              color: "rgba(255, 255, 255, 0.7)",
-              borderRadius: 2,
-              "&:hover": { backgroundColor: "rgba(255, 255, 255, 0.08)" },
-              "&.active": {
-                backgroundColor: "primary.main",
-                color: "white",
-                ".MuiListItemIcon-root": { color: "white" },
+        <ListItemButton
+          component={NavLink}
+          to="/pedidos"
+          sx={{
+            color: theme.palette.sidebar.text,
+            borderRadius: 2,
+            "&:hover": { backgroundColor: theme.palette.sidebar.hover },
+            "&.active": {
+              backgroundColor: "primary.main",
+              color: theme.palette.sidebar.textActive,
+              ".MuiListItemIcon-root": {
+                color: theme.palette.sidebar.textActive,
               },
-            }}
+            },
+          }}
+        >
+          <ListItemIcon
+            sx={{ color: theme.palette.sidebar.icon, minWidth: 40 }}
           >
-            <ListItemIcon
-              sx={{ color: "rgba(255, 255, 255, 0.7)", minWidth: 40 }}
-            >
-              <ShoppingCart size={20} />
-            </ListItemIcon>
-            <ListItemText primary="Fazer Pedido de Compra" />
-          </ListItemButton>
-        </ListItem>
+            <ShoppingCart size={20} />
+          </ListItemIcon>
+          <ListItemText primary="Fazer Pedido de Compra" />
+        </ListItemButton>
+      </ListItem>
 
       <Box sx={{ flexGrow: 1 }} />
 
       <List sx={{ p: 1, mt: "auto" }}>
-        {/* 5. SWITCH DO MODO ESCURO MOVIDO PARA AQUI */}
-        <ListItem sx={{ color: "rgba(255, 255, 255, 0.7)" }}>
+        <ListItem sx={{ color: theme.palette.sidebar.text }}>
           <ListItemIcon
-            sx={{ color: "rgba(255, 255, 255, 0.7)", minWidth: 40 }}
+            sx={{ color: theme.palette.sidebar.icon, minWidth: 40 }}
           >
             {isDarkMode ? <Sun size={20} /> : <Moon size={20} />}
           </ListItemIcon>
@@ -140,65 +155,74 @@ function Sidebar() {
           />
         </ListItem>
 
-        <> {/* <-- 2. Adicione um fragmento para agrupar os links de admin */}
-            
-            {/* 3. ADICIONE ESTE BLOCO NOVO PARA "APROVAÇÕES" */}
-            <ListItem disablePadding>
-              <ListItemButton
-                component={NavLink}
-                to="/aprovacoes"
-                sx={{
-                  color: "rgba(255, 255, 255, 0.7)",
-                  borderRadius: 2,
-                  "&:hover": { backgroundColor: "rgba(255, 255, 255, 0.08)" },
-                  "&.active": {
-                    backgroundColor: "primary.main",
-                    color: "white",
-                    ".MuiListItemIcon-root": { color: "white" },
-                  },
-                }}
-              >
-                <ListItemIcon
-                  sx={{ color: "rgba(255, 255, 255, 0.7)", minWidth: 40 }}
-                >
-                  <CheckSquare size={20} />
-                </ListItemIcon>
-                <ListItemText primary="Aprovações" />
-              </ListItemButton>
-            </ListItem>
-
-        {/* Link de Configurações (só para ADMIN) */}
-        {isUserAdmin && (
+        <>
           <ListItem disablePadding>
             <ListItemButton
               component={NavLink}
-              to="/configuracoes"
+              to="/aprovacoes"
               sx={{
-                color: "rgba(255, 255, 255, 0.7)",
+                color: theme.palette.sidebar.text,
                 borderRadius: 2,
-                "&:hover": { backgroundColor: "rgba(255, 255, 255, 0.08)" },
+                "&:hover": { backgroundColor: theme.palette.sidebar.hover },
                 "&.active": {
                   backgroundColor: "primary.main",
-                  color: "white",
-                  ".MuiListItemIcon-root": { color: "white" },
+                  color: theme.palette.sidebar.textActive,
+                  ".MuiListItemIcon-root": {
+                    color: theme.palette.sidebar.textActive,
+                  },
                 },
               }}
             >
               <ListItemIcon
-                sx={{ color: "rgba(255, 255, 255, 0.7)", minWidth: 40 }}
+                sx={{ color: theme.palette.sidebar.icon, minWidth: 40 }}
               >
-                <Settings size={20} />
+                <CheckSquare size={20} />
               </ListItemIcon>
-              <ListItemText primary="Configurações" />
+              <ListItemText primary="Aprovações" />
             </ListItemButton>
           </ListItem>
-        )}
-      </> {/* <-- 4. Feche o fragmento */}
 
-        {/* Botão Sair */}
+          {isUserAdmin && (
+            <ListItem disablePadding>
+              <ListItemButton
+                component={NavLink}
+                to="/configuracoes"
+                sx={{
+                  color: theme.palette.sidebar.text,
+                  borderRadius: 2,
+                  "&:hover": { backgroundColor: theme.palette.sidebar.hover },
+                  "&.active": {
+                    backgroundColor: "primary.main",
+                    color: theme.palette.sidebar.textActive,
+                    ".MuiListItemIcon-root": {
+                      color: theme.palette.sidebar.textActive,
+                    },
+                  },
+                }}
+              >
+                <ListItemIcon
+                  sx={{ color: theme.palette.sidebar.icon, minWidth: 40 }}
+                >
+                  <Settings size={20} />
+                </ListItemIcon>
+                <ListItemText primary="Configurações" />
+              </ListItemButton>
+            </ListItem>
+          )}
+        </>
+
         <ListItem disablePadding>
-          <ListItemButton onClick={handleLogout} sx={{ color: 'rgba(255, 255, 255, 0.7)', borderRadius: 2, '&:hover': { backgroundColor: 'rgba(255, 255, 255, 0.08)' } }}>
-            <ListItemIcon sx={{ color: 'rgba(255, 255, 255, 0.7)', minWidth: 40 }}>
+          <ListItemButton
+            onClick={handleLogout}
+            sx={{
+              color: theme.palette.sidebar.text,
+              borderRadius: 2,
+              "&:hover": { backgroundColor: theme.palette.sidebar.hover },
+            }}
+          >
+            <ListItemIcon
+              sx={{ color: theme.palette.sidebar.icon, minWidth: 40 }}
+            >
               <LogOut size={20} />
             </ListItemIcon>
             <ListItemText primary="Sair" />
@@ -217,8 +241,8 @@ function Sidebar() {
         "& .MuiDrawer-paper": {
           width: drawerWidth,
           boxSizing: "border-box",
-          backgroundColor:
-            theme.palette.mode === "dark" ? "#000000ff" : "#000000ff",
+          // --- CONEXÃO PRINCIPAL DO FUNDO DA SIDEBAR ---
+          backgroundColor: theme.palette.sidebar.background,
           borderRight: "none",
           display: "flex",
           flexDirection: "column",
