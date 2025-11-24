@@ -49,7 +49,11 @@ export const isAdmin = () => {
   try {
     const decodedToken = jwtDecode(token);
     // O campo 'roles' é um array. Verificamos se ele inclui 'ROLE_ADMIN'.
-    return decodedToken.roles && decodedToken.roles.includes("ROLE_ADMIN");
+    return (
+      decodedToken.roles &&
+      Array.isArray(decodedToken.roles) &&
+      decodedToken.roles.includes("ROLE_ADMIN")
+    );
   } catch (error) {
     console.error(
       "Erro ao decodificar o token para verificação de admin:",
@@ -57,4 +61,13 @@ export const isAdmin = () => {
     );
     return false;
   }
+};
+
+/**
+ * Remove o token atual e encerra a sessão localmente.
+ * Pode ser usado em botões de logout, etc.
+ */
+export const logout = () => {
+  localStorage.removeItem("jwt-token");
+  window.location.href = "/login";
 };

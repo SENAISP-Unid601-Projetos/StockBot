@@ -14,7 +14,7 @@ import {
 } from "@mui/material";
 import PictureAsPdfIcon from "@mui/icons-material/PictureAsPdf";
 import KpiCard from "../components/kpicard";
-import ActionList from "../components/actionlist";
+import ActionList from "../components/actionList";
 import CategoryChart from "../components/categoriachart";
 
 function DashboardPage() {
@@ -194,7 +194,7 @@ function DashboardPage() {
               <Grid xs={12} lg={4}>
                 <Paper sx={{ p: 2, height: "100%" }}>
                   <ActionList
-                    title={`Itens com Stock Baixo (≤ ${threshold})`}
+                    title={`Itens com Estoque Baixo (≤ ${threshold})`}
                     items={itensEstoqueBaixo}
                   />
                 </Paper>

@@ -1,11 +1,8 @@
 import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
-import axios from "axios";
+import api from "../services/api";
 import "./loginpage.css";
 import ParticlesBackground from "../components/ParticlesBackground";
-import { toast } from "react-toastify";
-
-const apiUrl = "http://localhost:8080/api/auth";
 
 function LoginPage() {
   const [email, setEmail] = useState("");
@@ -21,7 +18,7 @@ function LoginPage() {
     setLoading(true);
 
     try {
-      const response = await axios.post(`${apiUrl}/login`, {
+      const response = await api.post("/api/auth/login", {
         email,
         senha,
         dominioEmpresa,
@@ -91,7 +88,13 @@ function LoginPage() {
             {loading ? "A entrar..." : "Entrar"}
           </button>
         </form>
+          
+          {/* LINK NOVO */}
+          <div style={{textAlign: 'center', marginTop: '10px'}}>
+            <Link to="/recuperar-senha" style={{color: '#ccc', fontSize: '0.9rem'}}>Esqueceu a senha?</Link>
+          </div>
 
+        {/* // <-- ADICIONAR ESTE BLOCO DE VOLTA */}
         <div className="register-link">
           <p>
             Não tem uma conta? <Link to="/register">Crie uma nova empresa</Link>

@@ -10,7 +10,7 @@ import java.util.Optional; // Importa a classe Optional
 
 @Repository
 public interface UsuarioRepository extends JpaRepository<Usuario, Long> {
-
+    boolean existsByEmail(String email);
     // MELHORIA: Retorna um Optional para evitar NullPointerExceptions
     Optional<Usuario> findByEmail(String email);
 
