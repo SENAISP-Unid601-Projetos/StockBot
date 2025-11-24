@@ -192,9 +192,22 @@ function DashboardPage() {
               />
             </Box>
 
-            {/* --- BLOCO 2: GRÁFICO (Mantido como estava) --- */}
-            <Box sx={{ width: "100%" }}>
-              <CategoryChart componentes={componentes} />
+            {/* --- BLOCO 2: GRÁFICOS --- */}
+            {/* Aqui incluímos os dois gráficos, um abaixo do outro, com espaçamento (gap) */}
+            <Box sx={{ width: "100%", display: "flex", flexDirection: "column", gap: 3 }}>
+              <CategoryChart 
+                componentes={componentes} 
+                title="Distribuição de Itens por Quantidade Total"
+                yAxisLabel="Quantidade em Stock"
+                dataKey="quantidade"
+              />
+              
+              <CategoryChart 
+                componentes={componentes} 
+                title="Nível Mínimo de Estoque por Item"
+                yAxisLabel="Nível Mínimo Definido"
+                dataKey="nivelMinimoEstoque"
+              />
             </Box>
             
           </Box>
