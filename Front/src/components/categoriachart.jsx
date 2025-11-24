@@ -111,12 +111,14 @@ function CategoryChart({
   };
 
   return (
-    <Paper sx={{ p: 2, height: '100%', display: 'flex', flexDirection: 'column' }}>
-      <Typography variant="h6" component="h3" gutterBottom>
+    <Paper sx={{ p: 1.5, display: 'flex', flexDirection: 'column', width: '100%', boxShadow: 3 }}>
+      {/* Título menor e mais compacto */}
+      <Typography variant="subtitle2" component="h3" align="center" sx={{ mb: 0.5, fontWeight: 'bold', opacity: 0.8 }}>
         {title}
       </Typography>
-      <Box sx={{ position: 'relative', flexGrow: 1, minHeight: '300px' }}>
-        {/* Renderiza o componente Bar (Vertical) */}
+      
+      {/* Altura do gráfico forçada para 150px */}
+      <Box sx={{ position: 'relative', width: '100%', height: '250px' }}>
         <Bar data={chartData} options={chartOptions} />
       </Box>
     </Paper>
