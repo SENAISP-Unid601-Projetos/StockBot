@@ -12,7 +12,7 @@ import {
   TableRow,
   Typography,
   CircularProgress,
-  TablePagination, // <-- Importação da Paginação
+  TablePagination,
   Dialog,
   DialogActions,
   DialogContent,
@@ -118,7 +118,6 @@ function Recebimentopage() {
           <TableContainer>
             <Table stickyHeader>
               <TableHead>
-                {/* Design Padronizado (Cabeçalho Escuro) */}
                 <TableRow
                   sx={{
                     "& th": {
@@ -149,7 +148,6 @@ function Recebimentopage() {
                         {pedido.componenteNome}
                       </TableCell>
 
-                      {/* Quantidade sem "bolinha", apenas texto destacado */}
                       <TableCell
                         align="center"
                         sx={{ fontWeight: "bold", fontSize: "1.1rem" }}
@@ -191,7 +189,6 @@ function Recebimentopage() {
             </Table>
           </TableContainer>
 
-          {/* --- PAGINAÇÃO --- */}
           <TablePagination
             rowsPerPageOptions={[5, 10, 25]}
             component="div"
@@ -210,25 +207,41 @@ function Recebimentopage() {
           onClose={handleCloseDialog}
           aria-labelledby="alert-dialog-title"
           aria-describedby="alert-dialog-description"
+          // CORREÇÃO: Força a cor de fundo a seguir o tema (escuro ou claro)
+          PaperProps={{
+            sx: {
+              backgroundColor: "background.paper",
+              backgroundImage: "none",
+            },
+          }}
         >
           <DialogTitle
             id="alert-dialog-title"
-            sx={{ fontWeight: "bold", color: "#2a3c61ff" }}
+            // CORREÇÃO: Vermelho no título para chamar atenção em qualquer modo
+            sx={{ fontWeight: "bold", color: "#d32f2f" }}
           >
             {"Confirmar Recebimento?"}
           </DialogTitle>
           <DialogContent>
-            <DialogContentText id="alert-dialog-description">
+            <DialogContentText
+              id="alert-dialog-description"
+              // CORREÇÃO: Garante que o texto fique claro no modo escuro e escuro no modo claro
+              sx={{ color: "text.primary" }}
+            >
               Você está prestes a confirmar que este material chegou
               fisicamente.
               <br />
               <br />
-              Isso irá <strong>aumentar automaticamente o estoque</strong> do
-              item. Tem a certeza?
+              Isso irá aumentar automaticamente o estoque do item. Tem a
+              certeza?
             </DialogContentText>
           </DialogContent>
           <DialogActions>
-            <Button onClick={handleCloseDialog} color="inherit">
+            <Button
+              onClick={handleCloseDialog}
+              // CORREÇÃO: Cor neutra visível em ambos os modos
+              sx={{ color: "text.secondary" }}
+            >
               Cancelar
             </Button>
             <Button
