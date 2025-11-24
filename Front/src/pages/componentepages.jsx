@@ -27,61 +27,80 @@ import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 import SearchIcon from "@mui/icons-material/Search";
 
-import ModalComponente from "../components/modalcomponente";
+import ModalComponente from "../components/ModalComponente"; // Verifique se o nome do arquivo é minúsculo ou maiúsculo
 import api from "../services/api";
 import { isAdmin } from "../services/authService";
 
 function ComponentesPage() {
   const [componentes, setComponentes] = useState([]);
   const [loading, setLoading] = useState(true);
+
+  // Paginação
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [totalElements, setTotalElements] = useState(0);
+
   const [isModalVisible, setModalVisible] = useState(false);
   const [componenteEmEdicao, setComponenteEmEdicao] = useState(null);
   const [isUserAdmin, setIsUserAdmin] = useState(false);
   const [termoBusca, setTermoBusca] = useState("");
 
-const fetchData = useCallback(async (termo = "") => {
-    setLoading(true);
-    try {
-      const queryParam = typeof termo === 'string' ? termo : "";
-      
-      const response = await api.get("/api/componentes", {
-        params: { termo: queryParam } 
-      });
+  const fetchData = useCallback(
+    async (termo = "") => {
+      setLoading(true);
+      try {
+        // Configura os parâmetros para o Spring Boot
+        const params = {
+          page: page,
+          size: rowsPerPage,
+          // Se tiver termo, manda. Se não, não manda nada.
+          ...(termo && { termo: termo }),
+        };
 
-      const todosComponentes = response.data || [];
+        const response = await api.get("/api/componentes", { params });
 
-      setTotalElements(todosComponentes.length);
+        // --- CORREÇÃO AQUI ---
+        // O Spring retorna um objeto Page, não uma lista direta.
+        // A lista está dentro de .content
+        const data = response.data;
 
-      const inicio = page * rowsPerPage;
-      const fim = inicio + rowsPerPage;
-      
-      setComponentes(todosComponentes.slice(inicio, fim));
+        setComponentes(data.content || []); // Pega a lista de dentro do content
+        setTotalElements(data.totalElements || 0); // Pega o total real do banco
+      } catch (error) {
+        console.error("Erro ao buscar componentes:", error);
+        toast.error("Não foi possível carregar os componentes.");
+        setComponentes([]);
+        setTotalElements(0);
+      } finally {
+        setLoading(false);
+      }
+    },
+    [page, rowsPerPage]
+  ); // Recarrega se mudar página ou tamanho
 
-    } catch (error) {
-      console.error("Erro ao buscar componentes:", error);
-      toast.error("Não foi possível carregar os componentes.");
-      setComponentes([]);
-      setTotalElements(0);
-    } finally {
-      setLoading(false);
-    }
-  }, [
-      page,
-      rowsPerPage,
-      setComponentes,
-      setTotalElements,
-      setLoading
-    ]);
-
-  const debouncedFetchData = useCallback(_.debounce(fetchData, 500), []);
+  // Debounce para não chamar a API a cada letra digitada
+  const debouncedFetchData = useCallback(
+    _.debounce((termo) => {
+      setPage(0); // Volta para a página 1 ao pesquisar
+      fetchData(termo);
+    }, 500),
+    [fetchData]
+  );
 
   useEffect(() => {
     setIsUserAdmin(isAdmin());
-        fetchData();
-      }, [fetchData]);
+    fetchData(termoBusca);
+  }, [page, rowsPerPage]); // Dispara quando muda página/tamanho
+
+  // Dispara busca quando digita (usando debounce)
+  useEffect(() => {
+    // Só chama o debounce se o termo mudou, para evitar loop com o useEffect de cima
+    if (termoBusca !== "") {
+      debouncedFetchData(termoBusca);
+    } else {
+      fetchData(""); // Se limpar a busca, carrega tudo normal
+    }
+  }, [termoBusca]); // Removido debouncedFetchData da dependência para evitar loop
 
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
@@ -91,10 +110,6 @@ const fetchData = useCallback(async (termo = "") => {
     setRowsPerPage(parseInt(event.target.value, 10));
     setPage(0);
   };
-
-  useEffect(() => {
-    debouncedFetchData(termoBusca);
-  }, [termoBusca, debouncedFetchData]);
 
   const handleBuscaChange = (event) => {
     setTermoBusca(event.target.value);
@@ -113,11 +128,8 @@ const fetchData = useCallback(async (termo = "") => {
         await api.delete(`/api/componentes/${id}`);
         toast.success("Componente excluído com sucesso!");
         fetchData(termoBusca);
-        fetchData();
-
       } catch (error) {
         toast.error("Falha ao excluir o componente.");
-        console.error(error);
       }
     }
   };
@@ -157,7 +169,6 @@ const fetchData = useCallback(async (termo = "") => {
               Gerenciamento de Itens
             </Typography>
 
-            {/* --- BARRA DE PESQUISA ADICIONADA --- */}
             <TextField
               variant="outlined"
               size="small"
@@ -178,6 +189,7 @@ const fetchData = useCallback(async (termo = "") => {
               <Button
                 variant="contained"
                 onClick={handleAdd}
+                startIcon={<AddIcon />}
                 sx={{
                   backgroundColor: "#ce0000",
                   "&:hover": { backgroundColor: "#a40000" },
@@ -188,47 +200,79 @@ const fetchData = useCallback(async (termo = "") => {
             )}
           </Box>
 
-          {loading ? (
+          {loading && componentes.length === 0 ? (
             <Box sx={{ display: "flex", justifyContent: "center", mt: 10 }}>
               <CircularProgress />
             </Box>
           ) : (
-            <Paper sx={{ width: "100%", overflow: "hidden", boxShadow: 5 }}>
+            <Paper
+              sx={{
+                width: "100%",
+                overflow: "hidden",
+                boxShadow: 3,
+                borderRadius: 2,
+              }}
+            >
               <TableContainer>
                 <Table stickyHeader aria-label="tabela de componentes">
                   <TableHead>
                     <TableRow
                       sx={{
-                        // O seletor "& th" aplica o estilo a todas as células de cabeçalho dentro desta linha
                         "& th": {
-                          backgroundColor: "#2a3c61ff", // Cor de fundo preta
-                          color: "#ffffff", // Texto branco (essencial para contraste)
+                          backgroundColor: "#2a3c61",
+                          color: "#ffffff",
                           fontWeight: "bold",
                         },
                       }}
                     >
                       <TableCell align="center">Id</TableCell>
-                      <TableCell align="center">Nome</TableCell>
+                      <TableCell align="left">Nome</TableCell>
                       <TableCell align="center">Patrimônio</TableCell>
-                      <TableCell align="center">Quantidade</TableCell>
-                      <TableCell align="center">Localização</TableCell>
+                      <TableCell align="center">Qtd</TableCell>
+                      <TableCell align="center">Local</TableCell>
                       <TableCell align="center">Categoria</TableCell>
-                      <TableCell align="center">Ações</TableCell>
+                      {isUserAdmin && (
+                        <TableCell align="center">Ações</TableCell>
+                      )}
                     </TableRow>
                   </TableHead>
                   <TableBody>
                     {componentes.length > 0 ? (
                       componentes.map((componente) => (
                         <TableRow hover key={componente.id}>
-                          <TableCell align="center">{componente.id}</TableCell>
-                          <TableCell align="center">
+                          <TableCell
+                            align="center"
+                            sx={{
+                              color: "text.secondary",
+                              fontFamily: "monospace",
+                            }}
+                          >
+                            #{componente.id}
+                          </TableCell>
+                          <TableCell align="left" sx={{ fontWeight: 500 }}>
                             {componente.nome}
                           </TableCell>
                           <TableCell align="center">
                             {componente.codigoPatrimonio}
                           </TableCell>
                           <TableCell align="center">
-                            {componente.quantidade}
+                            <Typography
+                              variant="body2"
+                              sx={{
+                                color:
+                                  componente.quantidade <=
+                                  componente.nivelMinimoEstoque
+                                    ? "error.main"
+                                    : "text.primary",
+                                fontWeight:
+                                  componente.quantidade <=
+                                  componente.nivelMinimoEstoque
+                                    ? "bold"
+                                    : "normal",
+                              }}
+                            >
+                              {componente.quantidade}
+                            </Typography>
                           </TableCell>
                           <TableCell align="center">
                             {componente.localizacao || "-"}
@@ -236,26 +280,27 @@ const fetchData = useCallback(async (termo = "") => {
                           <TableCell align="center">
                             {componente.categoria || "-"}
                           </TableCell>
+
                           {isUserAdmin && (
-                            <TableCell align="right">
+                            <TableCell align="center">
                               <Stack
                                 direction="row"
                                 spacing={1}
                                 justifyContent="center"
                               >
                                 <IconButton
-                                  color="info"
+                                  color="primary"
                                   size="small"
                                   onClick={() => handleEdit(componente)}
                                 >
-                                  <EditIcon />
+                                  <EditIcon fontSize="small" />
                                 </IconButton>
                                 <IconButton
                                   color="error"
                                   size="small"
                                   onClick={() => handleDelete(componente.id)}
                                 >
-                                  <DeleteIcon />
+                                  <DeleteIcon fontSize="small" />
                                 </IconButton>
                               </Stack>
                             </TableCell>
@@ -264,8 +309,8 @@ const fetchData = useCallback(async (termo = "") => {
                       ))
                     ) : (
                       <TableRow>
-                        <TableCell colSpan={isUserAdmin ? 6 : 5} align="center">
-                          <Typography color="text.secondary" sx={{ p: 3 }}>
+                        <TableCell colSpan={isUserAdmin ? 7 : 6} align="center">
+                          <Typography color="text.secondary" sx={{ p: 4 }}>
                             Nenhum componente encontrado.
                           </Typography>
                         </TableCell>
@@ -275,16 +320,15 @@ const fetchData = useCallback(async (termo = "") => {
                 </Table>
               </TableContainer>
 
-              {/* 5. O Componente de Paginação do MUI */}
               <TablePagination
-                rowsPerPageOptions={[5, 10, 25]} // Opções de "itens por página".
-                component="div" // Renderiza como <div>.
-                count={totalElements} // N° total de itens (para calcular as páginas).
-                rowsPerPage={rowsPerPage} // N° de itens por página selecionado.
-                page={page} // Página atual.
-                onPageChange={handleChangePage} // Função p/ mudar de página.
-                onRowsPerPageChange={handleChangeRowsPerPage} // Função p/ mudar N° de itens.
-                labelRowsPerPage="Itens por página:" // Texto customizado.
+                rowsPerPageOptions={[5, 10, 25]}
+                component="div"
+                count={totalElements}
+                rowsPerPage={rowsPerPage}
+                page={page}
+                onPageChange={handleChangePage}
+                onRowsPerPageChange={handleChangeRowsPerPage}
+                labelRowsPerPage="Itens por página:"
               />
             </Paper>
           )}
@@ -292,7 +336,7 @@ const fetchData = useCallback(async (termo = "") => {
       </Box>
 
       <ModalComponente
-        isVisible={isModalVisible}
+        open={isModalVisible} // Mudei isVisible para open, se o seu modal novo usar Dialog do MUI
         onClose={() => setModalVisible(false)}
         onComponenteAdicionado={handleComponenteAdicionado}
         componenteParaEditar={componenteEmEdicao}

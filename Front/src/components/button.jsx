@@ -1,5 +1,5 @@
-import React from 'react';
-import './button.css';
+import React from "react";
+import "./button.css";
 
 /**
  * Componente de botão reutilizável e personalizado.
@@ -14,10 +14,10 @@ import './button.css';
 const Button = ({
   children,
   onClick,
-  variant = 'primary',
-  type = 'button',
+  variant = "primary",
+  type = "button",
   disabled = false,
-  className = '',
+  className = "",
   ...rest // Pega outras props como 'aria-label'
 }) => {
   // Monta as classes CSS: uma base 'btn' e uma específica da variante 'btn-primary'

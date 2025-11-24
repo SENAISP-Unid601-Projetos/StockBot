@@ -1,207 +1,320 @@
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import api from "../services/api";
 import { toast } from "react-toastify";
-import jsPDF from "jspdf";
-import autoTable from "jspdf-autotable";
+
+// Imports do MUI
 import {
   Box,
-  Button,
-  CircularProgress,
   Container,
   Grid,
   Paper,
   Typography,
+  Button,
+  IconButton,
+  Menu,
+  MenuItem,
+  Checkbox,
+  ListItemText,
+  Tooltip,
+  Badge,
+  Skeleton,
 } from "@mui/material";
+
+// Ícones
 import PictureAsPdfIcon from "@mui/icons-material/PictureAsPdf";
-import KpiCard from "../components/kpicard";
-import ActionList from "../components/actionList";
-import CategoryChart from "../components/categoriachart";
+import FilterListIcon from "@mui/icons-material/FilterList";
+import {
+  Inventory,
+  AttachMoney,
+  WarningAmber,
+  Assignment,
+  ShoppingCart,
+} from "@mui/icons-material";
+
+// Componentes
+import KpiCard from "../components/KpiCard"; // Verifique se o nome do arquivo é KpiCard ou kpicard
+import CategoryChart from "../components/categoriachart"; // Verifique o nome do arquivo
+
+// ChartJS para o Gráfico de Barras
+import { Bar } from "react-chartjs-2";
+import {
+  Chart as ChartJS,
+  CategoryScale,
+  LinearScale,
+  BarElement,
+  Title,
+  Tooltip as ChartTooltip,
+  Legend,
+} from "chart.js";
+
+// Registra os componentes do ChartJS
+ChartJS.register(
+  CategoryScale,
+  LinearScale,
+  BarElement,
+  Title,
+  ChartTooltip,
+  Legend
+);
 
 function DashboardPage() {
-  const [componentes, setComponentes] = useState([]);
+  const [dashboardData, setDashboardData] = useState(null);
+  const [todosComponentes, setTodosComponentes] = useState([]); // Lista completa para o filtro
   const [loading, setLoading] = useState(true);
-  const [threshold, setThreshold] = useState(5);
 
-  const fetchData = async () => {
-    setLoading(true);
-    try {
-      const [componentesResponse, thresholdResponse] = await Promise.all([
-        api.get("/api/componentes"),
-        api.get("/api/settings/lowStockThreshold").catch(() => ({ data: 5 })),
-      ]);
-
-      if (Array.isArray(componentesResponse.data)) {
-        setComponentes(componentesResponse.data);
-      }
-      setThreshold(thresholdResponse.data);
-    } catch (error) {
-      console.error("Erro ao buscar dados!", error);
-      toast.error("Não foi possível carregar os dados do dashboard.");
-    } finally {
-      setLoading(false);
-    }
-  };
+  // Filtro do Gráfico de Barras
+  const [selectedNames, setSelectedNames] = useState([]);
+  const [anchorEl, setAnchorEl] = useState(null);
+  const openMenu = Boolean(anchorEl);
 
   useEffect(() => {
+    const fetchData = async () => {
+      try {
+        // 1. Busca dados rápidos (KPIs + Pizza) do endpoint otimizado
+        const resDashboard = await api.get("/api/dashboard");
+        setDashboardData(resDashboard.data);
+
+        // 2. Busca lista detalhada para o gráfico de barras (Pega até 100 itens para filtrar)
+        const resComponentes = await api.get("/api/componentes?size=100");
+        const lista = resComponentes.data.content || [];
+        setTodosComponentes(lista);
+
+        // Seleção inicial: Primeiros 10 itens
+        setSelectedNames(lista.slice(0, 10).map((c) => c.nome));
+      } catch (error) {
+        console.error(error);
+        toast.error("Erro ao carregar dados.");
+      } finally {
+        setLoading(false);
+      }
+    };
     fetchData();
   }, []);
 
-  const handleGeneratePdf = async () => {
-    toast.info("A gerar o relatório em PDF...");
-    try {
-      const historicoResponse = await api.get("/api/historico?size=100");
-      const historicoData = historicoResponse.data.content || [];
+  // --- Lógica do Filtro ---
+  const handleFilterClick = (event) => setAnchorEl(event.currentTarget);
+  const handleFilterClose = () => setAnchorEl(null);
 
-      const mapaComponentes = new Map(
-        componentes.map((comp) => [comp.id, comp.nome])
-      );
-      const historicoProcessado = historicoData.map((item) => ({
-        ...item,
-        nomeComponente: mapaComponentes.get(item.componenteId) || "N/A",
-      }));
+  const handleToggleItem = (nome) => {
+    const currentIndex = selectedNames.indexOf(nome);
+    const newSelected = [...selectedNames];
 
-      const doc = new jsPDF();
-      doc.setFontSize(18);
-      doc.text("Relatório de Movimentações de Estoque", 14, 22);
-      doc.setFontSize(11);
-      doc.text(`Gerado em: ${new Date().toLocaleDateString("pt-BR")}`, 14, 30);
-
-      const tableColumn = [
-        "Data/Hora",
-        "Componente",
-        "Tipo",
-        "Qtd.",
-        "Utilizador",
-      ];
-      const tableRows = [];
-      historicoProcessado.forEach((item) => {
-        const itemData = [
-          new Date(item.dataHora).toLocaleString("pt-BR"),
-          item.nomeComponente,
-          item.tipo,
-          item.quantidade,
-          item.usuario,
-        ];
-        tableRows.push(itemData);
-      });
-
-      autoTable(doc, {
-        head: [tableColumn],
-        body: tableRows,
-        startY: 40,
-      });
-
-      doc.save("relatorio-historico.pdf");
-      toast.success("Relatório gerado com sucesso!");
-    } catch (error) {
-      console.error("Erro ao gerar PDF:", error);
-      toast.error("Não foi possível gerar o relatório.");
+    if (currentIndex === -1) {
+      if (newSelected.length >= 15) {
+        toast.warning("Limite de 15 itens para visualização.");
+        return;
+      }
+      newSelected.push(nome);
+    } else {
+      newSelected.splice(currentIndex, 1);
     }
+    setSelectedNames(newSelected);
   };
 
-  const totalUnidades = componentes.reduce(
-    (total, comp) => total + (comp.quantidade || 0),
-    0
-  );
-  const itensEmFalta = componentes.filter(
-    (comp) => (comp.quantidade || 0) <= 0
-  );
-  const itensEstoqueBaixo = componentes.filter(
-    (comp) => (comp.quantidade || 0) > 0 && (comp.quantidade || 0) <= threshold
-  );
+  // Prepara os dados para o Gráfico de Barras baseado na seleção
+  const dadosBarras = {
+    labels: selectedNames,
+    datasets: [
+      {
+        label: "Quantidade em Estoque",
+        data: selectedNames.map(
+          (nome) =>
+            todosComponentes.find((c) => c.nome === nome)?.quantidade || 0
+        ),
+        backgroundColor: "rgba(53, 162, 235, 0.6)",
+        borderColor: "rgb(53, 162, 235)",
+        borderWidth: 1,
+      },
+      {
+        label: "Estoque Mínimo",
+        data: selectedNames.map(
+          (nome) =>
+            todosComponentes.find((c) => c.nome === nome)?.nivelMinimoEstoque ||
+            0
+        ),
+        backgroundColor: "rgba(255, 99, 132, 0.6)",
+        borderColor: "rgb(255, 99, 132)",
+        borderWidth: 1,
+      },
+    ],
+  };
+
+  const handleGeneratePdf = () => {
+    window.print();
+  };
+
+  if (loading) {
+    return (
+      <Container maxWidth="xl" sx={{ mt: 4 }}>
+        <Skeleton variant="rectangular" height={400} />
+      </Container>
+    );
+  }
 
   return (
     <Box
       component="main"
       sx={{
         flexGrow: 1,
-        p: 3,
-        backgroundColor: "background.default",
+        py: 3,
+        bgcolor: "background.default",
         minHeight: "100vh",
       }}
     >
       <Container maxWidth="xl">
+        {/* Cabeçalho */}
         <Box
-          sx={{
-            display: "flex",
-            justifyContent: "space-between",
-            alignItems: "center",
-            mb: 4,
-          }}
+          display="flex"
+          justifyContent="space-between"
+          mb={4}
+          alignItems="center"
         >
-          <Typography variant="h4" component="h1" fontWeight="bold">
+          <Typography variant="h4" fontWeight="bold" color="text.primary">
             Dashboard
           </Typography>
           <Button
             variant="contained"
-            color="primary"
             startIcon={<PictureAsPdfIcon />}
             onClick={handleGeneratePdf}
           >
-            Gerar Relatório
+            Imprimir Relatório
           </Button>
         </Box>
 
-        {loading ? (
-          <Box sx={{ display: "flex", justifyContent: "center", mt: 10 }}>
-            <CircularProgress />
-          </Box>
-        ) : (
-          <Grid container spacing={3}>
-            {/* KPI Cards */}
-            {/* A CORREÇÃO ESTÁ AQUI: 
-              Note que o <Grid> abaixo (e os seguintes) NÃO têm a prop "item".
-              Eles estão diretamente dentro de um <Grid container>.
-            */}
-            <Grid container spacing={2}>
-              <Grid xs={12} sm={6} md={4}>
-                <KpiCard
-                  title="Total de Itens"
-                  value={componentes.length}
-                  description="Tipos de itens cadastrados"
-                  items={componentes}
-                />
-              </Grid>
-
-              <Grid xs={12} sm={6} md={4}>
-                <KpiCard
-                  title="Unidades em Estoque"
-                  value={totalUnidades}
-                  description="Total de unidades no inventário"
-                />
-              </Grid>
-
-              <Grid xs={12} sm={6} md={4}>
-                <KpiCard
-                  title="Itens em Falta"
-                  value={itensEmFalta.length}
-                  description="Itens com estoque zerado"
-                  isCritical={true}
-                  items={itensEmFalta}
-                />
-              </Grid>
-            </Grid>
-
-            {/* Chart + Action List */}
-            {/* A CORREÇÃO TAMBÉM ESTÁ AQUI: */}
-            <Grid container spacing={2}>
-              <Grid xs={12} lg={8}>
-                <Paper sx={{ p: 2, height: "100%" }}>
-                  <CategoryChart componentes={componentes} />
-                </Paper>
-              </Grid>
-
-              <Grid xs={12} lg={4}>
-                <Paper sx={{ p: 2, height: "100%" }}>
-                  <ActionList
-                    title={`Itens com Estoque Baixo (≤ ${threshold})`}
-                    items={itensEstoqueBaixo}
-                  />
-                </Paper>
-              </Grid>
-            </Grid>
+        {/* --- 1. KPIs (Cartões) --- */}
+        <Grid container spacing={3} mb={4}>
+          <Grid item xs={12} sm={6} md={2.4}>
+            <KpiCard
+              title="Total Itens"
+              value={dashboardData?.totalItens}
+              icon={<Inventory />}
+              color="#1976d2"
+            />
           </Grid>
-        )}
+          <Grid item xs={12} sm={6} md={2.4}>
+            <KpiCard
+              title="Estoque Total"
+              value={dashboardData?.totalQuantidadeEstoque}
+              icon={<AttachMoney />}
+              color="#2e7d32"
+            />
+          </Grid>
+          <Grid item xs={12} sm={6} md={2.4}>
+            <KpiCard
+              title="Em Falta"
+              value={dashboardData?.itensEmFalta}
+              icon={<WarningAmber />}
+              color="#d32f2f"
+              isCritical={dashboardData?.itensEmFalta > 0}
+            />
+          </Grid>
+          <Grid item xs={12} sm={6} md={2.4}>
+            <KpiCard
+              title="Req. Pendentes"
+              value={dashboardData?.requisicoesPendentes}
+              icon={<Assignment />}
+              color="#ed6c02"
+            />
+          </Grid>
+          <Grid item xs={12} sm={6} md={2.4}>
+            <KpiCard
+              title="Compras Pendentes"
+              value={dashboardData?.pedidosCompraPendentes}
+              icon={<ShoppingCart />}
+              color="#9c27b0"
+            />
+          </Grid>
+        </Grid>
+
+        <Grid container spacing={3}>
+          {/* --- 2. Gráfico de Pizza (Agregado) --- */}
+          <Grid item xs={12} md={4}>
+            {/* Passamos os dados formatados para o componente que já criamos */}
+            <CategoryChart
+              componentes={dashboardData?.distribuicaoPorCategoria.map((d) => ({
+                categoria: d.categoria || "Outros",
+                quantidade: d.quantidade,
+              }))}
+            />
+          </Grid>
+
+          {/* --- 3. Gráfico de Barras (Com Filtro) --- */}
+          <Grid item xs={12} md={8}>
+            <Paper
+              sx={{
+                p: 3,
+                height: "100%",
+                position: "relative",
+                minHeight: 400,
+                boxShadow: 3,
+              }}
+            >
+              {/* Botão de Filtro (Posicionado no canto) */}
+              <Box position="absolute" top={16} right={16} zIndex={10}>
+                <Tooltip title="Filtrar Itens">
+                  <IconButton onClick={handleFilterClick} color="primary">
+                    <Badge
+                      badgeContent={selectedNames.length}
+                      color="secondary"
+                    >
+                      <FilterListIcon />
+                    </Badge>
+                  </IconButton>
+                </Tooltip>
+
+                {/* Menu Dropdown */}
+                <Menu
+                  anchorEl={anchorEl}
+                  open={openMenu}
+                  onClose={handleFilterClose}
+                  // AQUI ESTA A CORREÇÃO: Usamos 'sx' dentro de SlotProps ou PaperProps
+                  PaperProps={{
+                    sx: { maxHeight: 300, width: 250 },
+                  }}
+                >
+                  <MenuItem disabled>
+                    <Typography variant="caption">
+                      Selecione até 15 itens
+                    </Typography>
+                  </MenuItem>
+                  {todosComponentes.map((comp) => (
+                    <MenuItem
+                      key={comp.id}
+                      onClick={() => handleToggleItem(comp.nome)}
+                      dense
+                    >
+                      <Checkbox
+                        checked={selectedNames.includes(comp.nome)}
+                        size="small"
+                      />
+                      <ListItemText primary={comp.nome} />
+                    </MenuItem>
+                  ))}
+                </Menu>
+              </Box>
+
+              <Typography variant="h6" gutterBottom fontWeight="bold">
+                Comparativo de Estoque (Item a Item)
+              </Typography>
+
+              <Box height={320} mt={4}>
+                <Bar
+                  data={dadosBarras}
+                  options={{
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                      legend: { position: "top" },
+                    },
+                    scales: {
+                      y: { beginAtZero: true },
+                    },
+                  }}
+                />
+              </Box>
+            </Paper>
+          </Grid>
+        </Grid>
       </Container>
     </Box>
   );
