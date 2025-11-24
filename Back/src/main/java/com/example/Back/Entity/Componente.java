@@ -27,9 +27,14 @@ public class Componente {
     private int quantidade;
     private String localizacao;
     private String categoria;
-    private String observacoes;
-    private int nivelMinimoEstoque;
+
+    @Column(nullable = false) // Garante que nunca é nulo
+    private int nivelMinimoEstoque = 1; // Valor padrão 1 (pode ser ajustado)
 
     @OneToMany(mappedBy = "componente", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Historico> historicos;
+
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "empresa_id", nullable = false)
+    private Empresa empresa;
 }
