@@ -19,6 +19,7 @@ import Recebimentopage from "./pages/Recebimentopage.jsx"; // <-- 1. IMPORTAR NO
 import RecuperarSenhaPage from "./pages/RecuperarSenhaPage.jsx";
 import AdminRoute from "./components/Adminroute.jsx"; // <-- 2. IMPORTAR ROTA PROTEGIDA
 import MainApp from "./MainApp.jsx";
+import LandingPage from "./pages/LandingPage.jsx";
 
 const router = createBrowserRouter([
   {
@@ -26,6 +27,7 @@ const router = createBrowserRouter([
     element: <App />, // O App verifica autenticação básica (User ou Admin)
     children: [
       // --- ROTAS PÚBLICAS (Acessíveis por qualquer utilizador logado) ---
+
       { index: true, element: <DashboardPage /> },
       { path: "/componentes", element: <ComponentesPage /> },
       { path: "/historico", element: <HistoricoPage /> },
@@ -44,6 +46,7 @@ const router = createBrowserRouter([
       },
     ],
   },
+  { path: "/welcome", element: <LandingPage /> },
   { path: "/login", element: <LoginPage /> },
   { path: "/register", element: <RegisterPage /> },
   { path: "/recuperar-senha", element: <RecuperarSenhaPage /> },
