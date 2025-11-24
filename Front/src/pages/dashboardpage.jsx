@@ -8,8 +8,6 @@ import {
   Button,
   CircularProgress,
   Container,
-  Grid,
-  Paper,
   Typography,
 } from "@mui/material";
 import PictureAsPdfIcon from "@mui/icons-material/PictureAsPdf";
@@ -118,9 +116,11 @@ function DashboardPage() {
         p: 3,
         backgroundColor: "background.default",
         minHeight: "100vh",
+        overflowX: "hidden",
       }}
     >
-      <Container maxWidth="xl">
+      <Container maxWidth={false} disableGutters sx={{ px: 3 }}>
+        {/* --- CABEÇALHO --- */}
         <Box
           sx={{
             display: "flex",
@@ -147,60 +147,62 @@ function DashboardPage() {
             <CircularProgress />
           </Box>
         ) : (
-          <Grid container spacing={3}>
-            {/* KPI Cards */}
-            {/* A CORREÇÃO ESTÁ AQUI: 
-              Note que o <Grid> abaixo (e os seguintes) NÃO têm a prop "item".
-              Eles estão diretamente dentro de um <Grid container>.
-            */}
-            <Grid container spacing={2}>
-              <Grid xs={12} sm={6} md={4}>
-                <KpiCard
-                  title="Total de Itens"
-                  value={componentes.length}
-                  description="Tipos de itens cadastrados"
-                  items={componentes}
-                />
-              </Grid>
+          <Box sx={{ display: "flex", flexDirection: "column", gap: 3 }}>
 
-              <Grid xs={12} sm={6} md={4}>
-                <KpiCard
-                  title="Unidades em Estoque"
-                  value={totalUnidades}
-                  description="Total de unidades no inventário"
-                />
-              </Grid>
+            {/* --- BLOCO 1: OS 4 CARDS (AGORA COM ALINHAMENTO PERFEITO) --- */}
+            {/* Usamos display: grid para garantir que os cards ocupem 100% da largura sem margens negativas externas */}
+            <Box
+              sx={{
+                display: "grid",
+                // Define as colunas: 1 em mobile, 2 em tablet, 4 em desktop
+                gridTemplateColumns: {
+                  xs: "1fr",
+                  sm: "1fr 1fr",
+                  md: "1fr 1fr 1fr 1fr",
+                },
+                gap: 3, // Espaçamento entre os cards (igual ao gap do container pai)
+                width: "100%",
+              }}
+            >
+              <KpiCard
+                title="Total de Itens"
+                value={componentes.length}
+                description="Tipos de itens cadastrados"
+              />
+              <KpiCard
+                title="Unidades em Estoque"
+                value={totalUnidades}
+                description="Total de unidades no inventário"
+              />
+              <KpiCard
+                title="Itens em Falta"
+                value={itensEmFalta.length}
+                description="Itens com estoque zerado"
+                isCritical={true}
+              />
+              <KpiCard
+                title="Estoque Baixo"
+                value={itensEstoqueBaixo.length}
+                description={`Itens abaixo do limite (≤ ${threshold})`}
+                isCritical={
+                  itensEstoqueBaixo.length > 0 && itensEmFalta.length === 0
+                }
+              />
+            </Box>
 
-              <Grid xs={12} sm={6} md={4}>
-                <KpiCard
-                  title="Itens em Falta"
-                  value={itensEmFalta.length}
-                  description="Itens com estoque zerado"
-                  isCritical={true}
-                  items={itensEmFalta}
-                />
-              </Grid>
-            </Grid>
+            {/* --- BLOCO 2: GRÁFICO (Mantido como estava) --- */}
+            <Box sx={{ width: "100%" }}>
+              <CategoryChart componentes={componentes} />
+            </Box>
 
-            {/* Chart + Action List */}
-            {/* A CORREÇÃO TAMBÉM ESTÁ AQUI: */}
-            <Grid container spacing={2}>
-              <Grid xs={12} lg={8}>
-                <Paper sx={{ p: 2, height: "100%" }}>
-                  <CategoryChart componentes={componentes} />
-                </Paper>
-              </Grid>
-
-              <Grid xs={12} lg={4}>
-                <Paper sx={{ p: 2, height: "100%" }}>
-                  <ActionList
-                    title={`Itens com Estoque Baixo (≤ ${threshold})`}
-                    items={itensEstoqueBaixo}
-                  />
-                </Paper>
-              </Grid>
-            </Grid>
-          </Grid>
+            {/* --- BLOCO 3: LISTA DE AÇÕES (Mantido como estava) --- */}
+            <Box sx={{ width: "100%" }}>
+              <ActionList
+                title={`Itens com Estoque Baixo (≤ ${threshold})`}
+                items={itensEstoqueBaixo}
+              />
+            </Box>
+          </Box>
         )}
       </Container>
     </Box>
