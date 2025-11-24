@@ -14,9 +14,10 @@ import {
   TableCell,
   TableContainer,
   TablePagination,
-  Autocomplete, // Novo
-  FormControlLabel, // Novo
-  Switch, // Novo
+  Autocomplete,
+  FormControlLabel,
+  Switch,
+  Chip,
 } from "@mui/material";
 import api from "../services/api";
 import { toast } from "react-toastify";
@@ -41,10 +42,10 @@ function PedidosPage() {
   const [listaComponentes, setListaComponentes] = useState([]);
   const [componenteSelecionado, setComponenteSelecionado] = useState(null);
 
-  // Carregar lista de componentes se o switch estiver ativo
   useEffect(() => {
     if (isItemExistente) {
-      api.get("/api/componentes")
+      api
+        .get("/api/componentes")
         .then((res) => setListaComponentes(res.data || []))
         .catch(() => toast.error("Erro ao carregar lista de itens."));
     }
@@ -83,37 +84,33 @@ function PedidosPage() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
-    // Validação
+
     if (isItemExistente && !componenteSelecionado) {
-        toast.error("Selecione um item da lista.");
-        return;
+      toast.error("Selecione um item da lista.");
+      return;
     }
     if (!isItemExistente && !nomeItem) {
-        toast.error("Digite o nome do item.");
-        return;
+      toast.error("Digite o nome do item.");
+      return;
     }
 
     setLoadingForm(true);
     try {
       await api.post("/api/pedidos-compra", {
-        // Se existente, manda ID. Se novo, manda nome.
         componenteId: isItemExistente ? componenteSelecionado.id : null,
         nomeItem: isItemExistente ? componenteSelecionado.nome : nomeItem,
         quantidade,
         justificativa,
       });
-      
+
       toast.success("Pedido enviado com sucesso!");
-      
-      // Reset
+
       setNomeItem("");
       setComponenteSelecionado(null);
       setQuantidade(1);
       setJustificativa("");
       if (page !== 0) setPage(0);
       else fetchMeusPedidos();
-
     } catch (error) {
       toast.error(error.response?.data?.message || "Falha ao enviar pedido.");
     } finally {
@@ -122,16 +119,22 @@ function PedidosPage() {
   };
 
   return (
-    <Box component="main" sx={{ flexGrow: 1, p: 3, backgroundColor: "background.default" }}>
+    <Box
+      component="main"
+      sx={{ flexGrow: 1, p: 3, backgroundColor: "background.default" }}
+    >
       <Container maxWidth="lg">
-        <Typography variant="h4" component="h1" fontWeight="bold" sx={{ mb: 2 }}>
+        <Typography
+          variant="h4"
+          component="h1"
+          fontWeight="bold"
+          sx={{ mb: 2 }}
+        >
           Solicitar Compra
         </Typography>
 
-        <Paper sx={{ p: 4, mb: 4, boxShadow: 3 }}>
+        <Paper sx={{ p: 4, mb: 4, boxShadow: 5 }}>
           <Box component="form" onSubmit={handleSubmit} noValidate>
-            
-            {/* Switch para escolher o modo */}
             <FormControlLabel
               control={
                 <Switch
@@ -139,18 +142,31 @@ function PedidosPage() {
                   onChange={(e) => setIsItemExistente(e.target.checked)}
                 />
               }
-              label={isItemExistente ? "Item já cadastrado no sistema" : "Item novo (não cadastrado)"}
+              label={
+                isItemExistente
+                  ? "Item já cadastrado no sistema"
+                  : "Item novo (não cadastrado)"
+              }
               sx={{ mb: 2, display: "block" }}
             />
 
             {isItemExistente ? (
               <Autocomplete
                 options={listaComponentes}
-                getOptionLabel={(option) => `${option.nome} (Patrimônio: ${option.codigoPatrimonio})`}
+                getOptionLabel={(option) =>
+                  `${option.nome} (Patrimônio: ${option.codigoPatrimonio})`
+                }
                 value={componenteSelecionado}
-                onChange={(event, newValue) => setComponenteSelecionado(newValue)}
+                onChange={(event, newValue) =>
+                  setComponenteSelecionado(newValue)
+                }
                 renderInput={(params) => (
-                  <TextField {...params} label="Selecione o Item" required margin="normal" />
+                  <TextField
+                    {...params}
+                    label="Selecione o Item"
+                    required
+                    margin="normal"
+                  />
                 )}
                 noOptionsText="Nenhum item encontrado"
               />
@@ -184,41 +200,96 @@ function PedidosPage() {
               fullWidth
               margin="normal"
             />
-            <Button type="submit" variant="contained" size="large" sx={{ mt: 2 }} disabled={loadingForm}>
-              {loadingForm ? <CircularProgress size={24} /> : "Enviar Solicitação"}
+            <Button
+              type="submit"
+              variant="contained"
+              size="large"
+              sx={{ mt: 2 }}
+              disabled={loadingForm}
+            >
+              {loadingForm ? (
+                <CircularProgress size={24} />
+              ) : (
+                "Enviar Solicitação"
+              )}
             </Button>
           </Box>
         </Paper>
 
-        {/* Tabela de Meus Pedidos (igual ao anterior) */}
-        <Typography variant="h5" component="h2" fontWeight="bold" sx={{ mb: 3 }}>
+        {/* --- TABELA DE MEUS PEDIDOS PADRONIZADA --- */}
+        <Typography
+          variant="h5"
+          component="h2"
+          fontWeight="bold"
+          sx={{ mb: 3 }}
+        >
           Meus Pedidos
         </Typography>
+
         {loading ? (
-          <CircularProgress />
+          <Box sx={{ display: "flex", justifyContent: "center", mt: 5 }}>
+            <CircularProgress />
+          </Box>
         ) : (
-          <Paper sx={{ boxShadow: 3, overflow: "hidden" }}>
+          <Paper sx={{ width: "100%", overflow: "hidden", boxShadow: 5 }}>
             <TableContainer>
-              <Table>
+              <Table stickyHeader>
                 <TableHead>
-                  <TableRow>
-                    <TableCell>Item</TableCell>
-                    <TableCell>Qtd.</TableCell>
-                    <TableCell>Data</TableCell>
-                    <TableCell>Status</TableCell>
+                  {/* ESTILO DO CABEÇALHO PADRONIZADO */}
+                  <TableRow
+                    sx={{
+                      "& th": {
+                        backgroundColor: "#2a3c61ff", // Azul escuro
+                        color: "#ffffff", // Texto branco
+                        fontWeight: "bold",
+                      },
+                    }}
+                  >
+                    <TableCell align="center">Item</TableCell>
+                    <TableCell align="center">Qtd.</TableCell>
+                    <TableCell align="center">Data</TableCell>
+                    <TableCell align="center">Status</TableCell>
                   </TableRow>
                 </TableHead>
                 <TableBody>
                   {meusPedidosPaginados.map((pedido) => (
                     <TableRow hover key={pedido.id}>
-                      <TableCell>{pedido.nomeItem}</TableCell>
-                      <TableCell>{pedido.quantidade}</TableCell>
-                      <TableCell>{pedido.dataPedido ? new Date(pedido.dataPedido).toLocaleDateString("pt-BR") : "-"}</TableCell>
-                      <TableCell>{pedido.status}</TableCell>
+                      <TableCell align="center">{pedido.nomeItem}</TableCell>
+                      <TableCell align="center">{pedido.quantidade}</TableCell>
+                      <TableCell align="center">
+                        {pedido.dataPedido
+                          ? new Date(pedido.dataPedido).toLocaleDateString(
+                              "pt-BR"
+                            )
+                          : "-"}
+                      </TableCell>
+                      <TableCell align="center">
+                        <Chip
+                          label={pedido.status}
+                          size="small"
+                          color={
+                            pedido.status === "APROVADO"
+                              ? "success"
+                              : pedido.status === "RECUSADO"
+                              ? "error"
+                              : pedido.status === "RECEBIDO"
+                              ? "info"
+                              : "warning"
+                          }
+                          variant="outlined"
+                          sx={{ fontWeight: "bold" }}
+                        />
+                      </TableCell>
                     </TableRow>
                   ))}
                   {meusPedidosPaginados.length === 0 && (
-                      <TableRow><TableCell colSpan={4} align="center">Nenhum pedido.</TableCell></TableRow>
+                    <TableRow>
+                      <TableCell colSpan={4} align="center" sx={{ py: 3 }}>
+                        <Typography color="text.secondary">
+                          Nenhum pedido realizado.
+                        </Typography>
+                      </TableCell>
+                    </TableRow>
                   )}
                 </TableBody>
               </Table>
@@ -231,6 +302,7 @@ function PedidosPage() {
               page={page}
               onPageChange={handleChangePage}
               onRowsPerPageChange={handleChangeRowsPerPage}
+              labelRowsPerPage="Itens por página:"
             />
           </Paper>
         )}
