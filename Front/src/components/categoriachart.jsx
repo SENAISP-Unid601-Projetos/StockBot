@@ -44,7 +44,6 @@ function CategoryChart({ componentes }) {
   const chartOptions = {
     responsive: true,
     maintainAspectRatio: false, // Permite que o gráfico seja grande dentro do contêiner
-    // A remoção de 'indexAxis: "y"' garante que o gráfico seja VERTICAL.
     plugins: {
       legend: {
         display: false,
@@ -77,8 +76,9 @@ function CategoryChart({ componentes }) {
             },
             ticks: {
                 color: theme.palette.text.secondary,
-                maxRotation: 45, // Rotação para evitar sobreposição de nomes longos
-                minRotation: 45,
+                // ALTERAÇÃO AQUI: Definir rotação para 0 força o texto a ficar horizontal
+                maxRotation: 0, 
+                minRotation: 0,
             },
             grid: {
                 display: false, // Remove linhas verticais

@@ -184,8 +184,8 @@ function DashboardPage() {
               />
               <KpiCard
                 title="Estoque Baixo"
-                value={itensEstoqueBaixo.length}
-                description={`Itens abaixo do limite (≤ ${threshold})`}
+                value={itensEstoqueBaixo.length} 
+                description={`Itens abaixo do mínimo`}
                 isCritical={
                   itensEstoqueBaixo.length > 0 && itensEmFalta.length === 0
                 }
@@ -196,14 +196,7 @@ function DashboardPage() {
             <Box sx={{ width: "100%" }}>
               <CategoryChart componentes={componentes} />
             </Box>
-
-            {/* --- BLOCO 3: LISTA DE AÇÕES (Mantido como estava) --- */}
-            <Box sx={{ width: "100%" }}>
-              <ActionList
-                title={`Itens com Estoque Baixo (≤ ${threshold})`}
-                items={itensEstoqueBaixo}
-              />
-            </Box>
+            
           </Box>
         )}
       </Container>
