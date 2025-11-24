@@ -20,13 +20,14 @@ import {
 import PictureAsPdfIcon from "@mui/icons-material/PictureAsPdf";
 import FilterListIcon from "@mui/icons-material/FilterList";
 import KpiCard from "../components/kpicard";
+import ActionList from "../components/actionList";
 import CategoryChart from "../components/categoriachart";
 
 function DashboardPage() {
   const [componentes, setComponentes] = useState([]);
   const [loading, setLoading] = useState(true);
   const [threshold, setThreshold] = useState(5);
-  
+
   // Estado para armazenar os nomes dos itens selecionados para o gráfico
   const [selectedNames, setSelectedNames] = useState([]);
 
@@ -90,7 +91,7 @@ function DashboardPage() {
     setSelectedNames(newSelected);
   };
 
-  const componentesFiltradosParaGrafico = componentes.filter(comp => 
+  const componentesFiltradosParaGrafico = componentes.filter(comp =>
     selectedNames.includes(comp.nome)
   );
 
@@ -230,7 +231,7 @@ function DashboardPage() {
               />
               <KpiCard
                 title="Estoque Baixo"
-                value={itensEstoqueBaixo.length} 
+                value={itensEstoqueBaixo.length}
                 description={`Itens abaixo do mínimo`}
                 isCritical={
                   itensEstoqueBaixo.length > 0 && itensEmFalta.length === 0
@@ -240,12 +241,12 @@ function DashboardPage() {
 
             {/* --- BLOCO 3: GRÁFICOS --- */}
             <Box sx={{ width: "100%", display: "flex", flexDirection: "column", gap: 3 }}>
-              
-              {/* Envolvemos o primeiro gráfico num Box com position relative 
-                  para posicionar o botão de filtro sobre ele 
+
+              {/* Envolvemos o primeiro gráfico num Box com position relative
+                  para posicionar o botão de filtro sobre ele
               */}
               <Box sx={{ position: "relative", width: "100%" }}>
-                
+
                 {/* --- BOTÃO DE FILTRO (Posição Absoluta) --- */}
                 <Box sx={{ position: "absolute", top: 16, right: 16, zIndex: 10 }}>
                   <Tooltip title="Filtrar Itens do Gráfico">
@@ -272,8 +273,8 @@ function DashboardPage() {
                     </MenuItem>
                     {componentes.map((comp) => (
                       <MenuItem key={comp.id} onClick={() => handleToggleItem(comp.nome)} dense>
-                        <Checkbox 
-                          checked={selectedNames.indexOf(comp.nome) > -1} 
+                        <Checkbox
+                          checked={selectedNames.indexOf(comp.nome) > -1}
                           size="small"
                         />
                         <ListItemText primary={comp.nome} />
@@ -283,23 +284,23 @@ function DashboardPage() {
                 </Box>
 
                 {/* GRÁFICO 1 */}
-                <CategoryChart 
-                  componentes={componentesFiltradosParaGrafico} 
+                <CategoryChart
+                  componentes={componentesFiltradosParaGrafico}
                   title="Distribuição de Itens por Quantidade Total"
                   yAxisLabel="Quantidade em Stock"
                   dataKey="quantidade"
                 />
               </Box>
-              
+
               {/* GRÁFICO 2 (Sem filtro individual por enquanto, usa o mesmo filtro ou dados gerais) */}
-              <CategoryChart 
-                componentes={componentesFiltradosParaGrafico} 
+              <CategoryChart
+                componentes={componentesFiltradosParaGrafico}
                 title="Nível Mínimo de Estoque por Item"
                 yAxisLabel="Nível Mínimo Definido"
                 dataKey="nivelMinimoEstoque"
               />
             </Box>
-            
+
           </Box>
         )}
       </Container>

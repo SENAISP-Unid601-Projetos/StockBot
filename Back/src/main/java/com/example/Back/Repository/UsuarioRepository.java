@@ -6,20 +6,26 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
-import java.util.Optional; // Importa a classe Optional
+import java.util.Optional;
 
 @Repository
 public interface UsuarioRepository extends JpaRepository<Usuario, Long> {
-
+    boolean existsByEmail(String email);
     // MELHORIA: Retorna um Optional para evitar NullPointerExceptions
     Optional<Usuario> findByEmail(String email);
 
     // O Spring Security também consegue trabalhar com UserDetails
     UserDetails findUserDetailsByEmail(String email);
 
-    // Método para encontrar todos os usuários de uma empresa específica
+    // Spring Security usa este método para carregar detalhes (se necessário no futuro)
+    default UserDetails loadUserByUsername(String username) {
+        return findByEmail(username).orElse(null);
+    }
+
     List<Usuario> findAllByEmpresaId(Long empresaId);
 
-    // Método para encontrar um usuário específico dentro de uma empresa (para segurança)
     Optional<Usuario> findByIdAndEmpresaId(Long id, Long empresaId);
+
+    // Adicionamos este para o AuthorizationService funcionar corretamente se ele usar findByEmail ou similar
+    // (O seu AuthorizationService já usa findByEmail, então está tudo certo).
 }

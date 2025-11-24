@@ -1,5 +1,6 @@
 package com.example.Back.config;
 
+import com.example.Back.Entity.Usuario;
 import com.example.Back.Repository.UsuarioRepository;
 import com.example.Back.Service.TokenService;
 import jakarta.servlet.FilterChain;
@@ -9,7 +10,6 @@ import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.lang.NonNull;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
@@ -39,21 +39,26 @@ public class SecurityFilter extends OncePerRequestFilter {
             try {
                 var subject = tokenService.getSubject(tokenJWT);
 
-                // --- CORREÇÃO APLICADA AQUI ---
-                // 1. Recebemos a "caixa" (Optional) do repositório
-                Optional<UserDetails> optionalUsuario = Optional.ofNullable(usuarioRepository.findUserDetailsByEmail(subject));
+                // --- CORREÇÃO: Usar findByEmail que retorna Optional<Usuario> ---
+                Optional<Usuario> optionalUsuario = usuarioRepository.findByEmail(subject);
 
-                // 2. Verificamos se a "caixa" não está vazia
                 if (optionalUsuario.isPresent()) {
-                    // 3. Se não estiver, pegamos o conteúdo de dentro
-                    UserDetails usuario = optionalUsuario.get();
+                    Usuario usuario = optionalUsuario.get();
+
+                    // --- LOGS DE DEBUG (Aparecerão no Render) ---
+                    System.out.println("LOGIN DEBUG: Usuário encontrado: " + usuario.getEmail());
+                    System.out.println("LOGIN DEBUG: Role no Banco: " + usuario.getRole());
+                    System.out.println("LOGIN DEBUG: Autoridades geradas: " + usuario.getAuthorities());
+                    // -------------------------------------------
 
                     var authentication = new UsernamePasswordAuthenticationToken(usuario, null, usuario.getAuthorities());
                     SecurityContextHolder.getContext().setAuthentication(authentication);
+                } else {
+                    System.out.println("LOGIN DEBUG: Token válido, mas usuário não encontrado no banco: " + subject);
                 }
 
             } catch (Exception e) {
-                // Lida com tokens inválidos ou expirados
+                System.out.println("LOGIN DEBUG: Erro ao validar token: " + e.getMessage());
                 SecurityContextHolder.clearContext();
             }
         }

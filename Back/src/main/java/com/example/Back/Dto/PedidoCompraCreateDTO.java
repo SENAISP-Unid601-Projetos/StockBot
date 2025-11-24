@@ -14,4 +14,6 @@ public class PedidoCompraCreateDTO {
     private int quantidade;
 
     private String justificativa;
+
+    private Long componenteId;
 }

@@ -1,4 +1,3 @@
-// Em: src/components/TabelaRequisicoes.jsx
 import { useState, useEffect } from "react";
 import api from "../services/api";
 import { toast } from "react-toastify";
@@ -14,7 +13,7 @@ import {
   TableHead,
   TableRow,
   Stack,
-  Typography, // Adicione Typography
+  Typography,
 } from "@mui/material";
 
 function TabelaRequisicoes() {
@@ -24,8 +23,9 @@ function TabelaRequisicoes() {
   const fetchRequisicoes = async () => {
     setLoading(true);
     try {
-      const response = await api.get("/requisicoes/pendentes"); // Endpoint /api/requisicoes/pendentes
-      setRequisicoes(response.data.content || []); // Garante que seja um array
+      // CORREÇÃO 1: Adicionado '/api' no início da URL
+      const response = await api.get("/api/requisicoes/pendentes");
+      setRequisicoes(response.data || []); 
     } catch (error) {
       toast.error("Falha ao carregar requisições de estoque.");
       console.error("Erro fetchRequisicoes:", error);
@@ -40,8 +40,10 @@ function TabelaRequisicoes() {
 
   const handleAprovar = async (id) => {
     try {
-      await api.put(`/requisicoes/${id}/aprovar`); // Endpoint /api/requisicoes/{id}/aprovar
-      toast.success("Requisição de estoque APROVADA!");
+      // CORREÇÃO 2: URL correta (/api...) e Endpoint correto (/concluir)
+      // No backend atual, "Concluir" é o equivalente a aprovar a saída
+      await api.put(`/api/requisicoes/${id}/concluir`); 
+      toast.success("Requisição de estoque LIBERADA!");
       fetchRequisicoes();
     } catch (error) {
       toast.error("Falha ao aprovar.");
@@ -49,16 +51,19 @@ function TabelaRequisicoes() {
     }
   };
 
+  // NOTA: O backend atual de Requisições não tem endpoint de "Recusar".
+  // Por enquanto, vamos remover ou comentar essa função para não dar erro 404.
+  /*
   const handleRecusar = async (id) => {
     try {
-      await api.put(`/requisicoes/${id}/recusar`); // Endpoint /api/requisicoes/{id}/recusar
+      await api.put(`/api/requisicoes/${id}/recusar`);
       toast.warn("Requisição de estoque RECUSADA.");
       fetchRequisicoes();
     } catch (error) {
       toast.error("Falha ao recusar.");
-      console.error("Erro handleRecusar:", error);
     }
   };
+  */
 
   if (loading) {
     return (
@@ -93,7 +98,7 @@ function TabelaRequisicoes() {
                     {req.componenteCodigoPatrimonio || "N/A"}
                   </TableCell>
                   <TableCell>{req.quantidade}</TableCell>
-                  <TableCell>{req.usuarioNome || "N/A"}</TableCell>
+                  <TableCell>{req.usuario || "Sistema"}</TableCell>
                   <TableCell>
                     {req.dataRequisicao
                       ? new Date(req.dataRequisicao).toLocaleString("pt-BR")
@@ -107,16 +112,9 @@ function TabelaRequisicoes() {
                         color="success"
                         onClick={() => handleAprovar(req.id)}
                       >
-                        Aprovar
+                        Liberar Saída
                       </Button>
-                      <Button
-                        variant="contained"
-                        size="small"
-                        color="error"
-                        onClick={() => handleRecusar(req.id)}
-                      >
-                        Recusar
-                      </Button>
+                      {/* Botão recusar removido temporariamente até atualizar o backend */}
                     </Stack>
                   </TableCell>
                 </TableRow>

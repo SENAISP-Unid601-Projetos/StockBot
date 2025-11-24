@@ -24,6 +24,7 @@ import {
   Sun,
   CheckSquare,
   ShoppingCart,
+  PackageCheck, // <-- 1. NOVO ÍCONE PARA RECEBIMENTO
 } from "lucide-react";
 
 import { isAdmin } from "../services/authService";
@@ -105,7 +106,6 @@ function Sidebar() {
             </ListItemButton>
           </ListItem>
         ))}
-      </List>
 
       <ListItem disablePadding>
         <ListItemButton

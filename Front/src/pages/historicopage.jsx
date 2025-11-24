@@ -116,7 +116,7 @@ function HistoricoPage() {
             }}
             sx={{
               minWidth: "300px",
-              backgroundColor: "rgba(255,255,255,0.5)",
+              backgroundColor: "background.paper",
               borderRadius: 1,
             }}
           />
@@ -134,77 +134,74 @@ function HistoricoPage() {
         >
           <TableContainer>
             <Table stickyHeader>
-              {/* --- APLICAÇÃO DA COR #2a3c61ff NA LINHA E EM TODAS AS CÉLULAS --- */}
               <TableHead>
-    <TableRow>
-        <TableCell
-            // CORREÇÃO: Aplicando a cor de fundo diretamente na célula
-            sx={{
-                backgroundColor: "#2a3c61ff",
-                color: "#fff",
-                fontWeight: "bold",
-                borderBottom: 0,
-            }}
-        >
-            Id
-        </TableCell>
-        <TableCell
-            // CORREÇÃO: Aplicando a cor de fundo diretamente na célula
-            sx={{
-                backgroundColor: "#2a3c61ff",
-                color: "#fff",
-                fontWeight: "bold",
-                borderBottom: 0,
-            }}
-        >
-            Item
-        </TableCell>
-        <TableCell
-            // CORREÇÃO: Aplicando a cor de fundo diretamente na célula
-            sx={{
-                backgroundColor: "#2a3c61ff",
-                color: "#fff",
-                fontWeight: "bold",
-                borderBottom: 0,
-            }}
-        >
-            Quantidade
-        </TableCell>
-        <TableCell
-            // CORREÇÃO: Aplicando a cor de fundo diretamente na célula
-            sx={{
-                backgroundColor: "#2a3c61ff",
-                color: "#fff",
-                fontWeight: "bold",
-                borderBottom: 0,
-            }}
-        >
-            Tipo
-        </TableCell>
-        <TableCell
-            // CORREÇÃO: Aplicando a cor de fundo diretamente na célula
-            sx={{
-                backgroundColor: "#2a3c61ff",
-                color: "#fff",
-                fontWeight: "bold",
-                borderBottom: 0,
-            }}
-        >
-            Data e Hora
-        </TableCell>
-        <TableCell
-            // CORREÇÃO: Aplicando a cor de fundo diretamente na célula
-            sx={{
-                backgroundColor: "#2a3c61ff",
-                color: "#fff",
-                fontWeight: "bold",
-                borderBottom: 0,
-            }}
-        >
-            Utilizador
-        </TableCell>
-    </TableRow>
-</TableHead>
+                <TableRow>
+                  <TableCell
+                    sx={{
+                      backgroundColor: "#2a3c61ff",
+                      color: "#fff",
+                      fontWeight: "bold",
+                      borderBottom: 0,
+                    }}
+                  >
+                    Id
+                  </TableCell>
+                  <TableCell
+                    sx={{
+                      backgroundColor: "#2a3c61ff",
+                      color: "#fff",
+                      fontWeight: "bold",
+                      borderBottom: 0,
+                    }}
+                  >
+                    Item
+                  </TableCell>
+                  <TableCell
+                    // CORREÇÃO: Aplicando a cor de fundo diretamente na célula
+                    sx={{
+                      backgroundColor: "#2a3c61ff",
+                      color: "#fff",
+                      fontWeight: "bold",
+                      borderBottom: 0,
+                    }}
+                  >
+                    Quantidade
+                  </TableCell>
+                  <TableCell
+                    // CORREÇÃO: Aplicando a cor de fundo diretamente na célula
+                    sx={{
+                      backgroundColor: "#2a3c61ff",
+                      color: "#fff",
+                      fontWeight: "bold",
+                      borderBottom: 0,
+                    }}
+                  >
+                    Tipo
+                  </TableCell>
+                  <TableCell
+                    // CORREÇÃO: Aplicando a cor de fundo diretamente na célula
+                    sx={{
+                      backgroundColor: "#2a3c61ff",
+                      color: "#fff",
+                      fontWeight: "bold",
+                      borderBottom: 0,
+                    }}
+                  >
+                    Data e Hora
+                  </TableCell>
+                  <TableCell
+                    // CORREÇÃO: Aplicando a cor de fundo diretamente na célula
+                    sx={{
+                      backgroundColor: "#2a3c61ff",
+                      color: "#fff",
+                      fontWeight: "bold",
+                      borderBottom: 0,
+                    }}
+                  >
+                    Utilizador
+                  </TableCell>
+                </TableRow>
+              </TableHead>
 
               <TableBody>
                 {loading ? (
@@ -253,7 +250,7 @@ function HistoricoPage() {
                               fontWeight: "bold",
                               px: 1.5,
                               py: 0.5,
-                              boxShadow: "0px 1px 6px rgba(0,0,0,0.15)",
+                              boxShadow: "0px 1px 6px rgba(0, 0, 0, 0.15)",
                             }}
                           />
                         </TableCell>

@@ -6,11 +6,11 @@ import { Box, Paper, Typography, useTheme } from '@mui/material';
 // Registra os plugins necessários do Chart.js
 ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend);
 
-function CategoryChart({ 
-  componentes, 
-  title = 'Distribuição de Itens por Quantidade Total', 
-  yAxisLabel = 'Quantidade em Estoque', 
-  dataKey = 'quantidade' 
+function CategoryChart({
+  componentes,
+  title = 'Distribuição de Itens por Quantidade Total',
+  yAxisLabel = 'Quantidade em Estoque',
+  dataKey = 'quantidade'
 }) {
   // Acessa o tema do MUI
   const theme = useTheme();
@@ -57,7 +57,7 @@ function CategoryChart({
       },
       title: {
         display: true, // Exibe um título claro
-        text: title, 
+        text: title,
         font: {
           size: 16,
           family: theme.typography.fontFamily,
@@ -84,7 +84,7 @@ function CategoryChart({
             ticks: {
                 color: theme.palette.text.secondary,
                 // ALTERAÇÃO AQUI: Definir rotação para 0 força o texto a ficar horizontal
-                maxRotation: 0, 
+                maxRotation: 0,
                 minRotation: 0,
             },
             grid: {
@@ -95,7 +95,7 @@ function CategoryChart({
             // Eixo Y (Valores): Quantidade em Stock
             title: {
                 display: true,
-                text: yAxisLabel, 
+                text: yAxisLabel,
                 color: theme.palette.text.secondary,
             },
             ticks: {
@@ -115,7 +115,7 @@ function CategoryChart({
       {/* Título menor e mais compacto */}
       <Typography variant="subtitle2" component="h3" align="center" sx={{ mb: 0.5, fontWeight: 'bold', opacity: 0.8 }}>
       </Typography>
-      
+
       {/* Altura do gráfico forçada para 150px */}
       <Box sx={{ position: 'relative', width: '100%', height: '275px' }}>
         <Bar data={chartData} options={chartOptions} />
