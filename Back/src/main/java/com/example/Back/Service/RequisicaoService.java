@@ -1,9 +1,8 @@
 package com.example.Back.Service;
 
-import com.example.Back.Entity.Componente;
+import com.example.Back.Dto.RequisicaoDTO;
 import com.example.Back.Entity.Empresa;
 import com.example.Back.Entity.Requisicao;
-import com.example.Back.Dto.RequisicaoDTO;
 import com.example.Back.Repository.RequisicaoRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -26,7 +25,9 @@ public class RequisicaoService {
     public List<RequisicaoDTO> findPendentesByEmpresa() {
         Empresa empresa = usuarioService.getEmpresaDoUsuarioAutenticado();
 
-        List<Requisicao> requisicoes = requisicaoRepository.findAllByEmpresaIdAndStatus(empresa.getId(), "PENDENTE");
+        // O repositório já faz o JOIN, então o getComponente().getNome() não vai no banco de novo
+        List<Requisicao> requisicoes = requisicaoRepository
+                .findAllByEmpresaIdAndStatusOrderByDataRequisicaoDesc(empresa.getId(), "PENDENTE");
 
         return requisicoes.stream()
                 .map(this::toDTO)
@@ -40,25 +41,29 @@ public class RequisicaoService {
         Requisicao requisicao = requisicaoRepository.findByIdAndEmpresaId(id, empresa.getId())
                 .orElseThrow(() -> new RuntimeException("Requisição não encontrada ou não pertence a esta empresa."));
 
+        // TODO: Aqui você pode adicionar lógica para abater do estoque se necessário
+        // Ex: componenteService.registrarSaida(requisicao.getComponente().getId(), requisicao.getQuantidade());
+
         requisicao.setStatus("CONCLUIDO");
         requisicaoRepository.save(requisicao);
     }
 
+    // Converter Entidade -> DTO
     private RequisicaoDTO toDTO(Requisicao req) {
-        String componenteNome = (req.getComponente() != null)
+        String nomeComponente = (req.getComponente() != null)
                 ? req.getComponente().getNome()
-                : "Componente não encontrado";
+                : "Componente Removido";
 
-        String solicitanteEmail = (req.getSolicitante() != null)
+        String emailSolicitante = (req.getSolicitante() != null)
                 ? req.getSolicitante().getEmail()
-                : "Sistema";
+                : "Sistema Automático";
 
         return new RequisicaoDTO(
                 req.getId(),
-                componenteNome,
+                nomeComponente,
                 req.getQuantidade(),
                 req.getJustificativa(),
-                solicitanteEmail,
+                emailSolicitante,
                 req.getDataRequisicao()
         );
     }

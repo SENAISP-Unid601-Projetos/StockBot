@@ -2,9 +2,11 @@ package com.example.Back.Controller;
 
 import com.example.Back.Dto.AuthDTO;
 import com.example.Back.Dto.LoginResponseDTO;
-import com.example.Back.Dto.RegisterDTO; // Usaremos um DTO para registo também
+import com.example.Back.Dto.RegisterDTO;
 import com.example.Back.Service.AuthService;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -17,7 +19,6 @@ public class AuthController {
 
     private final AuthService authService;
 
-    // Injeção via construtor
     public AuthController(AuthService authService) {
         this.authService = authService;
     }
@@ -35,13 +36,18 @@ public class AuthController {
     }
 
     @PostMapping("/forgot-password")
-    public ResponseEntity<String> forgotPassword(@RequestBody java.util.Map<String, String> body) {
-        String email = body.get("email");
+    public ResponseEntity<String> forgotPassword(@RequestBody @Valid EmailRequestDTO body) {
         try {
-            authService.recuperarSenha(email);
-            return ResponseEntity.ok("Uma nova senha foi enviada para o seu e-mail.");
+            authService.recuperarSenha(body.email());
+            return ResponseEntity.ok("Se o e-mail existir, uma nova senha será enviada.");
         } catch (RuntimeException e) {
+            // Por segurança, não devemos dizer se o email existe ou não (User Enumeration)
+            // Mas para facilitar o desenvolvimento agora, retornamos o erro.
+            // Em produção, retorne sempre 200 OK.
             return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
+
+    // DTO interno para o endpoint de esqueci senha
+    public record EmailRequestDTO(@NotBlank @Email String email) {}
 }

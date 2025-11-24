@@ -7,16 +7,20 @@ import com.example.Back.Entity.Usuario;
 import com.example.Back.Entity.UserRole;
 import com.example.Back.Repository.EmpresaRepository;
 import com.example.Back.Repository.UsuarioRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import java.util.Optional; // Importar Optional
 
 @Service
 public class AuthService {
+
+    private static final Logger logger = LoggerFactory.getLogger(AuthService.class);
 
     private final AuthenticationManager authenticationManager;
     private final UsuarioRepository usuarioRepository;
@@ -34,78 +38,92 @@ public class AuthService {
         this.emailService = emailService;
     }
 
-    @Transactional
-    public void recuperarSenha(String email) {
-        Usuario usuario = usuarioRepository.findByEmail(email)
-                .orElseThrow(() -> new RuntimeException("E-mail não encontrado no sistema."));
-
-        // Gera uma senha temporária aleatória (8 caracteres)
-        String novaSenha = java.util.UUID.randomUUID().toString().substring(0, 8);
-
-        // Atualiza no banco
-        usuario.setSenha(passwordEncoder.encode(novaSenha));
-        usuarioRepository.save(usuario);
-
-        // Envia por e-mail
-        String mensagem = "Olá,\n\nSua senha foi resetada com sucesso.\n" +
-                "Sua nova senha temporária é: " + novaSenha + "\n\n" +
-                "Por favor, acesse o sistema e troque sua senha imediatamente em Configurações.";
-
-        emailService.enviarEmailTexto(email, "Recuperação de Senha - StockBot", mensagem);
-    }
-
     @Transactional(readOnly = true)
     public String login(AuthDTO data) {
-        try {
-            Usuario usuario = usuarioRepository.findByEmail(data.email())
-                    .orElseThrow(() -> new RuntimeException("E-mail, senha ou domínio inválidos."));
+        // 1. Normalização (Sanitização de Input)
+        String emailLimpo = data.email().trim().toLowerCase();
+        String dominioLimpo = data.dominioEmpresa().trim().toLowerCase();
 
-            if (usuario.getEmpresa() == null || !usuario.getEmpresa().getDominio().equals(data.dominioEmpresa())) {
-                throw new RuntimeException("E-mail, senha ou domínio inválidos.");
+        try {
+            // 2. Busca Otimizada (O findByEmail já traz a empresa via EntityGraph)
+            Usuario usuario = usuarioRepository.findByEmail(emailLimpo)
+                    .orElseThrow(() -> new BadCredentialsException("Credenciais inválidas."));
+
+            // 3. Validação de Domínio (Case Insensitive)
+            if (!usuario.getEmpresa().getDominio().equalsIgnoreCase(dominioLimpo)) {
+                // Loga o erro real para o admin, mas retorna erro genérico para o usuário
+                logger.warn("Tentativa de login com domínio errado. User: {}, Domínio Tentado: {}", emailLimpo, dominioLimpo);
+                throw new BadCredentialsException("Credenciais inválidas.");
             }
 
-            var usernamePassword = new UsernamePasswordAuthenticationToken(data.email(), data.senha());
+            // 4. Autenticação Spring Security
+            var usernamePassword = new UsernamePasswordAuthenticationToken(emailLimpo, data.senha());
             var auth = this.authenticationManager.authenticate(usernamePassword);
+
+            // 5. Gera Token
             return tokenService.gerarToken((Usuario) auth.getPrincipal());
 
         } catch (AuthenticationException e) {
-            throw new RuntimeException("E-mail, senha ou domínio inválidos.", e);
-        } catch (RuntimeException e) {
-            throw e;
+            // Captura erro de senha errada e relança mensagem genérica
+            throw new BadCredentialsException("E-mail, senha ou domínio incorretos.");
         }
     }
 
-    // *** MÉTODO REGISTER SEGURO ***
     @Transactional
     public void register(RegisterDTO data) {
-        if (this.usuarioRepository.findByEmail(data.email()).isPresent()) {
-            throw new IllegalArgumentException("E-mail já está em uso.");
+        String emailLimpo = data.email().trim().toLowerCase();
+        String dominioLimpo = data.dominioEmpresa().trim().toLowerCase();
+
+        // 1. Validação Rápida de Email (Exists é mais rápido que Find)
+        if (usuarioRepository.existsByEmail(emailLimpo)) {
+            throw new IllegalArgumentException("Este e-mail já está em uso.");
         }
 
-        // Verifica se o DOMÍNIO já existe
-        Optional<Empresa> empresaExistente = empresaRepository.findByDominio(data.dominioEmpresa());
-
-        if (empresaExistente.isPresent()) {
-            // Se o domínio JÁ EXISTE, bloqueia o registo público.
-            throw new IllegalArgumentException("Domínio já registado. Peça a um administrador da sua empresa para criar a sua conta.");
-
-        } else {
-            // Se o domínio é NOVO, cria a empresa E o primeiro ADMIN
-            Empresa novaEmpresa = new Empresa();
-            novaEmpresa.setDominio(data.dominioEmpresa());
-            // (Pode adicionar nomeExibicao e corPrimaria aqui depois)
-            empresaRepository.save(novaEmpresa);
-
-            Usuario novoUsuario = new Usuario();
-            novoUsuario.setEmail(data.email());
-            novoUsuario.setSenha(passwordEncoder.encode(data.senha()));
-
-            // O primeiro utilizador do domínio é automaticamente ADMIN
-            novoUsuario.setRole(UserRole.ADMIN);
-
-            novoUsuario.setEmpresa(novaEmpresa);
-
-            this.usuarioRepository.save(novoUsuario);
+        // 2. Validação Rápida de Domínio (IgnoreCase)
+        if (empresaRepository.existsByDominioIgnoreCase(dominioLimpo)) {
+            throw new IllegalArgumentException("Este domínio empresarial já está registado. Solicite acesso ao administrador.");
         }
+
+        // 3. Criar Empresa (Usa o construtor que criamos na Entidade Empresa)
+        Empresa novaEmpresa = new Empresa(dominioLimpo);
+        empresaRepository.save(novaEmpresa);
+
+        // 4. Criar Primeiro Usuário (ADMIN)
+        Usuario novoUsuario = new Usuario();
+        novoUsuario.setEmail(emailLimpo);
+        novoUsuario.setSenha(passwordEncoder.encode(data.senha()));
+        novoUsuario.setRole(UserRole.ADMIN);
+        novoUsuario.setEmpresa(novaEmpresa);
+
+        usuarioRepository.save(novoUsuario);
+
+        logger.info("Nova empresa registrada: {}", dominioLimpo);
+    }
+
+    @Transactional
+    public void recuperarSenha(String email) {
+        String emailLimpo = email.trim().toLowerCase();
+
+        // Busca segura
+        Usuario usuario = usuarioRepository.findByEmail(emailLimpo)
+                .orElseThrow(() -> new RuntimeException("E-mail não encontrado no sistema."));
+
+        String novaSenha = java.util.UUID.randomUUID().toString().substring(0, 8);
+
+        usuario.setSenha(passwordEncoder.encode(novaSenha));
+        usuarioRepository.save(usuario);
+
+        String assunto = "Recuperação de Senha - StockBot";
+        String mensagem = String.format("""
+                Olá,
+                
+                Recebemos um pedido de recuperação de senha.
+                Sua nova senha temporária é: %s
+                
+                Acesse o sistema e troque sua senha imediatamente.
+                """, novaSenha);
+
+        // Envia o email de forma assíncrona (se o EmailService suportar @Async)
+        emailService.enviarEmailTexto(emailLimpo, assunto, mensagem);
     }
 }

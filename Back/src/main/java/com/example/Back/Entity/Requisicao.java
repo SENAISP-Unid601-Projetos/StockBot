@@ -2,39 +2,43 @@ package com.example.Back.Entity;
 
 import jakarta.persistence.*;
 import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.AllArgsConstructor;
 import java.time.LocalDateTime;
 
-// 1. IMPORTAR A ENTIDADE DO UTILIZADOR
-import com.example.Back.Entity.Usuario;
-
 @Entity
+@Table(name = "requisicoes")
 @Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class Requisicao {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne
+    // OTIMIZAÇÃO: FetchType.LAZY (Não traga o componente a menos que eu peça)
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "componente_id", nullable = false)
     private Componente componente;
 
+    @Column(nullable = false)
     private LocalDateTime dataRequisicao;
 
-    private String status;
+    @Column(nullable = false)
+    private String status; // "PENDENTE", "CONCLUIDO", "RECUSADO"
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "empresa_id", nullable = false)
     private Empresa empresa;
 
-    // --- 2. CAMPOS ADICIONADOS ---
-    @Column(nullable = true) // Pode ser nulo se a quantidade não for aplicável
+    @Column(nullable = true)
     private Integer quantidade;
 
-    @Column(nullable = true)
+    @Column(length = 500) // Limita tamanho do texto
     private String justificativa;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "solicitante_id", nullable = true) // O solicitante pode ser o "Sistema" (nulo) ou um utilizador
+    @JoinColumn(name = "solicitante_id", nullable = true)
     private Usuario solicitante;
 }

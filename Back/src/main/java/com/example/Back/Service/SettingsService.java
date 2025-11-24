@@ -5,35 +5,37 @@ import com.example.Back.Repository.EmpresaRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-@Service // <-- Importante: Define como um Serviço Spring
+@Service
 public class SettingsService {
 
-    private final UsuarioService usuarioService; // Depende do UsuarioService
-    private final EmpresaRepository empresaRepository; // Depende do EmpresaRepository
+    private final UsuarioService usuarioService;
+    private final EmpresaRepository empresaRepository;
 
-    // Construtor para injeção de dependência
     public SettingsService(UsuarioService usuarioService, EmpresaRepository empresaRepository) {
         this.usuarioService = usuarioService;
         this.empresaRepository = empresaRepository;
     }
 
-    /**
-     * Busca o limite de stock baixo da empresa do utilizador logado.
-     */
     @Transactional(readOnly = true)
     public int getLowStockThreshold() {
-        // Reutiliza o helper que já criámos no UsuarioService
+        // A mágica do multi-tenant acontece aqui.
+        // Não precisamos saber o ID, o token já nos diz qual empresa é.
         Empresa empresa = usuarioService.getEmpresaDoUsuarioAutenticado();
         return empresa.getNivelEstoqueBaixoPadrao();
     }
 
-    /**
-     * Atualiza o limite de stock baixo da empresa do utilizador logado.
-     */
     @Transactional
     public void updateLowStockThreshold(int newThreshold) {
+        // Regra de negócio: Estoque mínimo não pode ser negativo
+        if (newThreshold < 0) {
+            throw new IllegalArgumentException("O nível de estoque não pode ser negativo.");
+        }
+
         Empresa empresa = usuarioService.getEmpresaDoUsuarioAutenticado();
         empresa.setNivelEstoqueBaixoPadrao(newThreshold);
+
+        // O JPA detectaria a mudança sozinho ao fechar a transação,
+        // mas o save explícito deixa o código mais legível.
         empresaRepository.save(empresa);
     }
 }

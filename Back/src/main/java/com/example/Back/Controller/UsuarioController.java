@@ -3,16 +3,16 @@ package com.example.Back.Controller;
 import com.example.Back.Dto.CreateUserDTO;
 import com.example.Back.Dto.PasswordChangeDTO;
 import com.example.Back.Dto.UsuarioDTO;
-import com.example.Back.Entity.UserRole;
 import com.example.Back.Service.UsuarioService;
 import jakarta.validation.Valid;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault; // Importante
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/api/users")
@@ -24,10 +24,14 @@ public class UsuarioController {
         this.usuarioService = usuarioService;
     }
 
+    // --- CORREÇÃO: Retorna Page e aceita Pageable ---
     @GetMapping
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<List<UsuarioDTO>> getAllUsers() {
-        return ResponseEntity.ok(usuarioService.findAll());
+    public ResponseEntity<Page<UsuarioDTO>> getAllUsers(
+            // Padrão: 10 itens por página, ordenado por email
+            @PageableDefault(size = 10, sort = "email") Pageable pageable
+    ) {
+        return ResponseEntity.ok(usuarioService.findAll(pageable));
     }
 
     @PostMapping
@@ -36,15 +40,6 @@ public class UsuarioController {
         UsuarioDTO novoUsuario = usuarioService.createUser(createUserDTO);
         return new ResponseEntity<>(novoUsuario, HttpStatus.CREATED);
     }
-
-    // REMOVA ESTE BLOCO DE CÓDIGO INTEIRO
-    /*
-    @PutMapping("/{id}/role")
-    @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<UsuarioDTO> changeUserRole(@PathVariable Long id, @RequestBody UserRole newRole) {
-        return ResponseEntity.ok(usuarioService.changeUserRole(id, newRole));
-    }
-    */
 
     @DeleteMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")

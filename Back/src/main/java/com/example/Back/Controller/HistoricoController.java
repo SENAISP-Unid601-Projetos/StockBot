@@ -7,6 +7,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize; // Importante
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -21,13 +22,12 @@ public class HistoricoController {
         this.historicoService = historicoService;
     }
 
-    // Este é o método que o seu frontend vai chamar
     @GetMapping
+    @PreAuthorize("isAuthenticated()") // Segurança: Só usuários logados veem histórico
     public ResponseEntity<Page<HistoricoDTO>> getHistoricoPaginado(
-            // @PageableDefault define os valores padrão se o frontend não os enviar
+            // Padrão: 10 itens, ordenados do mais recente para o mais antigo (DESC)
             @PageableDefault(size = 10, sort = "dataHora", direction = Sort.Direction.DESC) Pageable pageable) {
 
-        Page<HistoricoDTO> historicoPage = historicoService.findAllPaginated(pageable);
-        return ResponseEntity.ok(historicoPage);
+        return ResponseEntity.ok(historicoService.findAllPaginated(pageable));
     }
 }

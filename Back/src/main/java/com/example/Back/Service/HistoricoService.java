@@ -1,7 +1,7 @@
 package com.example.Back.Service;
 
 import com.example.Back.Dto.HistoricoDTO;
-import com.example.Back.Entity.Empresa; // <-- Importar Empresa
+import com.example.Back.Entity.Empresa;
 import com.example.Back.Entity.Historico;
 import com.example.Back.Repository.HistoricoRepository;
 import org.springframework.data.domain.Page;
@@ -13,35 +13,39 @@ import org.springframework.transaction.annotation.Transactional;
 public class HistoricoService {
 
     private final HistoricoRepository historicoRepository;
-    private final UsuarioService usuarioService; // <-- Injetar UsuarioService
+    private final UsuarioService usuarioService;
 
-    public HistoricoService(HistoricoRepository historicoRepository, UsuarioService usuarioService) { // <-- Mudar construtor
+    public HistoricoService(HistoricoRepository historicoRepository, UsuarioService usuarioService) {
         this.historicoRepository = historicoRepository;
-        this.usuarioService = usuarioService; // <-- Atribuir UsuarioService
+        this.usuarioService = usuarioService;
     }
 
-    // CORRIGIDO: Filtra por empresa
     @Transactional(readOnly = true)
     public Page<HistoricoDTO> findAllPaginated(Pageable pageable) {
-        // Pega a empresa do usuário logado
+        // 1. Segurança: Garante que só busca dados da empresa do token
         Empresa empresa = usuarioService.getEmpresaDoUsuarioAutenticado();
 
-        // Busca a página de histórico filtrada pelo ID da empresa
+        // 2. Busca Otimizada (Repository já faz o JOIN com Componente)
         Page<Historico> historicoPage = historicoRepository.findAllByEmpresaId(empresa.getId(), pageable);
 
+        // 3. Converte para DTO
         return historicoPage.map(this::toDTO);
     }
 
-    // Método toDTO permanece o mesmo
     private HistoricoDTO toDTO(Historico historico) {
-        String componenteNome = (historico.getComponente() != null)
-                ? historico.getComponente().getNome()
-                : "Componente Removido";
+        // Tratamento de segurança caso o componente venha nulo (soft delete ou erro de base)
+        String nomeComponente = "Desconhecido";
+        Long componenteId = null;
+
+        if (historico.getComponente() != null) {
+            nomeComponente = historico.getComponente().getNome();
+            componenteId = historico.getComponente().getId();
+        }
 
         return new HistoricoDTO(
                 historico.getId(),
-                historico.getComponente() != null ? historico.getComponente().getId() : null,
-                componenteNome,
+                componenteId,
+                nomeComponente,
                 historico.getTipo(),
                 historico.getQuantidade(),
                 historico.getUsuario(),
