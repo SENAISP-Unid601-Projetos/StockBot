@@ -71,3 +71,7 @@ export const logout = () => {
   localStorage.removeItem("jwt-token");
   window.location.href = "/login";
 };
+export const getUserId = () => {
+  // Supondo que você armazene o ID do usuário logado no localStorage
+  return parseInt(localStorage.getItem("userId"), 10);
+};
