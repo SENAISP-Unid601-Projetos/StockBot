@@ -116,7 +116,7 @@ function HistoricoPage() {
             }}
             sx={{
               minWidth: "300px",
-              backgroundColor: "rgba(255,255,255,0.5)",
+              backgroundColor: "background.paper",
               borderRadius: 1,
             }}
           />
@@ -134,7 +134,6 @@ function HistoricoPage() {
         >
           <TableContainer>
             <Table stickyHeader>
-              {/* --- APLICAÇÃO DA COR #2a3c61ff NA LINHA E EM TODAS AS CÉLULAS --- */}
               <TableHead>
                 <TableRow>
                   <TableCell
