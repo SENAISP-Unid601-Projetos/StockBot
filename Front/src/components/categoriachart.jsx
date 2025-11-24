@@ -9,7 +9,7 @@ ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend)
 function CategoryChart({ 
   componentes, 
   title = 'Distribuição de Itens por Quantidade Total', 
-  yAxisLabel = 'Quantidade em Stock', 
+  yAxisLabel = 'Quantidade em Estoque', 
   dataKey = 'quantidade' 
 }) {
   // Acessa o tema do MUI
@@ -114,11 +114,10 @@ function CategoryChart({
     <Paper sx={{ p: 1.5, display: 'flex', flexDirection: 'column', width: '100%', boxShadow: 3 }}>
       {/* Título menor e mais compacto */}
       <Typography variant="subtitle2" component="h3" align="center" sx={{ mb: 0.5, fontWeight: 'bold', opacity: 0.8 }}>
-        {title}
       </Typography>
       
       {/* Altura do gráfico forçada para 150px */}
-      <Box sx={{ position: 'relative', width: '100%', height: '250px' }}>
+      <Box sx={{ position: 'relative', width: '100%', height: '275px' }}>
         <Bar data={chartData} options={chartOptions} />
       </Box>
     </Paper>
