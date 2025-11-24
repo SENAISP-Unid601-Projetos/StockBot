@@ -8,7 +8,9 @@ function UserManagement({ users, onDeleteUser }) {
   if (!users || users.length === 0) {
     return (
       <Box sx={{ p: 2, textAlign: "center" }}>
-        <Typography color="text.secondary">Nenhum utilizador encontrado nesta empresa.</Typography>
+        <Typography color="text.secondary">
+          Nenhum utilizador encontrado nesta empresa.
+        </Typography>
       </Box>
     );
   }
@@ -36,7 +38,10 @@ function UserManagement({ users, onDeleteUser }) {
                   sx={{
                     fontWeight: "bold",
                     backgroundColor: "var(--cinzaClaro)",
-                    color: user.role === "ADMIN" ? "var(--vermelhoSenai)" : "#000000",
+                    color:
+                      user.role === "ADMIN"
+                        ? "var(--vermelhoSenai)"
+                        : "#041dffff",
                     border: "1px solid #ccc",
                   }}
                 />
