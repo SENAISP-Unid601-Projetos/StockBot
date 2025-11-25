@@ -56,54 +56,48 @@ public class AuthService {
 
     @Transactional(readOnly = true)
     public String login(AuthDTO data) {
+        // 1. VERIFICA SE O E-MAIL EXISTE NO BANCO
+        Usuario usuario = usuarioRepository.findByEmail(data.email())
+                .orElseThrow(() -> new RuntimeException("Este e-mail não está cadastrado.")); //
+
+        // 2. VERIFICA SE O DOMÍNIO ESTÁ CORRETO
+        if (usuario.getEmpresa() == null || !usuario.getEmpresa().getDominio().equals(data.dominioEmpresa())) {
+            throw new RuntimeException("Este usuário não pertence ao domínio " + data.dominioEmpresa());
+        }
+
+        // 3. TENTA AUTENTICAR (VERIFICA A SENHA)
         try {
-            Usuario usuario = usuarioRepository.findByEmail(data.email())
-                    .orElseThrow(() -> new RuntimeException("E-mail, senha ou domínio inválidos."));
-
-            if (usuario.getEmpresa() == null || !usuario.getEmpresa().getDominio().equals(data.dominioEmpresa())) {
-                throw new RuntimeException("E-mail, senha ou domínio inválidos.");
-            }
-
             var usernamePassword = new UsernamePasswordAuthenticationToken(data.email(), data.senha());
             var auth = this.authenticationManager.authenticate(usernamePassword);
             return tokenService.gerarToken((Usuario) auth.getPrincipal());
-
         } catch (AuthenticationException e) {
-            throw new RuntimeException("E-mail, senha ou domínio inválidos.", e);
-        } catch (RuntimeException e) {
-            throw e;
+            // Se o e-mail existe mas falhou aqui, é a senha
+            throw new RuntimeException("Senha incorreta.");
         }
     }
 
-    // *** MÉTODO REGISTER SEGURO ***
     @Transactional
     public void register(RegisterDTO data) {
+        // 1. VERIFICAÇÃO NO CADASTRO: SE O E-MAIL JÁ EXISTE
         if (this.usuarioRepository.findByEmail(data.email()).isPresent()) {
-            throw new IllegalArgumentException("E-mail já está em uso.");
+            throw new IllegalArgumentException("Este e-mail já está em uso. Tente fazer login."); //
         }
 
-        // Verifica se o DOMÍNIO já existe
         Optional<Empresa> empresaExistente = empresaRepository.findByDominio(data.dominioEmpresa());
 
         if (empresaExistente.isPresent()) {
-            // Se o domínio JÁ EXISTE, bloqueia o registo público.
-            throw new IllegalArgumentException("Domínio já registado. Peça a um administrador da sua empresa para criar a sua conta.");
-
+            throw new IllegalArgumentException("Domínio já registado. Peça a um administrador para criar sua conta.");
         } else {
-            // Se o domínio é NOVO, cria a empresa E o primeiro ADMIN
             Empresa novaEmpresa = new Empresa();
             novaEmpresa.setDominio(data.dominioEmpresa());
-            // (Pode adicionar nomeExibicao e corPrimaria aqui depois)
             empresaRepository.save(novaEmpresa);
 
             Usuario novoUsuario = new Usuario();
             novoUsuario.setEmail(data.email());
             novoUsuario.setSenha(passwordEncoder.encode(data.senha()));
-
-            // O primeiro utilizador do domínio é automaticamente ADMIN
             novoUsuario.setRole(UserRole.ADMIN);
-
             novoUsuario.setEmpresa(novaEmpresa);
+            // Não definimos 'enabled', assume-se true por padrão ou ajuste na entidade se tiver mudado
 
             this.usuarioRepository.save(novoUsuario);
         }

@@ -28,10 +28,9 @@ function LoginPage() {
       navigate("/");
     } catch (error) {
       console.error("Erro de login:", error);
-      const errorMsg =
-        error.response?.data?.message || "E-mail, senha ou domínio inválidos.";
-      setError(errorMsg);
-      // toast.error(errorMsg);
+      // Se o backend retornar apenas a string, usamos error.response.data
+      const errorMsg = error.response?.data?.message || error.response?.data || "Erro ao entrar.";
+      setError(errorMsg); // Vai exibir: "Este e-mail não está cadastrado."
     } finally {
       setLoading(false);
     }
