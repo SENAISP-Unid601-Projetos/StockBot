@@ -128,7 +128,7 @@ function Recebimentopage() {
                   }}
                 >
                   <TableCell align="center">Item</TableCell>
-                  <TableCell align="center">Qtd.</TableCell>
+                  <TableCell align="center">Quantidade</TableCell>
                   <TableCell align="center">Solicitante</TableCell>
                   <TableCell align="center">Data Pedido</TableCell>
                   <TableCell align="center">Ação</TableCell>

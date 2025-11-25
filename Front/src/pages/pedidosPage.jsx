@@ -246,7 +246,7 @@ function PedidosPage() {
                     }}
                   >
                     <TableCell align="center">Item</TableCell>
-                    <TableCell align="center">Qtd.</TableCell>
+                    <TableCell align="center">Quantidade</TableCell>
                     <TableCell align="center">Data</TableCell>
                     <TableCell align="center">Status</TableCell>
                   </TableRow>

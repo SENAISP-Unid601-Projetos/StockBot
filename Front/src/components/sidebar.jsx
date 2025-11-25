@@ -25,6 +25,7 @@ import {
   CheckSquare,
   ShoppingCart,
   PackageCheck,
+  Users, // <-- 1. Importar o ícone de Usuários
 } from "lucide-react";
 
 import { isAdmin } from "../services/authService";
@@ -56,12 +57,11 @@ function Sidebar() {
 
   const isDarkMode = theme.palette.mode === "dark";
 
-  // Estilo comum para os itens do menu (para evitar repetição e garantir cor branca)
   const listItemSx = {
-    color: "#FFFFFF", // Texto sempre branco
+    color: "#FFFFFF",
     borderRadius: 2,
     "&:hover": {
-      backgroundColor: "rgba(255, 255, 255, 0.1)", // Hover sutil claro
+      backgroundColor: "rgba(255, 255, 255, 0.1)",
     },
     "&.active": {
       backgroundColor: "primary.main",
@@ -73,21 +73,15 @@ function Sidebar() {
     },
   };
 
-  // Estilo comum para ícones
   const iconSx = {
-    color: "#FFFFFF", // Ícone sempre branco
+    color: "#FFFFFF",
     minWidth: 40,
   };
 
   const drawerContent = (
     <div style={{ display: "flex", flexDirection: "column", height: "100%" }}>
       <Box sx={{ p: 2, textAlign: "center" }}>
-        <Typography
-          variant="h5"
-          component="h2"
-          fontWeight="bold"
-          color="#FFFFFF" // Título branco
-        >
+        <Typography variant="h5" component="h2" fontWeight="bold" color="#FFFFFF">
           StockBot
         </Typography>
       </Box>
@@ -95,25 +89,15 @@ function Sidebar() {
       <List sx={{ p: 1 }}>
         {menuItems.map((item) => (
           <ListItem key={item.text} disablePadding>
-            <ListItemButton
-              component={NavLink}
-              to={item.path}
-              sx={listItemSx}
-            >
-              <ListItemIcon sx={iconSx}>
-                {item.icon}
-              </ListItemIcon>
+            <ListItemButton component={NavLink} to={item.path} sx={listItemSx}>
+              <ListItemIcon sx={iconSx}>{item.icon}</ListItemIcon>
               <ListItemText primary={item.text} />
             </ListItemButton>
           </ListItem>
         ))}
 
         <ListItem disablePadding>
-          <ListItemButton
-            component={NavLink}
-            to="/pedidos"
-            sx={listItemSx}
-          >
+          <ListItemButton component={NavLink} to="/pedidos" sx={listItemSx}>
             <ListItemIcon sx={iconSx}>
               <ShoppingCart size={20} />
             </ListItemIcon>
@@ -130,66 +114,63 @@ function Sidebar() {
             {isDarkMode ? <Sun size={20} /> : <Moon size={20} />}
           </ListItemIcon>
           <FormControlLabel
-            control={
-              <Switch
-                checked={isDarkMode}
-                onChange={toggleColorMode}
-                color="primary"
-              />
-            }
+            control={<Switch checked={isDarkMode} onChange={toggleColorMode} color="primary" />}
             label="Modo Escuro"
             sx={{ m: 0, flexGrow: 1 }}
           />
         </ListItem>
 
-      <>
-        {/* Item de Aprovações */}
-        <ListItem disablePadding>
-          <ListItemButton component={NavLink} to="/aprovacoes" sx={listItemSx}>
-            <ListItemIcon sx={iconSx}>
-              <CheckSquare size={20} />
-            </ListItemIcon>
-            <ListItemText primary="Aprovações" />
-          </ListItemButton>
-        </ListItem>
+        <>
+          <ListItem disablePadding>
+            <ListItemButton component={NavLink} to="/aprovacoes" sx={listItemSx}>
+              <ListItemIcon sx={iconSx}>
+                <CheckSquare size={20} />
+              </ListItemIcon>
+              <ListItemText primary="Aprovações" />
+            </ListItemButton>
+          </ListItem>
 
-        {/* --- BLOCO DE ADMINISTRAÇÃO --- */}
-        {isUserAdmin && (
-          <>
-            <ListItem disablePadding>
-              <ListItemButton
-                component={NavLink}
-                to="/recebimento"
-                sx={listItemSx}
-              >
-                <ListItemIcon sx={iconSx}>
-                  <PackageCheck size={20} />
-                </ListItemIcon>
-                <ListItemText primary="Recebimento" />
-              </ListItemButton>
-            </ListItem>
+          {/* --- BLOCO DE ADMINISTRAÇÃO --- */}
+          {isUserAdmin && (
+            <>
+              <ListItem disablePadding>
+                <ListItemButton component={NavLink} to="/recebimento" sx={listItemSx}>
+                  <ListItemIcon sx={iconSx}>
+                    <PackageCheck size={20} />
+                  </ListItemIcon>
+                  <ListItemText primary="Recebimento" />
+                </ListItemButton>
+              </ListItem>
 
-            {/* Item de Configurações */}
-            <ListItem disablePadding>
-              <ListItemButton component={NavLink} to="/configuracoes" sx={listItemSx}>
-                <ListItemIcon sx={iconSx}>
-                  <Settings size={20} />
-                </ListItemIcon>
-                <ListItemText primary="Configurações" />
-              </ListItemButton>
-            </ListItem>
-          </>
-        )}
-      </>
+              {/* --- 2. NOVO ITEM DE MENU PARA USUÁRIOS --- */}
+              <ListItem disablePadding>
+                <ListItemButton component={NavLink} to="/usuarios" sx={listItemSx}>
+                  <ListItemIcon sx={iconSx}>
+                    <Users size={20} />
+                  </ListItemIcon>
+                  <ListItemText primary="Usuários" />
+                </ListItemButton>
+              </ListItem>
 
+              <ListItem disablePadding>
+                <ListItemButton component={NavLink} to="/configuracoes" sx={listItemSx}>
+                  <ListItemIcon sx={iconSx}>
+                    <Settings size={20} />
+                  </ListItemIcon>
+                  <ListItemText primary="Configurações" />
+                </ListItemButton>
+              </ListItem>
+            </>
+          )}
+        </>
 
         <ListItem disablePadding>
           <ListItemButton
             onClick={handleLogout}
             sx={{
-               color: "#FFFFFF",
-               borderRadius: 2,
-               "&:hover": { backgroundColor: "rgba(255, 255, 255, 0.1)" },
+              color: "#FFFFFF",
+              borderRadius: 2,
+              "&:hover": { backgroundColor: "rgba(255, 255, 255, 0.1)" },
             }}
           >
             <ListItemIcon sx={iconSx}>
@@ -211,9 +192,8 @@ function Sidebar() {
         "& .MuiDrawer-paper": {
           width: drawerWidth,
           boxSizing: "border-box",
-          // --- FUNDO FORÇADO PARA PRETO ---
-          backgroundColor: "#000000", 
-          borderRight: "none", // Remove borda se desejar visual clean
+          backgroundColor: "#000000",
+          borderRight: "none",
           display: "flex",
           flexDirection: "column",
         },

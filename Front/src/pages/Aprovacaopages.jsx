@@ -139,7 +139,7 @@ function Aprovacaopages() {
                       }}
                     >
                       <TableCell align="center">Item</TableCell>
-                      <TableCell align="center">Qtd.</TableCell>
+                      <TableCell align="center">Quantidade</TableCell>
                       <TableCell align="center">Justificativa</TableCell>
                       <TableCell align="center">Solicitante</TableCell>
                       <TableCell align="center">Data</TableCell>
