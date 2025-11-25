@@ -40,29 +40,37 @@ function UserManagement({ users, onDeleteUser }) {
       <TableContainer>
         <Table stickyHeader aria-label="tabela de usuários">
           <TableHead>
-            <TableRow>
-              {/* Padrão ComponentesTable: Alinhamento à esquerda para texto, Negrito no header */}
-              <TableCell sx={{ fontWeight: "bold" }}>ID</TableCell>
-              <TableCell sx={{ fontWeight: "bold" }}>Email</TableCell>
-              {/* Centralizamos Cargo e Ações para melhor visualização dos botões/chips */}
-              <TableCell align="center" sx={{ fontWeight: "bold" }}>Cargo</TableCell>
-              <TableCell align="center" sx={{ fontWeight: "bold" }}>Ações</TableCell>
+            <TableRow
+              sx={{
+                // Padrão de cabeçalho azul escuro com texto branco
+                "& th": {
+                  backgroundColor: "#2a3c61ff",
+                  color: "#ffffff",
+                  fontWeight: "bold",
+                },
+              }}
+            >
+              {/* Definimos largura de 25% para cada coluna para distribuir igualmente o espaço */}
+              <TableCell width="25%">ID</TableCell>
+              <TableCell width="25%">Email</TableCell>
+              <TableCell align="center" width="25%">Cargo</TableCell>
+              <TableCell align="center" width="25%">Ações</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
             {users && users.length > 0 ? (
               usersPaginados.map((user) => (
                 <TableRow hover key={user.id}>
-                  {/* Dados alinhados à esquerda (Padrão) */}
+                  {/* Dados alinhados à esquerda */}
                   <TableCell>{user.id}</TableCell>
                   <TableCell>{user.email}</TableCell>
                   
-                  {/* Cargo Centralizado e com cor Azul para User */}
+                  {/* Cargo Centralizado */}
                   <TableCell align="center">
                     <Chip
                       label={user.role}
                       size="small"
-                      // Se for ADMIN usa 'error' (vermelho), se for outro (USER) usa 'info' (azul)
+                      // Admin = Vermelho (error), User = Azul (info)
                       color={user.role === "ADMIN" ? "error" : "info"}
                       variant={user.role === "ADMIN" ? "filled" : "outlined"}
                       sx={{ fontWeight: "bold", minWidth: "80px" }}
