@@ -42,7 +42,6 @@ function UserManagement({ users, onDeleteUser }) {
           <TableHead>
             <TableRow
               sx={{
-                // Padrão de cabeçalho azul escuro com texto branco
                 "& th": {
                   backgroundColor: "#2a3c61ff",
                   color: "#ffffff",
@@ -50,7 +49,6 @@ function UserManagement({ users, onDeleteUser }) {
                 },
               }}
             >
-              {/* Definimos largura de 25% para cada coluna para distribuir igualmente o espaço */}
               <TableCell width="25%">ID</TableCell>
               <TableCell width="25%">Email</TableCell>
               <TableCell align="center" width="25%">Cargo</TableCell>
@@ -61,23 +59,24 @@ function UserManagement({ users, onDeleteUser }) {
             {users && users.length > 0 ? (
               usersPaginados.map((user) => (
                 <TableRow hover key={user.id}>
-                  {/* Dados alinhados à esquerda */}
                   <TableCell>{user.id}</TableCell>
                   <TableCell>{user.email}</TableCell>
                   
-                  {/* Cargo Centralizado */}
                   <TableCell align="center">
                     <Chip
                       label={user.role}
                       size="small"
-                      // Admin = Vermelho (error), User = Azul (info)
                       color={user.role === "ADMIN" ? "error" : "info"}
-                      variant={user.role === "ADMIN" ? "filled" : "outlined"}
-                      sx={{ fontWeight: "bold", minWidth: "80px" }}
+                      variant="filled"
+                      sx={{ 
+                        fontWeight: "bold", 
+                        minWidth: "80px",
+                        // FORÇA O TEXTO A SER BRANCO
+                        color: "#ffffff" 
+                      }}
                     />
                   </TableCell>
                   
-                  {/* Ações Centralizadas */}
                   <TableCell align="center">
                     <Stack direction="row" spacing={1} justifyContent="center">
                       <Tooltip title="Excluir usuário">
@@ -106,7 +105,6 @@ function UserManagement({ users, onDeleteUser }) {
         </Table>
       </TableContainer>
       
-      {/* Paginação */}
       <TablePagination
         rowsPerPageOptions={[5, 10, 25]}
         component="div"
