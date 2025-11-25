@@ -41,7 +41,7 @@ const drawerWidth = 250;
 
 function Sidebar() {
   const navigate = useNavigate();
-  const theme = useTheme();
+  const theme = useTheme(); // O tema agora contém as cores da sidebar
   const { toggleColorMode } = useColorMode();
   const [isUserAdmin, setIsUserAdmin] = useState(false);
 
@@ -59,12 +59,17 @@ function Sidebar() {
   const drawerContent = (
     <div style={{ display: "flex", flexDirection: "column", height: "100%" }}>
       <Box sx={{ p: 2, textAlign: "center" }}>
-        <Typography variant="h5" component="h2" fontWeight="bold" color="white">
+        <Typography
+          variant="h5"
+          component="h2"
+          fontWeight="bold"
+          // Usa a cor de texto ativa definida no tema da sidebar
+          color={theme.palette.sidebar.textActive}
+        >
           StockBot
         </Typography>
       </Box>
 
-      {/* MENU GERAL (Para todos) */}
       <List sx={{ p: 1 }}>
         {menuItems.map((item) => (
           <ListItem key={item.text} disablePadding>
@@ -72,19 +77,28 @@ function Sidebar() {
               component={NavLink}
               to={item.path}
               sx={{
-                color: "rgba(255, 255, 255, 0.7)",
+                // --- CORES CONECTADAS AO TEMA ---
+                color: theme.palette.sidebar.text,
                 borderRadius: 2,
-                "&:hover": { backgroundColor: "rgba(255, 255, 255, 0.08)" },
+                "&:hover": {
+                  backgroundColor: theme.palette.sidebar.hover,
+                },
                 "&.active": {
                   backgroundColor: "primary.main",
-                  color: "white",
+                  color: theme.palette.sidebar.textActive,
                   fontWeight: "bold",
-                  ".MuiListItemIcon-root": { color: "white" },
+                  ".MuiListItemIcon-root": {
+                    color: theme.palette.sidebar.textActive,
+                  },
                 },
               }}
             >
               <ListItemIcon
-                sx={{ color: "rgba(255, 255, 255, 0.7)", minWidth: 40 }}
+                sx={{
+                  // Cor do ícone vinda do tema
+                  color: theme.palette.sidebar.icon,
+                  minWidth: 40,
+                }}
               >
                 {item.icon}
               </ListItemIcon>
@@ -93,39 +107,38 @@ function Sidebar() {
           </ListItem>
         ))}
 
-        {/* Link Pedidos (Para todos) */}
-        <ListItem disablePadding>
-          <ListItemButton
-            component={NavLink}
-            to="/pedidos"
-            sx={{
-              color: "rgba(255, 255, 255, 0.7)",
-              borderRadius: 2,
-              "&:hover": { backgroundColor: "rgba(255, 255, 255, 0.08)" },
-              "&.active": {
-                backgroundColor: "primary.main",
-                color: "white",
-                ".MuiListItemIcon-root": { color: "white" },
+      <ListItem disablePadding>
+        <ListItemButton
+          component={NavLink}
+          to="/pedidos"
+          sx={{
+            color: theme.palette.sidebar.text,
+            borderRadius: 2,
+            "&:hover": { backgroundColor: theme.palette.sidebar.hover },
+            "&.active": {
+              backgroundColor: "primary.main",
+              color: theme.palette.sidebar.textActive,
+              ".MuiListItemIcon-root": {
+                color: theme.palette.sidebar.textActive,
               },
-            }}
+            },
+          }}
+        >
+          <ListItemIcon
+            sx={{ color: theme.palette.sidebar.icon, minWidth: 40 }}
           >
-            <ListItemIcon
-              sx={{ color: "rgba(255, 255, 255, 0.7)", minWidth: 40 }}
-            >
-              <ShoppingCart size={20} />
-            </ListItemIcon>
-            <ListItemText primary="Pedido de Compra" />
-          </ListItemButton>
-        </ListItem>
-      </List>
+            <ShoppingCart size={20} />
+          </ListItemIcon>
+          <ListItemText primary="Fazer Pedido de Compra" />
+        </ListItemButton>
+      </ListItem>
 
       <Box sx={{ flexGrow: 1 }} />
 
       <List sx={{ p: 1, mt: "auto" }}>
-        {/* Switch Modo Escuro */}
-        <ListItem sx={{ color: "rgba(255, 255, 255, 0.7)" }}>
+        <ListItem sx={{ color: theme.palette.sidebar.text }}>
           <ListItemIcon
-            sx={{ color: "rgba(255, 255, 255, 0.7)", minWidth: 40 }}
+            sx={{ color: theme.palette.sidebar.icon, minWidth: 40 }}
           >
             {isDarkMode ? <Sun size={20} /> : <Moon size={20} />}
           </ListItemIcon>
@@ -142,98 +155,73 @@ function Sidebar() {
           />
         </ListItem>
 
-        {/* --- MENU ADMINISTRATIVO (Apenas Admin) --- */}
-        {isUserAdmin && (
-          <>
-            {/* Aprovações */}
-            <ListItem disablePadding>
-              <ListItemButton
-                component={NavLink}
-                to="/aprovacoes"
-                sx={{
-                  color: "rgba(255, 255, 255, 0.7)",
-                  borderRadius: 2,
-                  "&:hover": { backgroundColor: "rgba(255, 255, 255, 0.08)" },
-                  "&.active": {
-                    backgroundColor: "primary.main",
-                    color: "white",
-                    ".MuiListItemIcon-root": { color: "white" },
+        <>
+          <ListItem disablePadding>
+            <ListItemButton
+              component={NavLink}
+              to="/aprovacoes"
+              sx={{
+                color: theme.palette.sidebar.text,
+                borderRadius: 2,
+                "&:hover": { backgroundColor: theme.palette.sidebar.hover },
+                "&.active": {
+                  backgroundColor: "primary.main",
+                  color: theme.palette.sidebar.textActive,
+                  ".MuiListItemIcon-root": {
+                    color: theme.palette.sidebar.textActive,
                   },
-                }}
+                },
+              }}
+            >
+              <ListItemIcon
+                sx={{ color: theme.palette.sidebar.icon, minWidth: 40 }}
               >
-                <ListItemIcon
-                  sx={{ color: "rgba(255, 255, 255, 0.7)", minWidth: 40 }}
-                >
-                  <CheckSquare size={20} />
-                </ListItemIcon>
-                <ListItemText primary="Aprovações" />
-              </ListItemButton>
-            </ListItem>
+                <CheckSquare size={20} />
+              </ListItemIcon>
+              <ListItemText primary="Aprovações" />
+            </ListItemButton>
+          </ListItem>
 
-            {/* 2. Recebimento (NOVO) */}
-            <ListItem disablePadding>
-              <ListItemButton
-                component={NavLink}
-                to="/recebimento"
-                sx={{
-                  color: "rgba(255, 255, 255, 0.7)",
-                  borderRadius: 2,
-                  "&:hover": { backgroundColor: "rgba(255, 255, 255, 0.08)" },
-                  "&.active": {
-                    backgroundColor: "primary.main",
-                    color: "white",
-                    ".MuiListItemIcon-root": { color: "white" },
-                  },
-                }}
-              >
-                <ListItemIcon
-                  sx={{ color: "rgba(255, 255, 255, 0.7)", minWidth: 40 }}
-                >
-                  <PackageCheck size={20} />
-                </ListItemIcon>
-                <ListItemText primary="Recebimento" />
-              </ListItemButton>
-            </ListItem>
-
-            {/* Configurações */}
+          {isUserAdmin && (
             <ListItem disablePadding>
               <ListItemButton
                 component={NavLink}
                 to="/configuracoes"
                 sx={{
-                  color: "rgba(255, 255, 255, 0.7)",
+                  color: theme.palette.sidebar.text,
                   borderRadius: 2,
-                  "&:hover": { backgroundColor: "rgba(255, 255, 255, 0.08)" },
+                  "&:hover": { backgroundColor: theme.palette.sidebar.hover },
                   "&.active": {
                     backgroundColor: "primary.main",
-                    color: "white",
-                    ".MuiListItemIcon-root": { color: "white" },
+                    color: theme.palette.sidebar.textActive,
+                    ".MuiListItemIcon-root": {
+                      color: theme.palette.sidebar.textActive,
+                    },
                   },
                 }}
               >
                 <ListItemIcon
-                  sx={{ color: "rgba(255, 255, 255, 0.7)", minWidth: 40 }}
+                  sx={{ color: theme.palette.sidebar.icon, minWidth: 40 }}
                 >
                   <Settings size={20} />
                 </ListItemIcon>
                 <ListItemText primary="Configurações" />
               </ListItemButton>
             </ListItem>
-          </>
-        )}
+          )}
+        </>
 
-        {/* Botão Sair */}
         <ListItem disablePadding>
           <ListItemButton
             onClick={handleLogout}
             sx={{
-              color: "rgba(255, 255, 255, 0.7)",
+              color: theme.palette.sidebar.text,
               borderRadius: 2,
-              "&:hover": { backgroundColor: "rgba(255, 255, 255, 0.08)" },
+              "&:hover": { backgroundColor: theme.palette.sidebar.hover },
             }}
           >
             <ListItemIcon
-              sx={{ color: "rgba(255, 255, 255, 0.7)", minWidth: 40 }}
+              sx={{ color: theme.palette.sidebar.icon, minWidth: 40 }}
             >
               <LogOut size={20} />
             </ListItemIcon>
@@ -253,8 +241,8 @@ function Sidebar() {
         "& .MuiDrawer-paper": {
           width: drawerWidth,
           boxSizing: "border-box",
-          backgroundColor:
-            theme.palette.mode === "dark" ? "#000000ff" : "#000000ff",
+          // --- CONEXÃO PRINCIPAL DO FUNDO DA SIDEBAR ---
+          backgroundColor: theme.palette.sidebar.background,
           borderRight: "none",
           display: "flex",
           flexDirection: "column",

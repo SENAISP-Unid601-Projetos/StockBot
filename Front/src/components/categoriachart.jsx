@@ -6,14 +6,21 @@ import { Box, Paper, Typography, useTheme } from '@mui/material';
 // Registra os plugins necessários do Chart.js
 ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend);
 
-function CategoryChart({ componentes }) {
+function CategoryChart({
+  componentes,
+  title = 'Distribuição de Itens por Quantidade Total',
+  yAxisLabel = 'Quantidade em Estoque',
+  dataKey = 'quantidade'
+}) {
   // Acessa o tema do MUI
   const theme = useTheme();
 
   // Processamento de dados para o gráfico: Agrupando por NOME do componente
   const dadosGrafico = {};
   componentes.forEach(comp => {
-    dadosGrafico[comp.nome] = (dadosGrafico[comp.nome] || 0) + comp.quantidade;
+    // Usa a chave dinâmica (dataKey) para acessar o valor correto (quantidade ou nivelMinimoEstoque)
+    const valor = comp[dataKey] !== undefined ? comp[dataKey] : 0;
+    dadosGrafico[comp.nome] = (dadosGrafico[comp.nome] || 0) + valor;
   });
 
   // A lista de cores é mantida para que cada barra tenha uma cor diferente
@@ -32,7 +39,7 @@ function CategoryChart({ componentes }) {
     labels: Object.keys(dadosGrafico),
     datasets: [
       {
-        label: 'Quantidade em estoque',
+        label: yAxisLabel,
         data: Object.values(dadosGrafico),
         backgroundColor: colors,
         // É um único dataset, logo, barras individuais.
@@ -44,14 +51,13 @@ function CategoryChart({ componentes }) {
   const chartOptions = {
     responsive: true,
     maintainAspectRatio: false, // Permite que o gráfico seja grande dentro do contêiner
-    // A remoção de 'indexAxis: "y"' garante que o gráfico seja VERTICAL.
     plugins: {
       legend: {
         display: false,
       },
       title: {
         display: true, // Exibe um título claro
-        text: 'Distribuição de Itens por Quantidade Total', 
+        text: title,
         font: {
           size: 16,
           family: theme.typography.fontFamily,
@@ -77,8 +83,9 @@ function CategoryChart({ componentes }) {
             },
             ticks: {
                 color: theme.palette.text.secondary,
-                maxRotation: 45, // Rotação para evitar sobreposição de nomes longos
-                minRotation: 45,
+                // ALTERAÇÃO AQUI: Definir rotação para 0 força o texto a ficar horizontal
+                maxRotation: 0,
+                minRotation: 0,
             },
             grid: {
                 display: false, // Remove linhas verticais
@@ -88,7 +95,7 @@ function CategoryChart({ componentes }) {
             // Eixo Y (Valores): Quantidade em Stock
             title: {
                 display: true,
-                text: 'Quantidade em Stock', 
+                text: yAxisLabel,
                 color: theme.palette.text.secondary,
             },
             ticks: {
@@ -104,12 +111,13 @@ function CategoryChart({ componentes }) {
   };
 
   return (
-    <Paper sx={{ p: 2, height: '100%', display: 'flex', flexDirection: 'column' }}>
-      <Typography variant="h6" component="h3" gutterBottom>
-        Distribuição de Itens
+    <Paper sx={{ p: 1.5, display: 'flex', flexDirection: 'column', width: '100%', boxShadow: 3 }}>
+      {/* Título menor e mais compacto */}
+      <Typography variant="subtitle2" component="h3" align="center" sx={{ mb: 0.5, fontWeight: 'bold', opacity: 0.8 }}>
       </Typography>
-      <Box sx={{ position: 'relative', flexGrow: 1, minHeight: '300px' }}>
-        {/* Renderiza o componente Bar (Vertical) */}
+
+      {/* Altura do gráfico forçada para 150px */}
+      <Box sx={{ position: 'relative', width: '100%', height: '275px' }}>
         <Bar data={chartData} options={chartOptions} />
       </Box>
     </Paper>

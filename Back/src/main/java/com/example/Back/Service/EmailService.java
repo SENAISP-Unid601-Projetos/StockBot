@@ -34,14 +34,14 @@ public class EmailService {
         // mas NÃO TRAVA o sistema se falhar.
         try {
             // Se quiser tentar enviar de verdade, descomente as linhas abaixo:
-            /*
+
             SimpleMailMessage email = new SimpleMailMessage();
             email.setFrom(remetente);
             email.setTo(destinatario);
             email.setSubject(assunto);
             email.setText(mensagem);
             mailSender.send(email);
-            */
+
         } catch (Exception e) {
             // Apenas loga o erro, mas deixa o fluxo continuar
             System.err.println("⚠️ Aviso: Não foi possível enviar o e-mail real (SMTP não configurado ou bloqueado).");

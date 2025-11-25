@@ -9,8 +9,16 @@ import {
   CircularProgress,
   Container,
   Typography,
+  Checkbox,
+  ListItemText,
+  IconButton,
+  Menu,
+  MenuItem,
+  Tooltip,
+  Badge
 } from "@mui/material";
 import PictureAsPdfIcon from "@mui/icons-material/PictureAsPdf";
+import FilterListIcon from "@mui/icons-material/FilterList";
 import KpiCard from "../components/kpicard";
 import ActionList from "../components/actionList";
 import CategoryChart from "../components/categoriachart";
@@ -19,6 +27,13 @@ function DashboardPage() {
   const [componentes, setComponentes] = useState([]);
   const [loading, setLoading] = useState(true);
   const [threshold, setThreshold] = useState(5);
+
+  // Estado para armazenar os nomes dos itens selecionados para o gráfico
+  const [selectedNames, setSelectedNames] = useState([]);
+
+  // Estados para controlar o Menu do filtro
+  const [anchorEl, setAnchorEl] = useState(null);
+  const openMenu = Boolean(anchorEl);
 
   const fetchData = async () => {
     setLoading(true);
@@ -29,7 +44,12 @@ function DashboardPage() {
       ]);
 
       if (Array.isArray(componentesResponse.data)) {
-        setComponentes(componentesResponse.data);
+        const todosComponentes = componentesResponse.data;
+        setComponentes(todosComponentes);
+
+        // Seleção inicial: Primeiros 16 itens
+        const selecaoInicial = todosComponentes.slice(0, 16).map(c => c.nome);
+        setSelectedNames(selecaoInicial);
       }
       setThreshold(thresholdResponse.data);
     } catch (error) {
@@ -43,6 +63,37 @@ function DashboardPage() {
   useEffect(() => {
     fetchData();
   }, []);
+
+  // --- Handlers do Filtro ---
+
+  const handleFilterClick = (event) => {
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handleFilterClose = () => {
+    setAnchorEl(null);
+  };
+
+  const handleToggleItem = (nome) => {
+    const currentIndex = selectedNames.indexOf(nome);
+    const newSelected = [...selectedNames];
+
+    if (currentIndex === -1) {
+      if (newSelected.length >= 16) {
+        toast.warning("Limite de 16 itens atingido. Desmarque um para adicionar outro.");
+        return;
+      }
+      newSelected.push(nome);
+    } else {
+      newSelected.splice(currentIndex, 1);
+    }
+
+    setSelectedNames(newSelected);
+  };
+
+  const componentesFiltradosParaGrafico = componentes.filter(comp =>
+    selectedNames.includes(comp.nome)
+  );
 
   const handleGeneratePdf = async () => {
     toast.info("A gerar o relatório em PDF...");
@@ -148,19 +199,17 @@ function DashboardPage() {
           </Box>
         ) : (
           <Box sx={{ display: "flex", flexDirection: "column", gap: 3 }}>
-
-            {/* --- BLOCO 1: OS 4 CARDS (AGORA COM ALINHAMENTO PERFEITO) --- */}
-            {/* Usamos display: grid para garantir que os cards ocupem 100% da largura sem margens negativas externas */}
+            
+            {/* --- BLOCO 1: OS 4 CARDS --- */}
             <Box
               sx={{
                 display: "grid",
-                // Define as colunas: 1 em mobile, 2 em tablet, 4 em desktop
                 gridTemplateColumns: {
                   xs: "1fr",
                   sm: "1fr 1fr",
                   md: "1fr 1fr 1fr 1fr",
                 },
-                gap: 3, // Espaçamento entre os cards (igual ao gap do container pai)
+                gap: 3,
                 width: "100%",
               }}
             >
@@ -183,25 +232,75 @@ function DashboardPage() {
               <KpiCard
                 title="Estoque Baixo"
                 value={itensEstoqueBaixo.length}
-                description={`Itens abaixo do limite (≤ ${threshold})`}
+                description={`Itens abaixo do mínimo`}
                 isCritical={
                   itensEstoqueBaixo.length > 0 && itensEmFalta.length === 0
                 }
               />
             </Box>
 
-            {/* --- BLOCO 2: GRÁFICO (Mantido como estava) --- */}
-            <Box sx={{ width: "100%" }}>
-              <CategoryChart componentes={componentes} />
-            </Box>
+            {/* --- BLOCO 3: GRÁFICOS --- */}
+            <Box sx={{ width: "100%", display: "flex", flexDirection: "column", gap: 3 }}>
 
-            {/* --- BLOCO 3: LISTA DE AÇÕES (Mantido como estava) --- */}
-            <Box sx={{ width: "100%" }}>
-              <ActionList
-                title={`Itens com Estoque Baixo (≤ ${threshold})`}
-                items={itensEstoqueBaixo}
+              {/* Envolvemos o primeiro gráfico num Box com position relative
+                  para posicionar o botão de filtro sobre ele
+              */}
+              <Box sx={{ position: "relative", width: "100%" }}>
+
+                {/* --- BOTÃO DE FILTRO (Posição Absoluta) --- */}
+                <Box sx={{ position: "absolute", top: 16, right: 16, zIndex: 10 }}>
+                  <Tooltip title="Filtrar Itens do Gráfico">
+                    <IconButton onClick={handleFilterClick} color="primary" size="small">
+                      <FilterListIcon />
+                    </IconButton>
+                  </Tooltip>
+
+                  <Menu
+                    anchorEl={anchorEl}
+                    open={openMenu}
+                    onClose={handleFilterClose}
+                    PaperProps={{
+                      style: {
+                        maxHeight: 300,
+                        width: 280,
+                      },
+                    }}
+                  >
+                    <MenuItem disabled>
+                      <Typography variant="caption" fontWeight="bold">
+                        Selecione até 16 itens para visualizar
+                      </Typography>
+                    </MenuItem>
+                    {componentes.map((comp) => (
+                      <MenuItem key={comp.id} onClick={() => handleToggleItem(comp.nome)} dense>
+                        <Checkbox
+                          checked={selectedNames.indexOf(comp.nome) > -1}
+                          size="small"
+                        />
+                        <ListItemText primary={comp.nome} />
+                      </MenuItem>
+                    ))}
+                  </Menu>
+                </Box>
+
+                {/* GRÁFICO 1 */}
+                <CategoryChart
+                  componentes={componentesFiltradosParaGrafico}
+                  title="Distribuição de Itens por Quantidade Total"
+                  yAxisLabel="Quantidade em Stock"
+                  dataKey="quantidade"
+                />
+              </Box>
+
+              {/* GRÁFICO 2 (Sem filtro individual por enquanto, usa o mesmo filtro ou dados gerais) */}
+              <CategoryChart
+                componentes={componentesFiltradosParaGrafico}
+                title="Nível Mínimo de Estoque por Item"
+                yAxisLabel="Nível Mínimo Definido"
+                dataKey="nivelMinimoEstoque"
               />
             </Box>
+
           </Box>
         )}
       </Container>
