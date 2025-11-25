@@ -5,11 +5,10 @@ import {
   Box,
   Container,
   Typography,
-  Paper,
   Button,
   CircularProgress,
 } from "@mui/material";
-import AddIcon from "@mui/icons-material/Add"; // Ícone para o botão
+import AddIcon from "@mui/icons-material/Add"; 
 import UserManagement from "../components/usermanagement.jsx";
 import ModalAddUser from "../components/modaladduser.jsx";
 
@@ -18,7 +17,6 @@ function UserManagementPage() {
   const [loading, setLoading] = useState(false);
   const [isAddUserModalVisible, setAddUserModalVisible] = useState(false);
 
-  // Busca os usuários ao carregar a página
   useEffect(() => {
     fetchUsers();
   }, []);
@@ -58,7 +56,6 @@ function UserManagementPage() {
       }}
     >
       <Container maxWidth="lg">
-        {/* Cabeçalho da Página */}
         <Box
           sx={{
             display: "flex",
@@ -83,19 +80,16 @@ function UserManagementPage() {
           </Button>
         </Box>
 
-        {/* Tabela de Usuários */}
         {loading ? (
           <Box sx={{ display: "flex", justifyContent: "center", mt: 5 }}>
             <CircularProgress />
           </Box>
         ) : (
-          <Paper sx={{ p: 3, boxShadow: 5, borderRadius: 2 }}>
-            <UserManagement users={users} onDeleteUser={handleDeleteUser} />
-          </Paper>
+          // O componente UserManagement já contém o Paper e a tabela estilizada
+          <UserManagement users={users} onDeleteUser={handleDeleteUser} />
         )}
       </Container>
 
-      {/* Modal de Adicionar Usuário */}
       {isAddUserModalVisible && (
         <ModalAddUser
           isVisible={isAddUserModalVisible}
