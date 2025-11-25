@@ -166,7 +166,7 @@ function DashboardPage() {
         <Box
           display="flex"
           justifyContent="space-between"
-          mb={4}
+          mb={6}
           alignItems="center"
         >
           <Typography variant="h4" fontWeight="bold" color="text.primary">

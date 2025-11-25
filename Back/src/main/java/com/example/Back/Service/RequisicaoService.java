@@ -41,7 +41,6 @@ public class RequisicaoService {
         Requisicao requisicao = requisicaoRepository.findByIdAndEmpresaId(id, empresa.getId())
                 .orElseThrow(() -> new RuntimeException("Requisição não encontrada ou não pertence a esta empresa."));
 
-        // TODO: Aqui você pode adicionar lógica para abater do estoque se necessário
         // Ex: componenteService.registrarSaida(requisicao.getComponente().getId(), requisicao.getQuantidade());
 
         requisicao.setStatus("CONCLUIDO");
