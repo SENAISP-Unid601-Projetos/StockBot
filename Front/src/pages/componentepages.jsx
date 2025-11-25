@@ -20,6 +20,12 @@ import {
   Stack,
   TextField,
   InputAdornment,
+  // Imports para o Dialog (Aviso Personalizado)
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  DialogTitle,
 } from "@mui/material";
 
 import AddIcon from "@mui/icons-material/Add";
@@ -42,46 +48,45 @@ function ComponentesPage() {
   const [isUserAdmin, setIsUserAdmin] = useState(false);
   const [termoBusca, setTermoBusca] = useState("");
 
-const fetchData = useCallback(async (termo = "") => {
-    setLoading(true);
-    try {
-      const queryParam = typeof termo === 'string' ? termo : "";
-      
-      const response = await api.get("/api/componentes", {
-        params: { termo: queryParam } 
-      });
+  // --- ESTADOS PARA O DIALOG DE EXCLUSÃO ---
+  const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
+  const [idToDelete, setIdToDelete] = useState(null);
 
-      const todosComponentes = response.data || [];
+  const fetchData = useCallback(
+    async (termo = "") => {
+      setLoading(true);
+      try {
+        const queryParam = typeof termo === "string" ? termo : "";
 
-      setTotalElements(todosComponentes.length);
+        const response = await api.get("/api/componentes", {
+          params: { termo: queryParam },
+        });
 
-      const inicio = page * rowsPerPage;
-      const fim = inicio + rowsPerPage;
-      
-      setComponentes(todosComponentes.slice(inicio, fim));
+        const todosComponentes = response.data || [];
+        setTotalElements(todosComponentes.length);
 
-    } catch (error) {
-      console.error("Erro ao buscar componentes:", error);
-      toast.error("Não foi possível carregar os componentes.");
-      setComponentes([]);
-      setTotalElements(0);
-    } finally {
-      setLoading(false);
-    }
-  }, [
-      page,
-      rowsPerPage,
-      setComponentes,
-      setTotalElements,
-      setLoading
-    ]);
+        const inicio = page * rowsPerPage;
+        const fim = inicio + rowsPerPage;
+
+        setComponentes(todosComponentes.slice(inicio, fim));
+      } catch (error) {
+        console.error("Erro ao buscar componentes:", error);
+        toast.error("Não foi possível carregar os componentes.");
+        setComponentes([]);
+        setTotalElements(0);
+      } finally {
+        setLoading(false);
+      }
+    },
+    [page, rowsPerPage]
+  );
 
   const debouncedFetchData = useCallback(_.debounce(fetchData, 500), []);
 
   useEffect(() => {
     setIsUserAdmin(isAdmin());
-        fetchData();
-      }, [fetchData]);
+    fetchData();
+  }, [fetchData]);
 
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
@@ -105,20 +110,34 @@ const fetchData = useCallback(async (termo = "") => {
     setModalVisible(true);
   };
 
-  const handleDelete = async (id) => {
-    if (
-      window.confirm("Você tem certeza que deseja excluir este componente?")
-    ) {
-      try {
-        await api.delete(`/api/componentes/${id}`);
-        toast.success("Componente excluído com sucesso!");
-        fetchData(termoBusca);
-        fetchData();
+  // --- LÓGICA DE EXCLUSÃO ATUALIZADA ---
 
-      } catch (error) {
-        toast.error("Falha ao excluir o componente.");
-        console.error(error);
-      }
+  // 1. Abre o aviso
+  const handleDeleteClick = (id) => {
+    setIdToDelete(id);
+    setOpenDeleteDialog(true);
+  };
+
+  // 2. Fecha o aviso
+  const handleCloseDeleteDialog = () => {
+    setOpenDeleteDialog(false);
+    setIdToDelete(null);
+  };
+
+  // 3. Confirma a exclusão
+  const handleConfirmDelete = async () => {
+    handleCloseDeleteDialog(); // Fecha o modal primeiro
+
+    if (!idToDelete) return;
+
+    try {
+      await api.delete(`/api/componentes/${idToDelete}`);
+      toast.success("Componente excluído com sucesso!");
+      // Atualiza a lista
+      fetchData(termoBusca);
+    } catch (error) {
+      toast.error("Falha ao excluir o componente.");
+      console.error(error);
     }
   };
 
@@ -157,7 +176,7 @@ const fetchData = useCallback(async (termo = "") => {
               Gerenciamento de Itens
             </Typography>
 
-            {/* --- BARRA DE PESQUISA ADICIONADA --- */}
+            {/* --- BARRA DE PESQUISA --- */}
             <TextField
               variant="outlined"
               size="small"
@@ -199,10 +218,9 @@ const fetchData = useCallback(async (termo = "") => {
                   <TableHead>
                     <TableRow
                       sx={{
-                        // O seletor "& th" aplica o estilo a todas as células de cabeçalho dentro desta linha
                         "& th": {
-                          backgroundColor: "#2a3c61ff", // Cor de fundo preta
-                          color: "#ffffff", // Texto branco (essencial para contraste)
+                          backgroundColor: "#2a3c61ff",
+                          color: "#ffffff",
                           fontWeight: "bold",
                         },
                       }}
@@ -253,7 +271,10 @@ const fetchData = useCallback(async (termo = "") => {
                                 <IconButton
                                   color="error"
                                   size="small"
-                                  onClick={() => handleDelete(componente.id)}
+                                  // ALTERADO: Agora chama a função que abre o Dialog
+                                  onClick={() =>
+                                    handleDeleteClick(componente.id)
+                                  }
                                 >
                                   <DeleteIcon />
                                 </IconButton>
@@ -275,16 +296,15 @@ const fetchData = useCallback(async (termo = "") => {
                 </Table>
               </TableContainer>
 
-              {/* 5. O Componente de Paginação do MUI */}
               <TablePagination
-                rowsPerPageOptions={[5, 10, 25]} // Opções de "itens por página".
-                component="div" // Renderiza como <div>.
-                count={totalElements} // N° total de itens (para calcular as páginas).
-                rowsPerPage={rowsPerPage} // N° de itens por página selecionado.
-                page={page} // Página atual.
-                onPageChange={handleChangePage} // Função p/ mudar de página.
-                onRowsPerPageChange={handleChangeRowsPerPage} // Função p/ mudar N° de itens.
-                labelRowsPerPage="Itens por página:" // Texto customizado.
+                rowsPerPageOptions={[5, 10, 25]}
+                component="div"
+                count={totalElements}
+                rowsPerPage={rowsPerPage}
+                page={page}
+                onPageChange={handleChangePage}
+                onRowsPerPageChange={handleChangeRowsPerPage}
+                labelRowsPerPage="Itens por página:"
               />
             </Paper>
           )}
@@ -297,6 +317,53 @@ const fetchData = useCallback(async (termo = "") => {
         onComponenteAdicionado={handleComponenteAdicionado}
         componenteParaEditar={componenteEmEdicao}
       />
+
+      {/* --- AVISO PERSONALIZADO DE EXCLUSÃO --- */}
+      <Dialog
+        open={openDeleteDialog}
+        onClose={handleCloseDeleteDialog}
+        aria-labelledby="alert-dialog-title"
+        aria-describedby="alert-dialog-description"
+        PaperProps={{
+          sx: {
+            backgroundColor: "background.paper", // Adapta ao tema escuro/claro
+            backgroundImage: "none",
+          },
+        }}
+      >
+        <DialogTitle
+          id="alert-dialog-title"
+          sx={{ fontWeight: "bold", color: "#d32f2f" }} // Título Vermelho
+        >
+          {"Excluir Componente?"}
+        </DialogTitle>
+        <DialogContent>
+          <DialogContentText
+            id="alert-dialog-description"
+            sx={{ color: "text.primary" }}
+          >
+            Tem a certeza que deseja excluir este componente?
+            <br />
+            Esta ação <strong>não pode ser desfeita</strong>.
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button
+            onClick={handleCloseDeleteDialog}
+            sx={{ color: "text.secondary" }}
+          >
+            Cancelar
+          </Button>
+          <Button
+            onClick={handleConfirmDelete}
+            variant="contained"
+            color="error"
+            autoFocus
+          >
+            Sim, Excluir
+          </Button>
+        </DialogActions>
+      </Dialog>
     </>
   );
 }
