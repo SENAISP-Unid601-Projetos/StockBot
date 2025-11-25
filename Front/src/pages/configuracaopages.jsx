@@ -1,188 +1,208 @@
 import { useState, useEffect } from "react";
-import { jwtDecode } from "jwt-decode";
 import api from "../services/api";
 import { toast } from "react-toastify";
-import { useColorMode } from "../useColorMode.js"
 import { useTheme } from "@mui/material/styles";
-
-// Componentes do MUI e outros
 import {
   Box,
   Container,
   Typography,
   Paper,
-  FormControlLabel,
-  Switch,
-  TextField,
   Button as MuiButton,
-  CircularProgress,
+  Grid,
+  TextField,
 } from "@mui/material";
-import Sidebar from "../components/sidebar";
-import UserManagement from "../components/usermanagement.jsx";
-import ModalAddUser from "../components/modaladduser.jsx";
+import TextIncreaseIcon from "@mui/icons-material/TextIncrease";
+import TextDecreaseIcon from "@mui/icons-material/TextDecrease";
 
 function ConfiguracoesPage() {
-  const themeMui = useTheme(); // Hook do MUI para acessar o tema atual
-  const { toggleColorMode } = useColorMode(); // Nosso hook para pegar a função de toggle
+  const themeMui = useTheme();
+  const [passData, setPassData] = useState({
+    currentPassword: "",
+    newPassword: "",
+    confirmPassword: "",
+  });
+  const [loadingPass, setLoadingPass] = useState(false);
 
-  const [isAdmin, setIsAdmin] = useState(false);
-  const [users, setUsers] = useState([]);
-  const [loading, setLoading] = useState(false);
-  const [isAddUserModalVisible, setAddUserModalVisible] = useState(false);
-  const [isVerified, setIsVerified] = useState(false);
-  const [password, setPassword] = useState("");
+  // Substitua este ID pelo real do usuário logado
+  const userId = 1;
 
   useEffect(() => {
-    const token = localStorage.getItem("jwt-token");
-    if (token) {
+    const loadFont = async () => {
       try {
-        const decodedToken = jwtDecode(token);
-        if (decodedToken.roles?.includes("ROLE_ADMIN")) {
-          setIsAdmin(true);
-        }
+        const response = await api.get(
+          `/api/preferences/font?userId=${userId}`
+        );
+        document.documentElement.style.fontSize = response.data + "px";
       } catch (error) {
-        console.error("Erro ao descodificar o token:", error);
+        console.error("Erro ao carregar preferências de fonte");
       }
-    }
+    };
+    loadFont();
   }, []);
 
-  const fetchUsers = async () => {
-    setLoading(true);
-    try {
-      const response = await api.get("/api/users");
-      setUsers(response.data);
-    } catch (error) {
-      console.error("Erro ao carregar utilizadores:", error);
-      toast.error("Não foi possível carregar a lista de utilizadores.");
-    } finally {
-      setLoading(false);
-    }
-  };
+  
 
-  const handleVerifyPassword = async (e) => {
+  const handleChangePassword = async (e) => {
     e.preventDefault();
-    setLoading(true);
-    try {
-      await api.post("/api/auth/verify-password", { password });
-      setIsVerified(true);
-      fetchUsers(); // fetchUsers já gere o seu próprio loading state
-    } catch (error) {
-      console.error("Erro na verificação de senha:", error);
-      toast.error("Senha incorreta. Acesso negado.");
-      setIsVerified(false);
-      setLoading(false); // Precisamos de parar o loading aqui no caso de erro
+    if (passData.newPassword !== passData.confirmPassword) {
+      return toast.error("A nova senha e a confirmação não coincidem.");
     }
-    // O finally foi removido daqui porque o fetchUsers já o tem.
-    // O setLoading(false) só é necessário no catch agora.
+    setLoadingPass(true);
+    try {
+      await api.put("/api/users/me/password", {
+        currentPassword: passData.currentPassword,
+        newPassword: passData.newPassword,
+      });
+      toast.success("Senha alterada com sucesso!");
+      setPassData({
+        currentPassword: "",
+        newPassword: "",
+        confirmPassword: "",
+      });
+    } catch (error) {
+      toast.error(error.response?.data || "Erro ao alterar senha.");
+    } finally {
+      setLoadingPass(false);
+    }
   };
 
-  const handleDeleteUser = async (id) => {
-    if (
-      window.confirm("Tem a certeza de que deseja excluir este utilizador?")
-    ) {
-      setLoading(true); // ← MELHORIA: Inicia o loading
-      try {
-        await api.delete(`/api/users/${id}`);
-        toast.success("Utilizador excluído com sucesso!");
-        fetchUsers(); // ← IMPORTANTE: Recarregar a lista após exclusão
-      } catch (error) {
-        console.error("Erro ao excluir utilizador:", error);
-        toast.error("Falha ao excluir o utilizador.");
-      } finally {
-        setLoading(false); // ← IMPORTANTE: Parar o loading em qualquer caso
-      }
+  const alterarFonte = async (increment) => {
+    const current = parseFloat(
+      getComputedStyle(document.documentElement).fontSize
+    );
+    const newSize = current + increment;
+    document.documentElement.style.fontSize = newSize + "px";
+
+    try {
+      await api.post(
+        `/api/preferences/font?userId=${userId}&fontSize=${newSize}`
+      );
+      toast.info(`Fonte ${increment > 0 ? "aumentada" : "diminuída"} e salva`);
+    } catch {
+      toast.error("Erro ao salvar tamanho da fonte");
     }
   };
+
+  const aumentarFonte = () => alterarFonte(1);
+  const diminuirFonte = () => alterarFonte(-1);
+
+  
 
   return (
-    <>
-      <Box
-        component="main"
-        sx={{ flexGrow: 1, p: 3}}
-      >
-        <Container maxWidth="lg">
-          <Typography
-            variant="h4"
-            component="h1"
-            fontWeight="bold"
-            sx={{ mb: 4 }}
-          >
-            Configurações
-          </Typography>
+    <Box
+      component="main"
+      sx={{
+        flexGrow: 1,
+        p: 3,
+        minHeight: "100vh",
+        backgroundColor: "background.default",
+      }}
+    >
+      <Container maxWidth="lg">
+        <Typography variant="h4" fontWeight="bold" sx={{ mb: 4 }}>
+          Configurações
+        </Typography>
 
-          {/* Secção de Aparência com componentes MUI */}
-          <Paper sx={{ p: 3, mb: 4, boxShadow: 3 }}>
-            <Typography variant="h6" gutterBottom>
-              Aparência
-            </Typography>
-            <FormControlLabel
-              control={
-                <Switch checked={themeMui.palette.mode === "dark"} onChange={toggleColorMode} />
-              }
-              label="Modo Escuro"
-            />
-          </Paper>
-
-        {/* Secção de Gestão de Utilizadores */}
-        {isAdmin && (
-          <Paper sx={{ p: 3, boxShadow: 3 }}>
-            <Box
-              sx={{
-                display: "flex",
-                justifyContent: "space-between",
-                alignItems: "center",
-                mb: 2,
-              }}
-            >
-              <Typography variant="h6">Gestão de Utilizadores</Typography>
-              <MuiButton
-                variant="contained"
-                onClick={() => setAddUserModalVisible(true)}
+        <Grid container spacing={3} direction="column">
+          {/* Alterar Senha */}
+          <Grid item xs={12}>
+            <Paper sx={{ p: 3, boxShadow: 3, width: "100%" }}>
+              <Typography variant="h6" gutterBottom>
+                Alterar Minha Senha
+              </Typography>
+              <Box
+                component="form"
+                onSubmit={handleChangePassword}
                 sx={{
-                  backgroundColor: "#ce0000",
-                  "&:hover": { backgroundColor: "#a40000" },
+                  display: "flex",
+                  flexDirection: "column",
+                  gap: 2,
+                  maxWidth: "400px",
                 }}
               >
-                Adicionar Utilizador
-              </MuiButton>
-            </Box>
-
-              {!isVerified ? (
-                <Box
-                  component="form"
-                  onSubmit={handleVerifyPassword}
-                  sx={{ mt: 2, display: "flex", gap: 2, alignItems: "center" }}
+                <TextField
+                  label="Senha Atual"
+                  type="password"
+                  required
+                  fullWidth
+                  value={passData.currentPassword}
+                  onChange={(e) =>
+                    setPassData({
+                      ...passData,
+                      currentPassword: e.target.value,
+                    })
+                  }
+                />
+                <TextField
+                  label="Nova Senha"
+                  type="password"
+                  required
+                  fullWidth
+                  value={passData.newPassword}
+                  onChange={(e) =>
+                    setPassData({ ...passData, newPassword: e.target.value })
+                  }
+                />
+                <TextField
+                  label="Confirmar Nova Senha"
+                  type="password"
+                  required
+                  fullWidth
+                  value={passData.confirmPassword}
+                  onChange={(e) =>
+                    setPassData({
+                      ...passData,
+                      confirmPassword: e.target.value,
+                    })
+                  }
+                />
+                <MuiButton
+                  type="submit"
+                  variant="contained"
+                  disabled={loadingPass}
                 >
-                  <TextField
-                    type="password"
-                    label="Senha de Administrador"
-                    variant="outlined"
-                    size="small"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    required
-                  />
-                  <MuiButton type="submit" variant="contained">
-                    Verificar
-                  </MuiButton>
-                </Box>
-              ) : loading ? (
-                <Box sx={{ display: "flex", justifyContent: "center", mt: 4 }}>
-                  <CircularProgress />
-                </Box>
-              ) : (
-                <UserManagement users={users} onDeleteUser={handleDeleteUser} />
-              )}
+                  {loadingPass ? "Alterando..." : "Salvar Nova Senha"}
+                </MuiButton>
+              </Box>
             </Paper>
-          )}
-        </Container>
-        <ModalAddUser
-          isVisible={isAddUserModalVisible}
-          onClose={() => setAddUserModalVisible(false)}
-          onUserAdded={fetchUsers}
-        />
-      </Box>
-    </>
+          </Grid>
+
+          
+
+          {/* Ajuste de Fonte */}
+          <Grid item xs={12}>
+            <Paper sx={{ p: 3, boxShadow: 3 }}>
+              <Typography variant="h6" gutterBottom>
+                Acessibilidade
+              </Typography>
+              <Typography sx={{ mb: 2 }}>Ajustar tamanho da fonte</Typography>
+              <Box sx={{ display: "flex", gap: 2 }}>
+                <MuiButton
+                  variant="contained"
+                  color="primary"
+                  startIcon={<TextIncreaseIcon />}
+                  onClick={aumentarFonte}
+                >
+                  A+
+                </MuiButton>
+                <MuiButton
+                  variant="contained"
+                  color="secondary"
+                  startIcon={<TextDecreaseIcon />}
+                  onClick={diminuirFonte}
+                >
+                  A−
+                </MuiButton>
+              </Box>
+            </Paper>
+          </Grid>
+
+          
+        </Grid>
+      </Container>
+
+      
+    </Box>
   );
 }
 

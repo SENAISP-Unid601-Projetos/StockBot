@@ -37,7 +37,7 @@ function ActionList({ title, items }) {
                 {/* ListItemText: Organiza o texto principal e secundário */}
                 <ListItemText
                   primary={item.nome}
-                  secondary={`Património: ${item.codigoPatrimonio} | Stock: ${item.quantidade}`}
+                  secondary={`Património: ${item.codigoPatrimonio} | Estoque: ${item.quantidade}`}
                 />
               </ListItem>
               <Divider variant="inset" component="li" />
