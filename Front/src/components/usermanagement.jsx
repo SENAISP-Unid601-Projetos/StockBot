@@ -41,30 +41,37 @@ function UserManagement({ users, onDeleteUser }) {
         <Table stickyHeader aria-label="tabela de usuários">
           <TableHead>
             <TableRow>
-              {/* Padrão ComponentesTable: Texto em negrito, sem cor de fundo específica */}
+              {/* Padrão ComponentesTable: Alinhamento à esquerda para texto, Negrito no header */}
               <TableCell sx={{ fontWeight: "bold" }}>ID</TableCell>
               <TableCell sx={{ fontWeight: "bold" }}>Email</TableCell>
-              <TableCell sx={{ fontWeight: "bold" }}>Cargo</TableCell>
-              <TableCell sx={{ fontWeight: "bold" }}>Ações</TableCell>
+              {/* Centralizamos Cargo e Ações para melhor visualização dos botões/chips */}
+              <TableCell align="center" sx={{ fontWeight: "bold" }}>Cargo</TableCell>
+              <TableCell align="center" sx={{ fontWeight: "bold" }}>Ações</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
             {users && users.length > 0 ? (
               usersPaginados.map((user) => (
                 <TableRow hover key={user.id}>
+                  {/* Dados alinhados à esquerda (Padrão) */}
                   <TableCell>{user.id}</TableCell>
                   <TableCell>{user.email}</TableCell>
-                  <TableCell>
+                  
+                  {/* Cargo Centralizado e com cor Azul para User */}
+                  <TableCell align="center">
                     <Chip
                       label={user.role}
                       size="small"
-                      color={user.role === "ADMIN" ? "error" : "primary"}
+                      // Se for ADMIN usa 'error' (vermelho), se for outro (USER) usa 'info' (azul)
+                      color={user.role === "ADMIN" ? "error" : "info"}
                       variant={user.role === "ADMIN" ? "filled" : "outlined"}
                       sx={{ fontWeight: "bold", minWidth: "80px" }}
                     />
                   </TableCell>
-                  <TableCell>
-                    <Stack direction="row" spacing={1}>
+                  
+                  {/* Ações Centralizadas */}
+                  <TableCell align="center">
+                    <Stack direction="row" spacing={1} justifyContent="center">
                       <Tooltip title="Excluir usuário">
                         <IconButton
                           aria-label="excluir"
@@ -91,7 +98,7 @@ function UserManagement({ users, onDeleteUser }) {
         </Table>
       </TableContainer>
       
-      {/* Paginação integrada ao Paper, logo abaixo da tabela */}
+      {/* Paginação */}
       <TablePagination
         rowsPerPageOptions={[5, 10, 25]}
         component="div"
