@@ -156,38 +156,25 @@ function Sidebar() {
           />
         </ListItem>
 
-        <>
-          <ListItem disablePadding>
-            <ListItemButton
-              component={NavLink}
-              to="/aprovacoes"
-              sx={{
-                color: theme.palette.sidebar.text,
-                borderRadius: 2,
-                "&:hover": { backgroundColor: theme.palette.sidebar.hover },
-                "&.active": {
-                  backgroundColor: "primary.main",
-                  color: theme.palette.sidebar.textActive,
-                  ".MuiListItemIcon-root": {
-                    color: theme.palette.sidebar.textActive,
-                  },
-                },
-              }}
-            >
-              <ListItemIcon
-                sx={{ color: theme.palette.sidebar.icon, minWidth: 40 }}
-              >
-                <CheckSquare size={20} />
-              </ListItemIcon>
-              <ListItemText primary="Aprovações" />
-            </ListItemButton>
-          </ListItem>
+      <>
+        {/* Item de Aprovações (Já existente) */}
+        <ListItem disablePadding>
+          <ListItemButton component={NavLink} to="/aprovacoes" sx={{ color: theme.palette.sidebar.text, borderRadius: 2, "&:hover": { backgroundColor: theme.palette.sidebar.hover }, "&.active": { backgroundColor: "primary.main", color: theme.palette.sidebar.textActive, ".MuiListItemIcon-root": { color: theme.palette.sidebar.textActive } } }}>
+            <ListItemIcon sx={{ color: theme.palette.sidebar.icon, minWidth: 40 }}>
+              <CheckSquare size={20} />
+            </ListItemIcon>
+            <ListItemText primary="Aprovações" />
+          </ListItemButton>
+        </ListItem>
 
-          {isUserAdmin && (
+        {/* --- BLOCO DE ADMINISTRAÇÃO --- */}
+        {isUserAdmin && (
+          <>
+            {/* --- 1. ADICIONE ISTO AQUI: BOTÃO DE RECEBIMENTO --- */}
             <ListItem disablePadding>
               <ListItemButton
                 component={NavLink}
-                to="/configuracoes"
+                to="/recebimento"
                 sx={{
                   color: theme.palette.sidebar.text,
                   borderRadius: 2,
@@ -201,16 +188,27 @@ function Sidebar() {
                   },
                 }}
               >
-                <ListItemIcon
-                  sx={{ color: theme.palette.sidebar.icon, minWidth: 40 }}
-                >
+                <ListItemIcon sx={{ color: theme.palette.sidebar.icon, minWidth: 40 }}>
+                  {/* O ícone PackageCheck que você já importou */}
+                  <PackageCheck size={20} />
+                </ListItemIcon>
+                <ListItemText primary="Recebimento" />
+              </ListItemButton>
+            </ListItem>
+
+            {/* Item de Configurações (Já existente) */}
+            <ListItem disablePadding>
+              <ListItemButton component={NavLink} to="/configuracoes" sx={{ color: theme.palette.sidebar.text, borderRadius: 2, "&:hover": { backgroundColor: theme.palette.sidebar.hover }, "&.active": { backgroundColor: "primary.main", color: theme.palette.sidebar.textActive, ".MuiListItemIcon-root": { color: theme.palette.sidebar.textActive } } }}>
+                <ListItemIcon sx={{ color: theme.palette.sidebar.icon, minWidth: 40 }}>
                   <Settings size={20} />
                 </ListItemIcon>
                 <ListItemText primary="Configurações" />
               </ListItemButton>
             </ListItem>
-          )}
-        </>
+          </>
+        )}
+      </>
+
 
         <ListItem disablePadding>
           <ListItemButton
