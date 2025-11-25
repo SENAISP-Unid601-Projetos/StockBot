@@ -8,252 +8,193 @@ import {
   Grid,
   Toolbar,
   Typography,
-  Card,
-  CardContent,
-  useTheme,
+  List,
+  ListItem,
+  ListItemIcon,
+  ListItemText,
+  Paper,
+  Stack,
 } from "@mui/material";
-import {
-  Inventory,
-  Security,
-  Timeline,
-  ShoppingCart,
-} from "@mui/icons-material";
+import CheckCircleIcon from "@mui/icons-material/CheckCircle";
+import EmailIcon from "@mui/icons-material/Email";
 import ParticlesBackground from "../components/ParticlesBackground";
 
 function LandingPage() {
-  const theme = useTheme();
-
-  const features = [
-    {
-      icon: <Inventory fontSize="large" color="primary" />,
-      title: "Controle Total",
-      desc: "Gerencie entradas, saídas e movimentações de estoque em tempo real.               ",
-    },
-    {
-      icon: <ShoppingCart fontSize="large" color="primary" />,
-      title: "Fluxo de Compras",
-      desc: "Solicite materiais, aprove pedidos e confirme recebimentos em um fluxo unificado.",
-    },
-    {
-      icon: <Timeline fontSize="large" color="primary" />,
-      title: "Histórico Detalhado",
-      desc: "Rastreabilidade completa de quem mexeu no quê e quando.                          ",
-    },
-    {
-      icon: <Security fontSize="large" color="primary" />,
-      title: "Segurança Avançada",
-      desc: "Controle de acesso por níveis (Admin/Usuário) e recuperação de senha segura.",
-    },
-  ];
-
   return (
     <Box
       sx={{
-        minWidth: "100vh",
         minHeight: "100vh",
         display: "flex",
         flexDirection: "column",
+        position: "relative",
+        overflow: "hidden", // Evita scroll horizontal indesejado
       }}
     >
-      {/* --- HEADER --- */}
-      <AppBar
-        position="static"
-        color="transparent"
-        elevation={0}
-        sx={{ zIndex: 10 }}
+      {/* --- FUNDO DE PARTÍCULAS --- */}
+      <Box
+        sx={{
+          position: "absolute",
+          top: 0,
+          left: 0,
+          width: "100%",
+          height: "100%",
+          zIndex: -1,
+          backgroundColor: "#121212", // Fundo base escuro para as partículas
+        }}
       >
+        <ParticlesBackground />
+      </Box>
+
+      {/* --- NAVBAR / CABEÇALHO --- */}
+      <AppBar position="static" color="transparent" elevation={0} sx={{ zIndex: 10, pt: 2 }}>
         <Container maxWidth="lg">
           <Toolbar disableGutters sx={{ justifyContent: "space-between" }}>
-            {/* Logo / Nome */}
+            {/* Logo */}
             <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-              <Box
-                component="img"
-                src="/bot.svg"
-                alt="Logo StockBot"
-                sx={{
-                  width: 40,
-                  height: 40,
-                  filter: "drop-shadow(0px 2px 4px rgba(0,0,0,0.2))",
-                }}
-              />
-              <Typography
-                variant="h5"
-                fontWeight="bold"
-                sx={{ color: "#fff", letterSpacing: 1 }}
-              >
+             
+              <Typography variant="h4" fontWeight="bold" sx={{ color: "#fff", letterSpacing: 1 }}>
                 StockBot
               </Typography>
             </Box>
 
-            {/* Botões */}
-            <Box sx={{ display: "flex", gap: 2 }}>
-              <Button
-                component={Link}
-                to="/login"
-                variant="outlined"
-                sx={{
-                  color: "#fff",
-                  borderColor: "#fff",
-                  "&:hover": { borderColor: "#C00000", color: "#C00000" },
-                }}
-              >
-                Entrar
-              </Button>
-              <Button
-                component={Link}
-                to="/register"
-                variant="contained"
-                sx={{
-                  backgroundColor: "#C00000",
-                  "&:hover": { backgroundColor: "#a40000" },
-                }}
-              >
-                Criar Conta
-              </Button>
-            </Box>
+            {/* Botão Entrar */}
+            <Button
+              component={Link}
+              to="/login"
+              variant="contained"
+              sx={{
+                color: "#fff",
+                borderColor: "rgba(255,255,255,0.5)",
+                textTransform: "none",
+                px: 3,
+                "&:hover": { borderColor: "#C00000", color: "#ffffffff", backgroundColor: "rgba(209, 20, 20, 0.66)" },
+              }}
+            >
+              Entrar
+            </Button>
           </Toolbar>
         </Container>
       </AppBar>
 
-      {/* --- HERO SECTION --- */}
-      <Box
-        sx={{
-          flexGrow: 1,
-          display: "flex",
-          alignItems: "center",
-          position: "relative",
-          color: "#fff",
-          py: 8,
-        }}
-      >
-        <div
-          style={{
-            position: "absolute",
-            top: 0,
-            left: 0,
-            width: "100%",
-            height: "100%",
-            zIndex: -1,
-          }}
-        >
-          <ParticlesBackground />
-        </div>
-
-        <Container maxWidth="lg" sx={{ position: "relative", zIndex: 1 }}>
-          <Grid container spacing={4} alignItems="center">
-            <Grid item xs={12} md={6}>
-              <Typography
-                variant="h2"
-                fontWeight="800"
-                sx={{
-                  mb: 2,
-                  background: "-webkit-linear-gradient(45deg, #fff, #ccc)",
-                  WebkitBackgroundClip: "text",
-                  WebkitTextFillColor: "transparent",
-                }}
-              >
-                Gestão de Estoque Inteligente e Simples.
-              </Typography>
-              <Typography
-                variant="h6"
-                sx={{ mb: 4, opacity: 0.8, lineHeight: 1.6 }}
-              >
-                O StockBot moderniza o almoxarifado da sua escola ou empresa.
-                Controle itens, aprove compras e acompanhe tudo em um só lugar.
-              </Typography>
-              <Button
-                component={Link}
-                to="/register"
-                variant="contained"
-                size="large"
-                sx={{
-                  backgroundColor: "#C00000",
-                  fontSize: "1.1rem",
-                  px: 4,
-                  py: 1.5,
-                  "&:hover": { backgroundColor: "#a40000" },
-                }}
-              >
-                Começar Agora Grátis
-              </Button>
-            </Grid>
-            <Grid
-              item
-              xs={12}
-              md={6}
-              sx={{ display: { xs: "none", md: "block" }, textAlign: "center" }}
-            >
-              {/* Espaço para imagem futura */}
-            </Grid>
-          </Grid>
-        </Container>
-      </Box>
-      <Box sx={{ backgroundColor: "#f5f5f5", py: 8 }}>
-        <Container maxWidth="lg">
-          <Typography
-            variant="h4"
-            fontWeight="bold"
-            textAlign="center"
-            sx={{ mb: 6, color: "#333" }}
-          >
-            Por que escolher o StockBot?
-          </Typography>
+      {/* --- CONTEÚDO PRINCIPAL (HERO SECTION) --- */}
+      <Container maxWidth="lg" sx={{ flexGrow: 1, display: "flex", alignItems: "center", py: 8, zIndex: 1 }}>
+        <Grid container spacing={6} alignItems="center">
           
+          {/* LADO ESQUERDO: TEXTO E CTA */}
+          <Grid item xs={12} md={6}>
+            <Typography
+              variant="overline"
+              sx={{ color: "#2ecc71", fontWeight: "bold", letterSpacing: 2, fontSize: "0.9rem" }}
+            >
+              100% GRATUITO
+            </Typography>
+            
+            <Typography
+              variant="h2"
+              fontWeight="800"
+              sx={{
+                mt: 1,
+                mb: 3,
+                color: "#fff",
+                lineHeight: 1.1,
+                fontSize: { xs: "2.5rem", md: "3.5rem" },
+              }}
+            >
+              Controle seu estoque da forma <span style={{ color: "#C00000" }}>correta</span>
+            </Typography>
 
-          {/* 'alignItems="stretch"' garante que todos os itens do grid tenham a mesma altura */}
-          <Grid container spacing={4} alignItems="stretch">
-            {features.map((feature, index) => (
-              <Grid
-                item
-                xs={12}
-                sm={6}
-                md={3}
-                key={index}
-                sx={{ display: "flex" }}
-              >
-                <Card
-                  sx={{
-                    width: "100%",
-                    display: "flex",
-                    flexDirection: "column",
-                    justifyContent: "space-between",
-                    textAlign: "center",
-                    p: 2,
-                    transition: "0.3s",
-                    "&:hover": { transform: "translateY(-5px)", boxShadow: 6 },
-                  }}
-                >
-                  <CardContent sx={{ flexGrow: 1 }}>
-                    <Box sx={{ mb: 2 }}>{feature.icon}</Box>
-                    <Typography variant="h6" fontWeight="bold" gutterBottom>
-                      {feature.title}
-                    </Typography>
-                    <Typography variant="body2" color="text.secondary">
-                      {feature.desc}
-                    </Typography>
-                  </CardContent>
-                </Card>
-              </Grid>
-            ))}
+            <Typography variant="h6" sx={{ color: "rgba(255,255,255,0.8)", mb: 4, lineHeight: 1.6, fontWeight: 400 }}>
+              O StockBot moderniza o seu estoque. 
+              Gerencie entradas, saídas e movimentações em um só lugar.
+            </Typography>
+
+            {/* LISTA DE BENEFÍCIOS (Estilo Hostinger) */}
+            <List sx={{ mb: 4 }}>
+              {[
+                "Sistema totalmente gratuito",
+                "Controle Total",
+                "Fluxo de Compras",
+                "Histórico Detalhado",
+                "Segurança Avançada",
+                "Suporte via e-mail",
+                "Painéis visuais intuitivos"
+              ].map((text, index) => (
+                <ListItem key={index} disableGutters sx={{ py: 0.5 }}>
+                  <ListItemIcon sx={{ minWidth: 35 }}>
+                    <CheckCircleIcon sx={{ color: "#2ecc71" }} />
+                  </ListItemIcon>
+                  <ListItemText primary={text} primaryTypographyProps={{ style: { color: "#fff", fontWeight: 500 } }} />
+                </ListItem>
+              ))}
+            </List>
+
+            {/* BOTÃO DE AÇÃO */}
+            <Button
+              component={Link}
+              to="/register"
+              variant="contained"
+              size="large"
+              sx={{
+                backgroundColor: "#C00000",
+                color: "#fff",
+                fontSize: "1.1rem",
+                fontWeight: "bold",
+                px: 5,
+                py: 1.8,
+                boxShadow: "0 10px 30px rgba(192, 0, 0, 0.3)",
+                "&:hover": { backgroundColor: "#a40000", transform: "translateY(-2px)" },
+                transition: "all 0.3s"
+              }}
+            >
+              Começar agora
+            </Button>
           </Grid>
+
+          {/* LADO DIREITO: VISUAL/MOCKUP */}
+          <Grid item xs={12} md={6}>
+            {/* Simulação da Interface do Sistema (Mockup CSS) */}
+            <Box
+              sx={{
+                position: "relative",
+                perspective: "1000px",
+              }}
+            >
+            
+            </Box>
+          </Grid>
+        </Grid>
+      </Container>
+
+      {/* --- RODAPÉ SIMPLES --- */}
+      <Box sx={{ backgroundColor: "rgba(0,0,0,0.8)", py: 4, borderTop: "1px solid rgba(255,255,255,0.1)", zIndex: 2 }}>
+        <Container maxWidth="lg">
+          <Stack direction={{ xs: "column", sm: "row" }} justifyContent="space-between" alignItems="center" spacing={2}>
+            <Typography variant="body2" sx={{ color: "rgba(255,255,255,0.6)" }}>
+              © {new Date().getFullYear()} StockBot. Todos os direitos reservados.
+            </Typography>
+            
+            <Box sx={{ display: "flex", alignItems: "center", gap: 1, color: "#fff" }}>
+                <EmailIcon fontSize="small" sx={{ color: "#C00000" }} />
+                <Typography variant="body2" component="a" href="mailto:stockbotdevstest@gmail.com" sx={{ color: "#fff", textDecoration: "none", "&:hover": { color: "#C00000" } }}>
+                    stockbotdevstest@gmail.com
+                </Typography>
+            </Box>
+          </Stack>
         </Container>
       </Box>
 
-      {/* --- FOOTER --- */}
-      <Box
-        sx={{
-          backgroundColor: "#000000ff",
-          color: "#fff",
-          py: 3,
-          textAlign: "center",
-        }}
-      >
-        <Typography variant="body2" sx={{ opacity: 0.7 }}>
-          © {new Date().getFullYear()} StockBot. Todos os direitos reservados.
-        </Typography>
-      </Box>
+      {/* CSS para animação de flutuação */}
+      <style>
+        {`
+          @keyframes float {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-15px); }
+            100% { transform: translateY(0px); }
+          }
+        `}
+      </style>
     </Box>
   );
 }
 
-export default LandingPage;
+export default LandingPage;
