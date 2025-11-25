@@ -40,6 +40,8 @@ public class EmailService {
         try {
             logger.info("Tentando enviar e-mail para: {}", destinatario);
 
+            // Se quiser tentar enviar de verdade, descomente as linhas abaixo:
+
             SimpleMailMessage email = new SimpleMailMessage();
             email.setFrom(remetente);
             email.setTo(destinatario);
@@ -49,6 +51,7 @@ public class EmailService {
             mailSender.send(email);
 
             logger.info("E-mail enviado com sucesso para: {}", destinatario);
+
 
         } catch (Exception e) {
             logger.error("Falha ao enviar e-mail para {}: {}", destinatario, e.getMessage());

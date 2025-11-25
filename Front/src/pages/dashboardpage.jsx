@@ -2,11 +2,11 @@ import React, { useState, useEffect } from "react";
 import api from "../services/api";
 import { toast } from "react-toastify";
 
-// Imports do MUI
+// Imports do MUI v6
 import {
   Box,
   Container,
-  Grid,
+  Grid2 as Grid, // Usando o Grid novo (v6)
   Paper,
   Typography,
   Button,
@@ -32,10 +32,10 @@ import {
 } from "@mui/icons-material";
 
 // Componentes
-import KpiCard from "../components/KpiCard"; // Verifique se o nome do arquivo é KpiCard ou kpicard
-import CategoryChart from "../components/categoriachart"; // Verifique o nome do arquivo
+import KpiCard from "../components/KpiCard";
+import CategoryChart from "../components/CategoryChart"; // Gráfico de Pizza
 
-// ChartJS para o Gráfico de Barras
+// ChartJS para o Gráfico de Barras (Comparativo)
 import { Bar } from "react-chartjs-2";
 import {
   Chart as ChartJS,
@@ -47,7 +47,6 @@ import {
   Legend,
 } from "chart.js";
 
-// Registra os componentes do ChartJS
 ChartJS.register(
   CategoryScale,
   LinearScale,
@@ -58,8 +57,12 @@ ChartJS.register(
 );
 
 function DashboardPage() {
+  // 1. Dados Agregados (Vem do endpoint rápido /dashboard)
   const [dashboardData, setDashboardData] = useState(null);
-  const [todosComponentes, setTodosComponentes] = useState([]); // Lista completa para o filtro
+  
+  // 2. Dados Detalhados (Vem de /componentes para alimentar o filtro)
+  const [todosComponentes, setTodosComponentes] = useState([]); 
+  
   const [loading, setLoading] = useState(true);
 
   // Filtro do Gráfico de Barras
@@ -70,17 +73,20 @@ function DashboardPage() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        // 1. Busca dados rápidos (KPIs + Pizza) do endpoint otimizado
-        const resDashboard = await api.get("/api/dashboard");
-        setDashboardData(resDashboard.data);
+        // Busca paralela para ser mais rápido
+        const [resDashboard, resComponentes] = await Promise.all([
+            api.get("/api/dashboard"),           // KPIs e Pizza
+            api.get("/api/componentes?size=100") // Lista para o filtro (limitado a 100 para não pesar)
+        ]);
 
-        // 2. Busca lista detalhada para o gráfico de barras (Pega até 100 itens para filtrar)
-        const resComponentes = await api.get("/api/componentes?size=100");
+        setDashboardData(resDashboard.data);
+        
         const lista = resComponentes.data.content || [];
         setTodosComponentes(lista);
 
-        // Seleção inicial: Primeiros 10 itens
+        // Seleção inicial automática: Primeiros 10 itens
         setSelectedNames(lista.slice(0, 10).map((c) => c.nome));
+
       } catch (error) {
         console.error(error);
         toast.error("Erro ao carregar dados.");
@@ -91,7 +97,7 @@ function DashboardPage() {
     fetchData();
   }, []);
 
-  // --- Lógica do Filtro ---
+  // --- Lógica do Filtro (Trazida do Fork) ---
   const handleFilterClick = (event) => setAnchorEl(event.currentTarget);
   const handleFilterClose = () => setAnchorEl(null);
 
@@ -111,125 +117,91 @@ function DashboardPage() {
     setSelectedNames(newSelected);
   };
 
-  // Prepara os dados para o Gráfico de Barras baseado na seleção
+  // Prepara os dados para o Gráfico de Barras (ChartJS)
   const dadosBarras = {
     labels: selectedNames,
     datasets: [
       {
-        label: "Quantidade em Estoque",
+        label: "Estoque Atual",
         data: selectedNames.map(
-          (nome) =>
-            todosComponentes.find((c) => c.nome === nome)?.quantidade || 0
+          (nome) => todosComponentes.find((c) => c.nome === nome)?.quantidade || 0
         ),
-        backgroundColor: "rgba(53, 162, 235, 0.6)",
+        backgroundColor: "rgba(53, 162, 235, 0.7)",
         borderColor: "rgb(53, 162, 235)",
         borderWidth: 1,
       },
       {
-        label: "Estoque Mínimo",
+        label: "Mínimo Exigido",
         data: selectedNames.map(
-          (nome) =>
-            todosComponentes.find((c) => c.nome === nome)?.nivelMinimoEstoque ||
-            0
+          (nome) => todosComponentes.find((c) => c.nome === nome)?.nivelMinimoEstoque || 0
         ),
-        backgroundColor: "rgba(255, 99, 132, 0.6)",
+        backgroundColor: "rgba(255, 99, 132, 0.5)",
         borderColor: "rgb(255, 99, 132)",
         borderWidth: 1,
+        borderDash: [5, 5], // Linha tracejada para diferenciar
       },
     ],
   };
 
   const handleGeneratePdf = () => {
-    window.print();
+    window.print(); // Mantendo a simplicidade do print nativo
   };
 
   if (loading) {
     return (
       <Container maxWidth="xl" sx={{ mt: 4 }}>
-        <Skeleton variant="rectangular" height={400} />
+        <Skeleton variant="rectangular" height={400} sx={{ borderRadius: 2 }} />
       </Container>
     );
   }
 
   return (
-    <Box
-      component="main"
-      sx={{
-        flexGrow: 1,
-        py: 3,
-        bgcolor: "background.default",
-        minHeight: "100vh",
-      }}
-    >
+    <Box component="main" sx={{ flexGrow: 1, py: 3, bgcolor: "background.default", minHeight: "100vh" }}>
       <Container maxWidth="xl">
+        
         {/* Cabeçalho */}
-        <Box
-          display="flex"
-          justifyContent="space-between"
-          mb={6}
-          alignItems="center"
-        >
-          <Typography variant="h4" fontWeight="bold" color="text.primary">
-            Dashboard
-          </Typography>
+        <Box display="flex" justifyContent="space-between" mb={4} alignItems="center">
+          <Box>
+            <Typography variant="h4" fontWeight="bold" color="text.primary">
+              Dashboard
+            </Typography>
+            <Typography variant="body2" color="text.secondary">
+              Visão geral e comparativo de estoque
+            </Typography>
+          </Box>
           <Button
-            variant="contained"
+            variant="outlined"
             startIcon={<PictureAsPdfIcon />}
             onClick={handleGeneratePdf}
           >
-            Imprimir Relatório
+            Relatório
           </Button>
         </Box>
 
-        {/* --- 1. KPIs (Cartões) --- */}
+        {/* --- 1. KPIs (Dados Rápidos) --- */}
         <Grid container spacing={3} mb={4}>
-          <Grid item xs={12} sm={6} md={2.4}>
-            <KpiCard
-              title="Total Itens"
-              value={dashboardData?.totalItens}
-              icon={<Inventory />}
-              color="#1976d2"
-            />
+          <Grid size={{ xs: 12, sm: 6, md: 2.4 }}>
+            <KpiCard title="Total Itens" value={dashboardData?.totalItens} icon={<Inventory />} color="#1976d2" />
           </Grid>
-          <Grid item xs={12} sm={6} md={2.4}>
-            <KpiCard
-              title="Estoque Total"
-              value={dashboardData?.totalQuantidadeEstoque}
-              icon={<AttachMoney />}
-              color="#2e7d32"
-            />
+          <Grid size={{ xs: 12, sm: 6, md: 2.4 }}>
+            <KpiCard title="Estoque Total" value={dashboardData?.totalQuantidadeEstoque} icon={<AttachMoney />} color="#2e7d32" />
           </Grid>
-          <Grid item xs={12} sm={6} md={2.4}>
-            <KpiCard
-              title="Em Falta"
-              value={dashboardData?.itensEmFalta}
-              icon={<WarningAmber />}
-              color="#d32f2f"
-              isCritical={dashboardData?.itensEmFalta > 0}
-            />
+          <Grid size={{ xs: 12, sm: 6, md: 2.4 }}>
+            <KpiCard title="Em Falta" value={dashboardData?.itensEmFalta} icon={<WarningAmber />} color="#d32f2f" isCritical={dashboardData?.itensEmFalta > 0} />
           </Grid>
-          <Grid item xs={12} sm={6} md={2.4}>
-            <KpiCard
-              title="Req. Pendentes"
-              value={dashboardData?.requisicoesPendentes}
-              icon={<Assignment />}
-              color="#ed6c02"
-            />
+          <Grid size={{ xs: 12, sm: 6, md: 2.4 }}>
+            <KpiCard title="Req. Pendentes" value={dashboardData?.requisicoesPendentes} icon={<Assignment />} color="#ed6c02" />
           </Grid>
-          <Grid item xs={12} sm={6} md={2.4}>
-            <KpiCard
-              title="Compras Pendentes"
-              value={dashboardData?.pedidosCompraPendentes}
-              icon={<ShoppingCart />}
-              color="#9c27b0"
-            />
+          <Grid size={{ xs: 12, sm: 6, md: 2.4 }}>
+            <KpiCard title="Compras Pendentes" value={dashboardData?.pedidosCompraPendentes} icon={<ShoppingCart />} color="#9c27b0" />
           </Grid>
         </Grid>
 
         <Grid container spacing={3}>
-          {/* --- 2. Gráfico de Pizza (Agregado) --- */}
-          <Grid item xs={12} md={4}>
-            {/* Passamos os dados formatados para o componente que já criamos */}
+          
+          {/* --- 2. Gráfico de Pizza (Agregado por Categoria) --- */}
+          <Grid size={{ xs: 12, md: 4 }}>
+            {/* Reutilizamos o componente que já criamos */}
             <CategoryChart
               componentes={dashboardData?.distribuicaoPorCategoria.map((d) => ({
                 categoria: d.categoria || "Outros",
@@ -238,8 +210,8 @@ function DashboardPage() {
             />
           </Grid>
 
-          {/* --- 3. Gráfico de Barras (Com Filtro) --- */}
-          <Grid item xs={12} md={8}>
+          {/* --- 3. Gráfico de Barras (Comparativo Item a Item com Filtro) --- */}
+          <Grid size={{ xs: 12, md: 8 }}>
             <Paper
               sx={{
                 p: 3,
@@ -247,46 +219,34 @@ function DashboardPage() {
                 position: "relative",
                 minHeight: 400,
                 boxShadow: 3,
+                borderRadius: 2
               }}
             >
-              {/* Botão de Filtro (Posicionado no canto) */}
+              {/* Botão de Filtro Flutuante */}
               <Box position="absolute" top={16} right={16} zIndex={10}>
                 <Tooltip title="Filtrar Itens">
                   <IconButton onClick={handleFilterClick} color="primary">
-                    <Badge
-                      badgeContent={selectedNames.length}
-                      color="secondary"
-                    >
+                    <Badge badgeContent={selectedNames.length} color="secondary">
                       <FilterListIcon />
                     </Badge>
                   </IconButton>
                 </Tooltip>
 
-                {/* Menu Dropdown */}
                 <Menu
                   anchorEl={anchorEl}
                   open={openMenu}
                   onClose={handleFilterClose}
-                  // AQUI ESTA A CORREÇÃO: Usamos 'sx' dentro de SlotProps ou PaperProps
+                  // CORREÇÃO DO ERRO DE TIPO: Usamos slotProps ou sx direto
                   PaperProps={{
-                    sx: { maxHeight: 300, width: 250 },
+                    sx: { maxHeight: 300, width: 250 }
                   }}
                 >
                   <MenuItem disabled>
-                    <Typography variant="caption">
-                      Selecione até 15 itens
-                    </Typography>
+                    <Typography variant="caption">Selecione até 15 itens</Typography>
                   </MenuItem>
                   {todosComponentes.map((comp) => (
-                    <MenuItem
-                      key={comp.id}
-                      onClick={() => handleToggleItem(comp.nome)}
-                      dense
-                    >
-                      <Checkbox
-                        checked={selectedNames.includes(comp.nome)}
-                        size="small"
-                      />
+                    <MenuItem key={comp.id} onClick={() => handleToggleItem(comp.nome)} dense>
+                      <Checkbox checked={selectedNames.includes(comp.nome)} size="small" />
                       <ListItemText primary={comp.nome} />
                     </MenuItem>
                   ))}
@@ -294,10 +254,10 @@ function DashboardPage() {
               </Box>
 
               <Typography variant="h6" gutterBottom fontWeight="bold">
-                Comparativo de Estoque (Item a Item)
+                Comparativo: Estoque Atual vs Mínimo
               </Typography>
-
-              <Box height={320} mt={4}>
+              
+              <Box height={320} mt={2}>
                 <Bar
                   data={dadosBarras}
                   options={{
@@ -305,6 +265,19 @@ function DashboardPage() {
                     maintainAspectRatio: false,
                     plugins: {
                       legend: { position: "top" },
+                      tooltip: {
+                        callbacks: {
+                            // Dica: Mostra se está acima ou abaixo da meta
+                            afterLabel: function(context) {
+                                if (context.datasetIndex === 0) { // Se for a barra azul
+                                    const item = todosComponentes.find(c => c.nome === context.label);
+                                    if (item && item.quantidade <= item.nivelMinimoEstoque) {
+                                        return "⚠️ ATENÇÃO: Estoque Baixo!";
+                                    }
+                                }
+                            }
+                        }
+                      }
                     },
                     scales: {
                       y: { beginAtZero: true },

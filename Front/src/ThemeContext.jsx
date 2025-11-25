@@ -13,16 +13,14 @@ export function ThemeProvider({ children }) {
     () => localStorage.getItem("themeMode") || "light"
   );
 
-  // **** BLOCO useEffect CORRIGIDO ****
+  // **** BLOCO useEffect ****
   useEffect(() => {
-    // Adiciona uma verificação para garantir que document.body existe
     if (document.body) {
       const bodyClassList = document.body.classList;
       bodyClassList.remove(mode === "light" ? "dark" : "light");
       bodyClassList.add(mode);
     }
-  }, [mode]); // Executa sempre que 'mode' mudar
-  // **** FIM DO BLOCO useEffect ****
+  }, [mode]);
 
   const colorMode = useMemo(
     () => ({
@@ -37,6 +35,7 @@ export function ThemeProvider({ children }) {
     []
   );
 
+  // --- AQUI ESTÁ A ALTERAÇÃO ---
   const theme = useMemo(
     () =>
       createTheme({
@@ -44,12 +43,28 @@ export function ThemeProvider({ children }) {
           mode,
           ...(mode === "light"
             ? {
+                // MODO CLARO
                 primary: { main: "#C00000" },
                 background: { default: "#f4f4f4", paper: "#ffffff" },
+                sidebar: {
+                  background: "#1A2E44", // Azul Escuro (do seu CSS)
+                  text: "rgba(255, 255, 255, 0.7)",
+                  textActive: "#ffffff",
+                  icon: "rgba(255, 255, 255, 0.7)",
+                  hover: "rgba(255, 255, 255, 0.08)",
+                },
               }
             : {
+                // MODO ESCURO
                 primary: { main: "#C00000" },
                 background: { default: "#121212", paper: "#1e1e1e" },
+                sidebar: {
+                  background: "#000000", // Preto
+                  text: "rgba(255, 255, 255, 0.7)",
+                  textActive: "#ffffff",
+                  icon: "rgba(255, 255, 255, 0.7)",
+                  hover: "rgba(255, 255, 255, 0.08)",
+                },
               }),
         },
       }),

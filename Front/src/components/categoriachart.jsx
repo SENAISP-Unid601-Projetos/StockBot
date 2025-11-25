@@ -1,80 +1,44 @@
 import React from 'react';
-import { Doughnut } from 'react-chartjs-2';
+import { Doughnut } from 'react-chartjs-2'; // Usamos Pizza/Rosca para categorias
 import { Chart as ChartJS, ArcElement, Tooltip, Legend } from 'chart.js';
-import { Box, Paper, Typography, useTheme } from '@mui/material';
+import { Paper, Typography, Box } from '@mui/material';
 
-// Registra os plugins necessários do Chart.js
 ChartJS.register(ArcElement, Tooltip, Legend);
 
-function CategoryChart({ componentes }) {
-  // Acessa o tema do MUI
-  const theme = useTheme();
-
-  // Processamento de dados para o gráfico
-  const dadosGrafico = {};
-  componentes.forEach(comp => {
-    dadosGrafico[comp.nome] = (dadosGrafico[comp.nome] || 0) + comp.quantidade;
+function CategoryChart({ componentes = [] }) {
+  // Agrupa por categoria
+  const dadosAgrupados = {};
+  componentes.forEach(item => {
+    const cat = item.categoria || 'Sem Categoria';
+    dadosAgrupados[cat] = (dadosAgrupados[cat] || 0) + (item.quantidade || 0);
   });
 
-  const chartData = {
-    labels: Object.keys(dadosGrafico),
+  const data = {
+    labels: Object.keys(dadosAgrupados),
     datasets: [
       {
-        label: 'Quantidade em estoque',
-        data: Object.values(dadosGrafico),
+        data: Object.values(dadosAgrupados),
         backgroundColor: [
-          theme.palette.primary.main,
-          theme.palette.secondary.main,
-          '#FFC107', // Amarelo
-          '#28a745', // Verde
-          '#6f42c1', // Roxo
-          '#17a2b8', // Ciano
-          '#fd7e14', // Laranja
-          '#e83e8c', // Rosa
+          '#1976d2', '#2e7d32', '#ed6c02', '#9c27b0', '#d32f2f', '#0288d1'
         ],
-        borderColor: theme.palette.background.paper,
-        borderWidth: 3,
-        hoverOffset: 8,
+        borderWidth: 1,
       },
     ],
   };
 
-  // Opções do gráfico usando o tema do MUI
-  const chartOptions = {
+  const options = {
     responsive: true,
     maintainAspectRatio: false,
     plugins: {
-      legend: {
-        position: 'right',
-        labels: {
-          color: theme.palette.text.secondary,
-          font: {
-            family: theme.typography.fontFamily,
-          },
-        },
-      },
-      title: {
-        display: false,
-      },
-      tooltip: {
-        titleFont: {
-          family: theme.typography.fontFamily,
-        },
-        bodyFont: {
-          family: theme.typography.fontFamily,
-        },
-      }
-    },
-    cutout: '60%',
+      legend: { position: 'right' },
+    }
   };
 
   return (
-    <Paper sx={{ p: 2, height: '100%', display: 'flex', flexDirection: 'column' }}>
-      <Typography variant="h6" component="h3" gutterBottom>
-        Distribuição de Itens
-      </Typography>
-      <Box sx={{ position: 'relative', flexGrow: 1, minHeight: '300px' }}>
-        <Doughnut data={chartData} options={chartOptions} />
+    <Paper sx={{ p: 3, height: '100%', minHeight: 400, boxShadow: 3, display: 'flex', flexDirection: 'column' }}>
+      <Typography variant="h6" gutterBottom fontWeight="bold">Distribuição por Categoria</Typography>
+      <Box sx={{ flexGrow: 1, position: 'relative' }}>
+        <Doughnut data={data} options={options} />
       </Box>
     </Paper>
   );
