@@ -6,7 +6,7 @@ import { toast } from "react-toastify";
 import {
   Box,
   Container,
-  Grid2 as Grid, // Usando o Grid novo (v6)
+  Grid,
   Paper,
   Typography,
   Button,
@@ -33,7 +33,7 @@ import {
 
 // Componentes
 import KpiCard from "../components/KpiCard";
-import CategoryChart from "../components/CategoryChart"; // Gráfico de Pizza
+import CategoryChart from "../components/categoriachart"; // Gráfico de Pizza
 
 // ChartJS para o Gráfico de Barras (Comparativo)
 import { Bar } from "react-chartjs-2";
