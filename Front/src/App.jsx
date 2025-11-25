@@ -10,8 +10,7 @@ function App() {
   // 1. VERIFICAÇÃO DE SEGURANÇA (o seu código, que está perfeito)
   // Se o utilizador não estiver autenticado, redireciona para a página de login
   if (!isAuthenticated()) {
-    // Usamos o `replace` para não deixar a página protegida no histórico do navegador
-    return <Navigate to="/login" state={{ from: location }} replace />;
+    return <Navigate to="/welcome" state={{ from: location }} replace />;
   }
 
   // 2. A MOLDURA (o layout visual)

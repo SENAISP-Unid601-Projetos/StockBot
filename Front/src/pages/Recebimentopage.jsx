@@ -23,7 +23,6 @@ function Recebimentopage() {
   const fetchAprovados = async () => {
     setLoading(true);
     try {
-      // Chama o endpoint novo que criamos no Controller
       const response = await api.get("/api/pedidos-compra/aprovados");
       setPedidos(response.data || []);
     } catch (error) {
@@ -37,54 +36,125 @@ function Recebimentopage() {
     fetchAprovados();
   }, []);
 
-  const handleConfirmarChegada = async (id) => {
-    if(!window.confirm("Confirmar que este material chegou fisicamente? O estoque será atualizado.")) return;
-    
+  // --- LÓGICA DE PAGINAÇÃO ---
+  const handleChangePage = (event, newPage) => {
+    setPage(newPage);
+  };
+
+  const handleChangeRowsPerPage = (event) => {
+    setRowsPerPage(parseInt(event.target.value, 10));
+    setPage(0);
+  };
+
+  // Cria a "fatia" de dados para exibir na página atual
+  const pedidosPaginados = pedidos.slice(
+    page * rowsPerPage,
+    page * rowsPerPage + rowsPerPage
+  );
+
+  // --- LÓGICA DO DIALOG ---
+  const handleOpenConfirmDialog = (id) => {
+    setSelectedPedidoId(id);
+    setOpenDialog(true);
+  };
+
+  const handleCloseDialog = () => {
+    setOpenDialog(false);
+    setSelectedPedidoId(null);
+  };
+
+  const executeConfirmarChegada = async () => {
+    handleCloseDialog();
+    if (!selectedPedidoId) return;
+
     try {
-      await api.put(`/api/pedidos-compra/${id}/receber`);
-      toast.success("Recebimento confirmado! Estoque atualizado.");
-      fetchAprovados(); // Recarrega a lista
+      const toastId = toast.loading("Atualizando estoque...");
+      await api.put(`/api/pedidos-compra/${selectedPedidoId}/receber`);
+      toast.update(toastId, {
+        render: "Estoque atualizado com sucesso!",
+        type: "success",
+        isLoading: false,
+        autoClose: 3000,
+      });
+      fetchAprovados();
     } catch (error) {
       toast.error("Erro ao confirmar recebimento.");
     }
   };
 
   return (
-    <Box component="main" sx={{ flexGrow: 1, p: 3 }}>
+    <Box
+      component="main"
+      sx={{
+        flexGrow: 1,
+        p: 3,
+        backgroundColor: "background.default",
+        minHeight: "100vh",
+      }}
+    >
       <Container maxWidth="lg">
         <Typography variant="h4" fontWeight="bold" sx={{ mb: 4 }}>
           Recebimento de Compras
         </Typography>
 
-        <Paper sx={{ width: "100%", overflow: "hidden", boxShadow: 3 }}>
+        <Paper sx={{ width: "100%", overflow: "hidden", boxShadow: 5 }}>
           <TableContainer>
             <Table stickyHeader>
               <TableHead>
-                <TableRow>
-                  <TableCell sx={{ fontWeight: "bold" }}>Item</TableCell>
-                  <TableCell sx={{ fontWeight: "bold" }}>Qtd.</TableCell>
-                  <TableCell sx={{ fontWeight: "bold" }}>Solicitante</TableCell>
-                  <TableCell sx={{ fontWeight: "bold" }}>Data Pedido</TableCell>
-                  <TableCell sx={{ fontWeight: "bold" }}>Ação</TableCell>
+                <TableRow
+                  sx={{
+                    "& th": {
+                      backgroundColor: "#2a3c61ff",
+                      color: "#ffffff",
+                      fontWeight: "bold",
+                    },
+                  }}
+                >
+                  <TableCell align="center">Item</TableCell>
+                  <TableCell align="center">Qtd.</TableCell>
+                  <TableCell align="center">Solicitante</TableCell>
+                  <TableCell align="center">Data Pedido</TableCell>
+                  <TableCell align="center">Ação</TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>
                 {loading ? (
-                  <TableRow><TableCell colSpan={5} align="center"><CircularProgress /></TableCell></TableRow>
-                ) : pedidos.length > 0 ? (
-                  pedidos.map((pedido) => (
+                  <TableRow>
+                    <TableCell colSpan={5} align="center">
+                      <CircularProgress />
+                    </TableCell>
+                  </TableRow>
+                ) : pedidosPaginados.length > 0 ? (
+                  pedidosPaginados.map((pedido) => (
                     <TableRow hover key={pedido.id}>
-                      <TableCell>{pedido.componenteNome}</TableCell>
-                      <TableCell>{pedido.quantidade}</TableCell>
-                      <TableCell>{pedido.solicitanteEmail}</TableCell>
-                      <TableCell>{new Date(pedido.dataRequisicao).toLocaleDateString("pt-BR")}</TableCell>
-                      <TableCell>
-                        <Button 
-                          variant="contained" 
-                          color="primary" 
-                          onClick={() => handleConfirmarChegada(pedido.id)}
+                      <TableCell align="center">
+                        {pedido.componenteNome}
+                      </TableCell>
+
+                      <TableCell
+                        align="center"
+                        sx={{ fontWeight: "bold", fontSize: "1.1rem" }}
+                      >
+                        {pedido.quantidade}
+                      </TableCell>
+
+                      <TableCell align="center">
+                        {pedido.solicitanteEmail}
+                      </TableCell>
+                      <TableCell align="center">
+                        {new Date(pedido.dataRequisicao).toLocaleDateString(
+                          "pt-BR"
+                        )}
+                      </TableCell>
+                      <TableCell align="center">
+                        <Button
+                          variant="contained"
+                          color="success"
+                          size="small"
+                          startIcon={<CheckCircleIcon />}
+                          onClick={() => handleOpenConfirmDialog(pedido.id)}
                         >
-                          Confirmar Chegada
+                          Confirmar
                         </Button>
                       </TableCell>
                     </TableRow>

@@ -36,14 +36,13 @@ function Aprovacaopages() {
     setTabIndex(newValue);
   };
 
-  // --- LÓGICA DE PEDIDOS DE COMPRA (Aba 0) ---
   const fetchPedidosCompra = useCallback(async () => {
     setLoading(true);
     try {
       const response = await api.get("/api/pedidos-compra/pendentes");
       const todosPedidos = response.data || [];
       setTotalElements(todosPedidos.length);
-      
+
       const inicio = page * rowsPerPage;
       const fim = inicio + rowsPerPage;
       setPedidosPaginados(todosPedidos.slice(inicio, fim));
@@ -55,7 +54,6 @@ function Aprovacaopages() {
     }
   }, [page, rowsPerPage]);
 
-  // Carrega dados apenas se estiver na aba de Compras
   useEffect(() => {
     if (tabIndex === 0) {
       fetchPedidosCompra();
@@ -72,7 +70,7 @@ function Aprovacaopages() {
     setUpdatingId(id);
     try {
       await api.put(`/api/pedidos-compra/${id}/aprovar`);
-      toast.success("Pedido aprovado! Enviado para recebimento.");
+      toast.success("Pedido aprovado!");
       fetchPedidosCompra();
     } catch (error) {
       toast.error("Erro ao aprovar.");
@@ -95,57 +93,100 @@ function Aprovacaopages() {
   };
 
   return (
-    <Box component="main" sx={{ flexGrow: 1, p: 3, minHeight: "100vh", backgroundColor: "background.default" }}>
+    <Box
+      component="main"
+      sx={{
+        flexGrow: 1,
+        p: 3,
+        minHeight: "100vh",
+        backgroundColor: "background.default",
+      }}
+    >
       <Container maxWidth="lg">
-        <Typography variant="h4" component="h1" fontWeight="bold" sx={{ mb: 2 }}>
+        <Typography
+          variant="h4"
+          component="h1"
+          fontWeight="bold"
+          sx={{ mb: 2 }}
+        >
           Central de Aprovações
         </Typography>
 
         <Box sx={{ borderBottom: 1, borderColor: "divider", mb: 3 }}>
           <Tabs value={tabIndex} onChange={handleTabChange}>
             <Tab label="Pedidos de Compra" />
-            <Tab label="Solicitações de Estoque" />
           </Tabs>
         </Box>
 
         {/* === ABA 0: PEDIDOS DE COMPRA === */}
         {tabIndex === 0 && (
-          <Paper sx={{ width: "100%", boxShadow: 3, overflow: "hidden" }}>
+          <Paper sx={{ width: "100%", boxShadow: 5, overflow: "hidden" }}>
             <TableContainer>
               {loading ? (
-                <Box sx={{ display: "flex", justifyContent: "center", p: 5 }}><CircularProgress /></Box>
+                <Box sx={{ display: "flex", justifyContent: "center", p: 5 }}>
+                  <CircularProgress />
+                </Box>
               ) : (
                 <Table stickyHeader>
                   <TableHead>
-                    <TableRow>
-                      <TableCell sx={{ fontWeight: "bold" }}>Item</TableCell>
-                      <TableCell sx={{ fontWeight: "bold" }}>Qtd.</TableCell>
-                      <TableCell sx={{ fontWeight: "bold" }}>Justificativa</TableCell>
-                      <TableCell sx={{ fontWeight: "bold" }}>Solicitante</TableCell>
-                      <TableCell sx={{ fontWeight: "bold" }}>Data</TableCell>
-                      <TableCell sx={{ fontWeight: "bold" }}>Ações</TableCell>
+                    {/* ESTILO PADRONIZADO */}
+                    <TableRow
+                      sx={{
+                        "& th": {
+                          backgroundColor: "#2a3c61ff",
+                          color: "#ffffff",
+                          fontWeight: "bold",
+                        },
+                      }}
+                    >
+                      <TableCell align="center">Item</TableCell>
+                      <TableCell align="center">Qtd.</TableCell>
+                      <TableCell align="center">Justificativa</TableCell>
+                      <TableCell align="center">Solicitante</TableCell>
+                      <TableCell align="center">Data</TableCell>
+                      <TableCell align="center">Ações</TableCell>
                     </TableRow>
                   </TableHead>
                   <TableBody>
                     {pedidosPaginados.length > 0 ? (
                       pedidosPaginados.map((req) => (
                         <TableRow hover key={req.id}>
-                          <TableCell>{req.componenteNome}</TableCell>
-                          <TableCell>{req.quantidade}</TableCell>
-                          <TableCell>{req.justificativa}</TableCell>
-                          <TableCell>{req.solicitanteEmail}</TableCell>
-                          <TableCell>{new Date(req.dataRequisicao).toLocaleDateString("pt-BR")}</TableCell>
-                          <TableCell>
-                            <Box sx={{ display: "flex", gap: 1 }}>
-                              <Button 
-                                variant="contained" color="success" size="small"
+                          <TableCell align="center">
+                            {req.componenteNome}
+                          </TableCell>
+                          <TableCell align="center">{req.quantidade}</TableCell>
+                          <TableCell align="center">
+                            {req.justificativa}
+                          </TableCell>
+                          <TableCell align="center">
+                            {req.solicitanteEmail}
+                          </TableCell>
+                          <TableCell align="center">
+                            {new Date(req.dataRequisicao).toLocaleDateString(
+                              "pt-BR"
+                            )}
+                          </TableCell>
+                          <TableCell align="center">
+                            <Box
+                              sx={{
+                                display: "flex",
+                                gap: 1,
+                                justifyContent: "center",
+                              }}
+                            >
+                              <Button
+                                variant="contained"
+                                color="success"
+                                size="small"
                                 onClick={() => handleAprovarCompra(req.id)}
                                 disabled={updatingId === req.id}
                               >
                                 Aprovar
                               </Button>
-                              <Button 
-                                variant="contained" color="error" size="small"
+                              <Button
+                                variant="contained"
+                                color="error"
+                                size="small"
                                 onClick={() => handleRecusarCompra(req.id)}
                                 disabled={updatingId === req.id}
                               >
@@ -157,7 +198,9 @@ function Aprovacaopages() {
                       ))
                     ) : (
                       <TableRow>
-                        <TableCell colSpan={6} align="center">Nenhum pedido de compra pendente.</TableCell>
+                        <TableCell colSpan={6} align="center">
+                          Nenhum pedido de compra pendente.
+                        </TableCell>
                       </TableRow>
                     )}
                   </TableBody>
@@ -177,11 +220,8 @@ function Aprovacaopages() {
           </Paper>
         )}
 
-        {/* === ABA 1: SOLICITAÇÕES DE ESTOQUE (Tabela antiga) === */}
-        {tabIndex === 1 && (
-          <TabelaRequisicoes />
-        )}
-
+        {/* === ABA 1: SOLICITAÇÕES DE ESTOQUE === */}
+        {tabIndex === 1 && <TabelaRequisicoes />}
       </Container>
     </Box>
   );

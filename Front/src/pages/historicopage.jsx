@@ -16,7 +16,6 @@ import {
   TablePagination,
   Chip,
   Typography,
-  Fade,
   TextField,
   InputAdornment,
 } from "@mui/material";
@@ -78,7 +77,15 @@ function HistoricoPage() {
   };
 
   return (
-    <Box component="main" sx={{ flexGrow: 1, p: 3 }}>
+    <Box
+      component="main"
+      sx={{
+        flexGrow: 1,
+        p: 3,
+        backgroundColor: "background.default",
+        minHeight: "100vh",
+      }}
+    >
       <Container maxWidth="lg">
         {/* --- Cabeçalho com Título e Barra de Busca --- */}
         <Box
@@ -117,89 +124,31 @@ function HistoricoPage() {
             sx={{
               minWidth: "300px",
               backgroundColor: "background.paper",
-              borderRadius: 1,
             }}
           />
         </Box>
 
-        {/* --- Paper com Estilo (Sombra e Blur) Padronizado --- */}
-        <Paper
-          sx={{
-            width: "100%",
-            overflow: "hidden",
-            borderRadius: 3,
-            backdropFilter: "blur(6px)",
-            boxShadow: "0px 6px 25px rgba(0,0,0,0.2)",
-          }}
-        >
+        {/* --- Paper Padronizado --- */}
+        <Paper sx={{ width: "100%", overflow: "hidden", boxShadow: 5 }}>
           <TableContainer>
             <Table stickyHeader>
               <TableHead>
-                <TableRow>
-                  <TableCell
-                    sx={{
-                      backgroundColor: "#2a3c61ff",
-                      color: "#fff",
+                {/* ESTILO DO CABEÇALHO PADRONIZADO */}
+                <TableRow
+                  sx={{
+                    "& th": {
+                      backgroundColor: "#2a3c61ff", // Azul escuro
+                      color: "#ffffff", // Texto branco
                       fontWeight: "bold",
-                      borderBottom: 0,
-                    }}
-                  >
-                    Id
-                  </TableCell>
-                  <TableCell
-                    sx={{
-                      backgroundColor: "#2a3c61ff",
-                      color: "#fff",
-                      fontWeight: "bold",
-                      borderBottom: 0,
-                    }}
-                  >
-                    Item
-                  </TableCell>
-                  <TableCell
-                    // CORREÇÃO: Aplicando a cor de fundo diretamente na célula
-                    sx={{
-                      backgroundColor: "#2a3c61ff",
-                      color: "#fff",
-                      fontWeight: "bold",
-                      borderBottom: 0,
-                    }}
-                  >
-                    Quantidade
-                  </TableCell>
-                  <TableCell
-                    // CORREÇÃO: Aplicando a cor de fundo diretamente na célula
-                    sx={{
-                      backgroundColor: "#2a3c61ff",
-                      color: "#fff",
-                      fontWeight: "bold",
-                      borderBottom: 0,
-                    }}
-                  >
-                    Tipo
-                  </TableCell>
-                  <TableCell
-                    // CORREÇÃO: Aplicando a cor de fundo diretamente na célula
-                    sx={{
-                      backgroundColor: "#2a3c61ff",
-                      color: "#fff",
-                      fontWeight: "bold",
-                      borderBottom: 0,
-                    }}
-                  >
-                    Data e Hora
-                  </TableCell>
-                  <TableCell
-                    // CORREÇÃO: Aplicando a cor de fundo diretamente na célula
-                    sx={{
-                      backgroundColor: "#2a3c61ff",
-                      color: "#fff",
-                      fontWeight: "bold",
-                      borderBottom: 0,
-                    }}
-                  >
-                    Utilizador
-                  </TableCell>
+                    },
+                  }}
+                >
+                  <TableCell align="center">Id</TableCell>
+                  <TableCell align="center">Item</TableCell>
+                  <TableCell align="center">Quantidade</TableCell>
+                  <TableCell align="center">Tipo</TableCell>
+                  <TableCell align="center">Data e Hora</TableCell>
+                  <TableCell align="center">Utilizador</TableCell>
                 </TableRow>
               </TableHead>
 
@@ -211,67 +160,45 @@ function HistoricoPage() {
                     </TableCell>
                   </TableRow>
                 ) : historicoFiltrado.length > 0 ? (
-                  historicoFiltrado.map((item, index) => (
-                    <Fade in timeout={300 + index * 60} key={item.id}>
-                      <TableRow
-                        hover
-                        sx={{
-                          backgroundColor:
-                            index % 2 === 0
-                              ? "rgba(255,255,255,0.04)"
-                              : "transparent",
-                          transition: "0.25s",
-                          "&:hover": {
-                            backgroundColor: "rgba(25,118,210,0.15)",
-                            transform: "scale(1.005)",
-                          },
-                        }}
-                      >
-                        <TableCell sx={{ fontWeight: 500 }}>
-                          {item.id}
-                        </TableCell>
-                        <TableCell sx={{ fontWeight: 500 }}>
-                          {item.componenteNome || "N/A"}
-                        </TableCell>
-                        <TableCell>{item.quantidade}</TableCell>
+                  historicoFiltrado.map((item) => (
+                    <TableRow hover key={item.id}>
+                      <TableCell align="center">{item.id}</TableCell>
 
-                        <TableCell>
-                          <Chip
-                            label={item.tipo}
-                            color={
-                              item.tipo === "ENTRADA"
-                                ? "success"
-                                : item.tipo === "SAIDA"
-                                ? "error"
-                                : "warning"
-                            }
-                            size="small"
-                            sx={{
-                              fontWeight: "bold",
-                              px: 1.5,
-                              py: 0.5,
-                              boxShadow: "0px 1px 6px rgba(0, 0, 0, 0.15)",
-                            }}
-                          />
-                        </TableCell>
+                      <TableCell align="center" sx={{ fontWeight: 500 }}>
+                        {item.componenteNome || "N/A"}
+                      </TableCell>
 
-                        <TableCell sx={{ opacity: 0.9 }}>
-                          {new Date(item.dataHora).toLocaleString("pt-BR")}
-                        </TableCell>
+                      <TableCell align="center">{item.quantidade}</TableCell>
 
-                        <TableCell sx={{ opacity: 0.9 }}>
-                          {item.usuario}
-                        </TableCell>
-                      </TableRow>
-                    </Fade>
+                      <TableCell align="center">
+                        <Chip
+                          label={item.tipo}
+                          color={
+                            item.tipo === "ENTRADA"
+                              ? "success"
+                              : item.tipo === "SAIDA"
+                              ? "error"
+                              : "warning"
+                          }
+                          size="small"
+                          sx={{ fontWeight: "bold", minWidth: "80px" }}
+                        />
+                      </TableCell>
+
+                      <TableCell align="center">
+                        {new Date(item.dataHora).toLocaleString("pt-BR")}
+                      </TableCell>
+
+                      <TableCell align="center">{item.usuario}</TableCell>
+                    </TableRow>
                   ))
                 ) : (
                   <TableRow>
                     <TableCell colSpan={6} align="center">
                       <Typography color="text.secondary" sx={{ p: 3 }}>
                         {termoBusca
-                          ? `Nenhum registo encontrado para "${termoBusca}".`
-                          : "Nenhum registo de histórico nesta página."}
+                          ? `Nenhum registro encontrado para "${termoBusca}".`
+                          : "Nenhum registro de histórico nesta página."}
                       </Typography>
                     </TableCell>
                   </TableRow>
@@ -280,6 +207,7 @@ function HistoricoPage() {
             </Table>
           </TableContainer>
 
+          {/* Paginação Padronizada (Fundo Branco) */}
           <TablePagination
             rowsPerPageOptions={[5, 10, 25]}
             component="div"
@@ -289,10 +217,6 @@ function HistoricoPage() {
             onPageChange={handleChangePage}
             onRowsPerPageChange={handleChangeRowsPerPage}
             labelRowsPerPage="Itens por página:"
-            sx={{
-              borderTop: "1px solid rgba(255,255,255,0.1)",
-              backgroundColor: "rgba(0,0,0,0.1)",
-            }}
           />
         </Paper>
       </Container>

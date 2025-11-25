@@ -88,7 +88,16 @@ function ReposicaoPage() {
     ]);
 
     autoTable(doc, {
-      head: [["Nome", "Patrimônio", "Status", "Qtd. Atual", "Nível Mínimo", "Repor Qtd."]],
+      head: [
+        [
+          "Nome",
+          "Patrimônio",
+          "Status",
+          "Qtd. Atual",
+          "Nível Mínimo",
+          "Repor Qtd.",
+        ],
+      ],
       body: tableData,
       startY: 30,
       styles: { fontSize: 10 },
@@ -113,15 +122,31 @@ function ReposicaoPage() {
     toast.info("Redirecionando para a página de Pedidos.");
   };
 
-  // --- AQUI ESTAVA O ERRO: REMOVIDO O BLOCO IF ERRADO ---
-
-  if (loading) return <CircularProgress sx={{ display: "block", margin: "20px auto" }} />;
+  if (loading)
+    return <CircularProgress sx={{ display: "block", margin: "20px auto" }} />;
 
   return (
-    <Box component="main" sx={{ flexGrow: 1, p: 3 }}>
+    <Box
+      component="main"
+      sx={{
+        flexGrow: 1,
+        p: 3,
+        backgroundColor: "background.default",
+        minHeight: "100vh",
+      }}
+    >
       <Container maxWidth="lg">
-        <Box display="flex" justifyContent="space-between" alignItems="center" mb={3} flexWrap="wrap" gap={2}>
-          <Typography variant="h4" component="h1" fontWeight="bold">Relatório de Reposição</Typography>
+        <Box
+          display="flex"
+          justifyContent="space-between"
+          alignItems="center"
+          mb={3}
+          flexWrap="wrap"
+          gap={2}
+        >
+          <Typography variant="h4" component="h1" fontWeight="bold">
+            Relatório de Reposição
+          </Typography>
           <Button
             variant="contained"
             startIcon={<PrintIcon />}
@@ -139,39 +164,55 @@ function ReposicaoPage() {
         )}
 
         {necessitaReposicao && (
-          <Paper sx={{ width: "100%", overflow: "hidden", boxShadow: 3 }}>
+          <Paper sx={{ width: "100%", overflow: "hidden", boxShadow: 5 }}>
             <TableContainer>
               <Table stickyHeader aria-label="tabela de reposição">
                 <TableHead>
-                  <TableRow>
-                    <TableCell sx={{ fontWeight: "bold" }}>Nome</TableCell>
-                    <TableCell sx={{ fontWeight: "bold" }}>Patrimônio</TableCell>
-                    <TableCell sx={{ fontWeight: "bold" }}>Status</TableCell>
-                    <TableCell sx={{ fontWeight: "bold" }} align="center">Qtd. Atual</TableCell>
-                    <TableCell sx={{ fontWeight: "bold" }} align="center">Nível Mínimo</TableCell>
-                    <TableCell sx={{ fontWeight: "bold" }} align="center">Repor Qtd.</TableCell>
-                    <TableCell sx={{ fontWeight: "bold" }}>Ações</TableCell>
+                  {/* ESTILO PADRONIZADO (CABEÇALHO ESCURO) */}
+                  <TableRow
+                    sx={{
+                      "& th": {
+                        backgroundColor: "#2a3c61ff",
+                        color: "#ffffff",
+                        fontWeight: "bold",
+                      },
+                    }}
+                  >
+                    <TableCell align="center">Nome</TableCell>
+                    <TableCell align="center">Patrimônio</TableCell>
+                    <TableCell align="center">Status</TableCell>
+                    <TableCell align="center">Qtd. Atual</TableCell>
+                    <TableCell align="center">Nível Mínimo</TableCell>
+                    <TableCell align="center">Repor Qtd.</TableCell>
+                    <TableCell align="center">Ações</TableCell>
                   </TableRow>
                 </TableHead>
                 <TableBody>
                   {itensPaginados.map((comp) => (
                     <TableRow hover key={comp.id}>
-                      <TableCell>{comp.nome}</TableCell>
-                      <TableCell>{comp.codigoPatrimonio}</TableCell>
-                      <TableCell>
+                      <TableCell align="center">{comp.nome}</TableCell>
+                      <TableCell align="center">
+                        {comp.codigoPatrimonio}
+                      </TableCell>
+                      <TableCell align="center">
                         <Chip
-                          label={comp.quantidade <= 0 ? "ESGOTADO" : "ESTOQUE BAIXO"}
+                          label={
+                            comp.quantidade <= 0 ? "ESGOTADO" : "ESTOQUE BAIXO"
+                          }
                           color={comp.quantidade <= 0 ? "error" : "warning"}
                           size="small"
                           sx={{ fontWeight: "bold" }}
                         />
                       </TableCell>
                       <TableCell align="center">{comp.quantidade}</TableCell>
-                      <TableCell align="center">{comp.nivelMinimoEstoque}</TableCell>
-                      <TableCell align="center" sx={{ fontWeight: "bold" }}>
-                        {(comp.nivelMinimoEstoque || 0) - (comp.quantidade || 0)}
+                      <TableCell align="center">
+                        {comp.nivelMinimoEstoque}
                       </TableCell>
-                      <TableCell>
+                      <TableCell align="center" sx={{ fontWeight: "bold" }}>
+                        {(comp.nivelMinimoEstoque || 0) -
+                          (comp.quantidade || 0)}
+                      </TableCell>
+                      <TableCell align="center">
                         <Button
                           variant="contained"
                           size="small"
