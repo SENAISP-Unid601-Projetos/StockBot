@@ -86,6 +86,7 @@ function Sidebar() {
         </Typography>
       </Box>
 
+      {/* MENU GERAL (Para todos) */}
       <List sx={{ p: 1 }}>
         {menuItems.map((item) => (
           <ListItem key={item.text} disablePadding>
@@ -164,6 +165,7 @@ function Sidebar() {
           )}
         </>
 
+        {/* Botão Sair */}
         <ListItem disablePadding>
           <ListItemButton
             onClick={handleLogout}

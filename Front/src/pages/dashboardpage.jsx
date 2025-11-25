@@ -199,7 +199,7 @@ function DashboardPage() {
           </Box>
         ) : (
           <Box sx={{ display: "flex", flexDirection: "column", gap: 3 }}>
-            
+
             {/* --- BLOCO 1: OS 4 CARDS --- */}
             <Box
               sx={{

@@ -1,6 +1,6 @@
 import React from 'react';
-import { Bar } from 'react-chartjs-2'; 
-import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend } from 'chart.js'; 
+import { Bar } from 'react-chartjs-2';
+import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend } from 'chart.js';
 import { Box, Paper, Typography, useTheme } from '@mui/material';
 
 // Registra os plugins necessários do Chart.js
@@ -78,7 +78,7 @@ function CategoryChart({
             // Eixo X (Categorias): Nomes dos Itens
             title: {
                 display: true,
-                text: 'Item (Nome do Componente)', 
+                text: 'Item (Nome do Componente)',
                 color: theme.palette.text.secondary,
             },
             ticks: {

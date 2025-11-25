@@ -1,6 +1,7 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import api from "../services/api";
 import { toast } from "react-toastify";
+import { useTheme } from "@mui/material/styles";
 import {
   Box,
   Container,
@@ -10,9 +11,11 @@ import {
   Grid,
   TextField,
 } from "@mui/material";
+import TextIncreaseIcon from "@mui/icons-material/TextIncrease";
+import TextDecreaseIcon from "@mui/icons-material/TextDecrease";
 
 function ConfiguracoesPage() {
-  // Estados para troca de senha
+  const themeMui = useTheme();
   const [passData, setPassData] = useState({
     currentPassword: "",
     newPassword: "",
@@ -20,7 +23,25 @@ function ConfiguracoesPage() {
   });
   const [loadingPass, setLoadingPass] = useState(false);
 
-  // Lógica de Troca de Senha
+  // Substitua este ID pelo real do usuário logado
+  const userId = 1;
+
+  useEffect(() => {
+    const loadFont = async () => {
+      try {
+        const response = await api.get(
+          `/api/preferences/font?userId=${userId}`
+        );
+        document.documentElement.style.fontSize = response.data + "px";
+      } catch (error) {
+        console.error("Erro ao carregar preferências de fonte");
+      }
+    };
+    loadFont();
+  }, []);
+
+
+
   const handleChangePassword = async (e) => {
     e.preventDefault();
     if (passData.newPassword !== passData.confirmPassword) {
@@ -45,6 +66,28 @@ function ConfiguracoesPage() {
     }
   };
 
+  const alterarFonte = async (increment) => {
+    const current = parseFloat(
+      getComputedStyle(document.documentElement).fontSize
+    );
+    const newSize = current + increment;
+    document.documentElement.style.fontSize = newSize + "px";
+
+    try {
+      await api.post(
+        `/api/preferences/font?userId=${userId}&fontSize=${newSize}`
+      );
+      toast.info(`Fonte ${increment > 0 ? "aumentada" : "diminuída"} e salva`);
+    } catch {
+      toast.error("Erro ao salvar tamanho da fonte");
+    }
+  };
+
+  const aumentarFonte = () => alterarFonte(1);
+  const diminuirFonte = () => alterarFonte(-1);
+
+
+
   return (
     <Box
       component="main"
@@ -61,20 +104,21 @@ function ConfiguracoesPage() {
         </Typography>
 
         <Grid container spacing={3} direction="column">
-          {/* BLOCO: Alterar Senha */}
+          {/* Alterar Senha */}
           <Grid item xs={12}>
-            <Paper sx={{ p: 4, boxShadow: 5, borderRadius: 2, maxWidth: "600px" }}>
-              <Typography variant="h6" gutterBottom fontWeight="bold">
+            <Paper sx={{ p: 3, boxShadow: 3, width: "100%" }}>
+              <Typography variant="h6" gutterBottom>
                 Alterar Minha Senha
               </Typography>
-              <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
-                Mantenha sua conta segura atualizando sua senha periodicamente.
-              </Typography>
-              
               <Box
                 component="form"
                 onSubmit={handleChangePassword}
-                sx={{ display: "flex", flexDirection: "column", gap: 2 }}
+                sx={{
+                  display: "flex",
+                  flexDirection: "column",
+                  gap: 2,
+                  maxWidth: "400px",
+                }}
               >
                 <TextField
                   label="Senha Atual"
@@ -83,7 +127,10 @@ function ConfiguracoesPage() {
                   fullWidth
                   value={passData.currentPassword}
                   onChange={(e) =>
-                    setPassData({ ...passData, currentPassword: e.target.value })
+                    setPassData({
+                      ...passData,
+                      currentPassword: e.target.value,
+                    })
                   }
                 />
                 <TextField
@@ -103,24 +150,60 @@ function ConfiguracoesPage() {
                   fullWidth
                   value={passData.confirmPassword}
                   onChange={(e) =>
-                    setPassData({ ...passData, confirmPassword: e.target.value })
+                    setPassData({
+                      ...passData,
+                      confirmPassword: e.target.value,
+                    })
                   }
                 />
                 <MuiButton
                   type="submit"
                   variant="contained"
-                  size="large"
                   disabled={loadingPass}
-                  sx={{ mt: 1 }}
                 >
                   {loadingPass ? "Alterando..." : "Salvar Nova Senha"}
                 </MuiButton>
               </Box>
             </Paper>
           </Grid>
+
+
+
+          {/* Ajuste de Fonte */}
+          <Grid item xs={12}>
+            <Paper sx={{ p: 3, boxShadow: 3 }}>
+              <Typography variant="h6" gutterBottom>
+                Acessibilidade
+              </Typography>
+              <Typography sx={{ mb: 2 }}>Ajustar tamanho da fonte</Typography>
+              <Box sx={{ display: "flex", gap: 2 }}>
+                <MuiButton
+                  variant="contained"
+                  color="primary"
+                  startIcon={<TextIncreaseIcon />}
+                  onClick={aumentarFonte}
+                >
+                  A+
+                </MuiButton>
+                <MuiButton
+                  variant="contained"
+                  color="secondary"
+                  startIcon={<TextDecreaseIcon />}
+                  onClick={diminuirFonte}
+                >
+                  A−
+                </MuiButton>
+              </Box>
+            </Paper>
+          </Grid>
+
+
         </Grid>
       </Container>
+
+
     </Box>
   );
 }
+
 export default ConfiguracoesPage;

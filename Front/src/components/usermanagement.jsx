@@ -31,7 +31,7 @@ function UserManagement({ users, onDeleteUser }) {
   };
 
   // Cálculo dos dados para a página atual
-  const usersPaginados = users 
+  const usersPaginados = users
     ? users.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
     : [];
 
@@ -61,22 +61,22 @@ function UserManagement({ users, onDeleteUser }) {
                 <TableRow hover key={user.id}>
                   <TableCell>{user.id}</TableCell>
                   <TableCell>{user.email}</TableCell>
-                  
+
                   <TableCell align="center">
                     <Chip
                       label={user.role}
                       size="small"
                       color={user.role === "ADMIN" ? "error" : "info"}
                       variant="filled"
-                      sx={{ 
-                        fontWeight: "bold", 
+                      sx={{
+                        fontWeight: "bold",
                         minWidth: "80px",
                         // FORÇA O TEXTO A SER BRANCO
-                        color: "#ffffff" 
+                        color: "#ffffff"
                       }}
                     />
                   </TableCell>
-                  
+
                   <TableCell align="center">
                     <Stack direction="row" spacing={1} justifyContent="center">
                       <Tooltip title="Excluir usuário">
@@ -104,7 +104,7 @@ function UserManagement({ users, onDeleteUser }) {
           </TableBody>
         </Table>
       </TableContainer>
-      
+
       <TablePagination
         rowsPerPageOptions={[5, 10, 25]}
         component="div"

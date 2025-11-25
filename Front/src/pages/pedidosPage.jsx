@@ -97,6 +97,10 @@ function PedidosPage() {
     setLoadingForm(true);
     try {
       await api.post("/api/pedidos-compra", {
+<<<<<<< HEAD
+=======
+        // Se existente, manda ID. Se novo, manda nome.
+>>>>>>> d75df003c3df67d4260f4f55bfa5cf18ad66dc8f
         componenteId: isItemExistente ? componenteSelecionado.id : null,
         nomeItem: isItemExistente ? componenteSelecionado.nome : nomeItem,
         quantidade,
@@ -111,6 +115,10 @@ function PedidosPage() {
       setJustificativa("");
       if (page !== 0) setPage(0);
       else fetchMeusPedidos();
+<<<<<<< HEAD
+=======
+
+>>>>>>> d75df003c3df67d4260f4f55bfa5cf18ad66dc8f
     } catch (error) {
       toast.error(error.response?.data?.message || "Falha ao enviar pedido.");
     } finally {
