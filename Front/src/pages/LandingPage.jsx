@@ -116,7 +116,6 @@ function LandingPage() {
                 "Fluxo de Compras",
                 "Histórico Detalhado",
                 "Segurança Avançada",
-                "Suporte via e-mail",
                 "Painéis visuais intuitivos"
               ].map((text, index) => (
                 <ListItem key={index} disableGutters sx={{ py: 0.5 }}>

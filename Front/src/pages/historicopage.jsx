@@ -197,8 +197,8 @@ function HistoricoPage() {
                     <TableCell colSpan={6} align="center">
                       <Typography color="text.secondary" sx={{ p: 3 }}>
                         {termoBusca
-                          ? `Nenhum registo encontrado para "${termoBusca}".`
-                          : "Nenhum registo de histórico nesta página."}
+                          ? `Nenhum registro encontrado para "${termoBusca}".`
+                          : "Nenhum registro de histórico nesta página."}
                       </Typography>
                     </TableCell>
                   </TableRow>

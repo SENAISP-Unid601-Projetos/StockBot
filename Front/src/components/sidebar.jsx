@@ -24,7 +24,7 @@ import {
   Sun,
   CheckSquare,
   ShoppingCart,
-  PackageCheck, // <-- 1. NOVO ÍCONE PARA RECEBIMENTO
+  PackageCheck,
 } from "lucide-react";
 
 import { isAdmin } from "../services/authService";
@@ -41,7 +41,7 @@ const drawerWidth = 250;
 
 function Sidebar() {
   const navigate = useNavigate();
-  const theme = useTheme(); // O tema agora contém as cores da sidebar
+  const theme = useTheme();
   const { toggleColorMode } = useColorMode();
   const [isUserAdmin, setIsUserAdmin] = useState(false);
 
@@ -56,6 +56,29 @@ function Sidebar() {
 
   const isDarkMode = theme.palette.mode === "dark";
 
+  // Estilo comum para os itens do menu (para evitar repetição e garantir cor branca)
+  const listItemSx = {
+    color: "#FFFFFF", // Texto sempre branco
+    borderRadius: 2,
+    "&:hover": {
+      backgroundColor: "rgba(255, 255, 255, 0.1)", // Hover sutil claro
+    },
+    "&.active": {
+      backgroundColor: "primary.main",
+      color: "#FFFFFF",
+      fontWeight: "bold",
+      ".MuiListItemIcon-root": {
+        color: "#FFFFFF",
+      },
+    },
+  };
+
+  // Estilo comum para ícones
+  const iconSx = {
+    color: "#FFFFFF", // Ícone sempre branco
+    minWidth: 40,
+  };
+
   const drawerContent = (
     <div style={{ display: "flex", flexDirection: "column", height: "100%" }}>
       <Box sx={{ p: 2, textAlign: "center" }}>
@@ -63,8 +86,7 @@ function Sidebar() {
           variant="h5"
           component="h2"
           fontWeight="bold"
-          // Usa a cor de texto ativa definida no tema da sidebar
-          color={theme.palette.sidebar.textActive}
+          color="#FFFFFF" // Título branco
         >
           StockBot
         </Typography>
@@ -76,30 +98,9 @@ function Sidebar() {
             <ListItemButton
               component={NavLink}
               to={item.path}
-              sx={{
-                // --- CORES CONECTADAS AO TEMA ---
-                color: theme.palette.sidebar.text,
-                borderRadius: 2,
-                "&:hover": {
-                  backgroundColor: theme.palette.sidebar.hover,
-                },
-                "&.active": {
-                  backgroundColor: "primary.main",
-                  color: theme.palette.sidebar.textActive,
-                  fontWeight: "bold",
-                  ".MuiListItemIcon-root": {
-                    color: theme.palette.sidebar.textActive,
-                  },
-                },
-              }}
+              sx={listItemSx}
             >
-              <ListItemIcon
-                sx={{
-                  // Cor do ícone vinda do tema
-                  color: theme.palette.sidebar.icon,
-                  minWidth: 40,
-                }}
-              >
+              <ListItemIcon sx={iconSx}>
                 {item.icon}
               </ListItemIcon>
               <ListItemText primary={item.text} />
@@ -111,25 +112,12 @@ function Sidebar() {
           <ListItemButton
             component={NavLink}
             to="/pedidos"
-            sx={{
-              color: theme.palette.sidebar.text,
-              borderRadius: 2,
-              "&:hover": { backgroundColor: theme.palette.sidebar.hover },
-              "&.active": {
-                backgroundColor: "primary.main",
-                color: theme.palette.sidebar.textActive,
-                ".MuiListItemIcon-root": {
-                  color: theme.palette.sidebar.textActive,
-                },
-              },
-            }}
+            sx={listItemSx}
           >
-            <ListItemIcon
-              sx={{ color: theme.palette.sidebar.icon, minWidth: 40 }}
-            >
+            <ListItemIcon sx={iconSx}>
               <ShoppingCart size={20} />
             </ListItemIcon>
-            <ListItemText primary="Fazer Pedido de Compra" />
+            <ListItemText primary="Pedido de Compra" />
           </ListItemButton>
         </ListItem>
       </List>
@@ -137,10 +125,8 @@ function Sidebar() {
       <Box sx={{ flexGrow: 1 }} />
 
       <List sx={{ p: 1, mt: "auto" }}>
-        <ListItem sx={{ color: theme.palette.sidebar.text }}>
-          <ListItemIcon
-            sx={{ color: theme.palette.sidebar.icon, minWidth: 40 }}
-          >
+        <ListItem sx={{ color: "#FFFFFF" }}>
+          <ListItemIcon sx={iconSx}>
             {isDarkMode ? <Sun size={20} /> : <Moon size={20} />}
           </ListItemIcon>
           <FormControlLabel
@@ -157,10 +143,10 @@ function Sidebar() {
         </ListItem>
 
       <>
-        {/* Item de Aprovações (Já existente) */}
+        {/* Item de Aprovações */}
         <ListItem disablePadding>
-          <ListItemButton component={NavLink} to="/aprovacoes" sx={{ color: theme.palette.sidebar.text, borderRadius: 2, "&:hover": { backgroundColor: theme.palette.sidebar.hover }, "&.active": { backgroundColor: "primary.main", color: theme.palette.sidebar.textActive, ".MuiListItemIcon-root": { color: theme.palette.sidebar.textActive } } }}>
-            <ListItemIcon sx={{ color: theme.palette.sidebar.icon, minWidth: 40 }}>
+          <ListItemButton component={NavLink} to="/aprovacoes" sx={listItemSx}>
+            <ListItemIcon sx={iconSx}>
               <CheckSquare size={20} />
             </ListItemIcon>
             <ListItemText primary="Aprovações" />
@@ -170,36 +156,23 @@ function Sidebar() {
         {/* --- BLOCO DE ADMINISTRAÇÃO --- */}
         {isUserAdmin && (
           <>
-            {/* --- 1. ADICIONE ISTO AQUI: BOTÃO DE RECEBIMENTO --- */}
             <ListItem disablePadding>
               <ListItemButton
                 component={NavLink}
                 to="/recebimento"
-                sx={{
-                  color: theme.palette.sidebar.text,
-                  borderRadius: 2,
-                  "&:hover": { backgroundColor: theme.palette.sidebar.hover },
-                  "&.active": {
-                    backgroundColor: "primary.main",
-                    color: theme.palette.sidebar.textActive,
-                    ".MuiListItemIcon-root": {
-                      color: theme.palette.sidebar.textActive,
-                    },
-                  },
-                }}
+                sx={listItemSx}
               >
-                <ListItemIcon sx={{ color: theme.palette.sidebar.icon, minWidth: 40 }}>
-                  {/* O ícone PackageCheck que você já importou */}
+                <ListItemIcon sx={iconSx}>
                   <PackageCheck size={20} />
                 </ListItemIcon>
                 <ListItemText primary="Recebimento" />
               </ListItemButton>
             </ListItem>
 
-            {/* Item de Configurações (Já existente) */}
+            {/* Item de Configurações */}
             <ListItem disablePadding>
-              <ListItemButton component={NavLink} to="/configuracoes" sx={{ color: theme.palette.sidebar.text, borderRadius: 2, "&:hover": { backgroundColor: theme.palette.sidebar.hover }, "&.active": { backgroundColor: "primary.main", color: theme.palette.sidebar.textActive, ".MuiListItemIcon-root": { color: theme.palette.sidebar.textActive } } }}>
-                <ListItemIcon sx={{ color: theme.palette.sidebar.icon, minWidth: 40 }}>
+              <ListItemButton component={NavLink} to="/configuracoes" sx={listItemSx}>
+                <ListItemIcon sx={iconSx}>
                   <Settings size={20} />
                 </ListItemIcon>
                 <ListItemText primary="Configurações" />
@@ -214,14 +187,12 @@ function Sidebar() {
           <ListItemButton
             onClick={handleLogout}
             sx={{
-              color: theme.palette.sidebar.text,
-              borderRadius: 2,
-              "&:hover": { backgroundColor: theme.palette.sidebar.hover },
+               color: "#FFFFFF",
+               borderRadius: 2,
+               "&:hover": { backgroundColor: "rgba(255, 255, 255, 0.1)" },
             }}
           >
-            <ListItemIcon
-              sx={{ color: theme.palette.sidebar.icon, minWidth: 40 }}
-            >
+            <ListItemIcon sx={iconSx}>
               <LogOut size={20} />
             </ListItemIcon>
             <ListItemText primary="Sair" />
@@ -240,9 +211,9 @@ function Sidebar() {
         "& .MuiDrawer-paper": {
           width: drawerWidth,
           boxSizing: "border-box",
-          // --- CONEXÃO PRINCIPAL DO FUNDO DA SIDEBAR ---
-          backgroundColor: theme.palette.sidebar.background,
-          borderRight: "none",
+          // --- FUNDO FORÇADO PARA PRETO ---
+          backgroundColor: "#000000", 
+          borderRight: "none", // Remove borda se desejar visual clean
           display: "flex",
           flexDirection: "column",
         },
