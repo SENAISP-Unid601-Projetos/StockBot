@@ -55,15 +55,4 @@ public class AuthController {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
-
-    @PostMapping("/forgot-password")
-    public ResponseEntity<String> forgotPassword(@RequestBody java.util.Map<String, String> body) {
-        String email = body.get("email");
-        try {
-            authService.recuperarSenha(email);
-            return ResponseEntity.ok("Uma nova senha foi enviada para o seu e-mail.");
-        } catch (RuntimeException e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
-        }
-    }
 }
