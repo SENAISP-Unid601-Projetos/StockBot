@@ -107,31 +107,32 @@ function Sidebar() {
           </ListItem>
         ))}
 
-      <ListItem disablePadding>
-        <ListItemButton
-          component={NavLink}
-          to="/pedidos"
-          sx={{
-            color: theme.palette.sidebar.text,
-            borderRadius: 2,
-            "&:hover": { backgroundColor: theme.palette.sidebar.hover },
-            "&.active": {
-              backgroundColor: "primary.main",
-              color: theme.palette.sidebar.textActive,
-              ".MuiListItemIcon-root": {
+        <ListItem disablePadding>
+          <ListItemButton
+            component={NavLink}
+            to="/pedidos"
+            sx={{
+              color: theme.palette.sidebar.text,
+              borderRadius: 2,
+              "&:hover": { backgroundColor: theme.palette.sidebar.hover },
+              "&.active": {
+                backgroundColor: "primary.main",
                 color: theme.palette.sidebar.textActive,
+                ".MuiListItemIcon-root": {
+                  color: theme.palette.sidebar.textActive,
+                },
               },
-            },
-          }}
-        >
-          <ListItemIcon
-            sx={{ color: theme.palette.sidebar.icon, minWidth: 40 }}
+            }}
           >
-            <ShoppingCart size={20} />
-          </ListItemIcon>
-          <ListItemText primary="Fazer Pedido de Compra" />
-        </ListItemButton>
-      </ListItem>
+            <ListItemIcon
+              sx={{ color: theme.palette.sidebar.icon, minWidth: 40 }}
+            >
+              <ShoppingCart size={20} />
+            </ListItemIcon>
+            <ListItemText primary="Fazer Pedido de Compra" />
+          </ListItemButton>
+        </ListItem>
+      </List>
 
       <Box sx={{ flexGrow: 1 }} />
 
