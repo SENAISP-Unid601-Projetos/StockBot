@@ -46,13 +46,21 @@ function LandingPage() {
       </Box>
 
       {/* --- NAVBAR / CABEÇALHO --- */}
-      <AppBar position="static" color="transparent" elevation={0} sx={{ zIndex: 10, pt: 2 }}>
+      <AppBar
+        position="static"
+        color="transparent"
+        elevation={0}
+        sx={{ zIndex: 10, pt: 2 }}
+      >
         <Container maxWidth="lg">
           <Toolbar disableGutters sx={{ justifyContent: "space-between" }}>
             {/* Logo */}
             <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-             
-              <Typography variant="h4" fontWeight="bold" sx={{ color: "#fff", letterSpacing: 1 }}>
+              <Typography
+                variant="h4"
+                fontWeight="bold"
+                sx={{ color: "#fff", letterSpacing: 1 }}
+              >
                 StockBot
               </Typography>
             </Box>
@@ -67,7 +75,11 @@ function LandingPage() {
                 borderColor: "rgba(255,255,255,0.5)",
                 textTransform: "none",
                 px: 3,
-                "&:hover": { borderColor: "#C00000", color: "#ffffffff", backgroundColor: "rgba(209, 20, 20, 0.66)" },
+                "&:hover": {
+                  borderColor: "#C00000",
+                  color: "#ffffffff",
+                  backgroundColor: "rgba(209, 20, 20, 0.66)",
+                },
               }}
             >
               Entrar
@@ -77,21 +89,34 @@ function LandingPage() {
       </AppBar>
 
       {/* --- CONTEÚDO PRINCIPAL (HERO SECTION) --- */}
-      <Container maxWidth="lg" sx={{ flexGrow: 1, display: "flex", alignItems: "center", py: 8, zIndex: 1 }}>
+      <Container
+        maxWidth="lg"
+        sx={{
+          flexGrow: 1,
+          display: "flex",
+          alignItems: "center",
+          py: 8,
+          zIndex: 1,
+        }}
+      >
         <Grid container spacing={6} alignItems="center">
-          
           {/* LADO ESQUERDO: TEXTO E CTA */}
           <Grid item xs={12} md={6}>
             <Typography
               variant="overline"
-              sx={{ color: "#2ecc71", fontWeight: "bold", letterSpacing: 2, fontSize: "0.9rem" }}
+              sx={{
+                color: "#2ecc71",
+                fontWeight: "bold",
+                letterSpacing: 2,
+                fontSize: "0.9rem",
+              }}
             >
               100% GRATUITO
             </Typography>
-            
+
             <Typography
               variant="h2"
-              fontWeight="800"
+              fontWeight="500"
               sx={{
                 mt: 1,
                 mb: 3,
@@ -100,12 +125,22 @@ function LandingPage() {
                 fontSize: { xs: "2.5rem", md: "3.5rem" },
               }}
             >
-              Controle seu estoque da forma <span style={{ color: "#C00000" }}>correta</span>
+              Controle seu estoque da forma{" "}
+              <span style={{ color: "#C00000" }}>correta</span>
             </Typography>
 
-            <Typography variant="h6" sx={{ color: "rgba(255,255,255,0.8)", mb: 4, lineHeight: 1.6, fontWeight: 400 }}>
-              O StockBot moderniza o seu estoque. 
-              Gerencie entradas, saídas e movimentações em um só lugar.
+            <Typography
+              variant="h6"
+              sx={{
+                color: "rgba(255,255,255,0.8)",
+                mb: 4,
+                lineHeight: 1.6,
+                fontWeight: 400,
+              }}
+            >
+              O StockBot moderniza a gestão do seu estoque. Centralize o
+              controle de todas as movimentações em uma única plataforma
+              eficiente.
             </Typography>
 
             {/* LISTA DE BENEFÍCIOS (Estilo Hostinger) */}
@@ -116,13 +151,18 @@ function LandingPage() {
                 "Fluxo de Compras",
                 "Histórico Detalhado",
                 "Segurança Avançada",
-                "Painéis visuais intuitivos"
+                "Painéis visuais intuitivos",
               ].map((text, index) => (
                 <ListItem key={index} disableGutters sx={{ py: 0.5 }}>
                   <ListItemIcon sx={{ minWidth: 35 }}>
                     <CheckCircleIcon sx={{ color: "#2ecc71" }} />
                   </ListItemIcon>
-                  <ListItemText primary={text} primaryTypographyProps={{ style: { color: "#fff", fontWeight: 500 } }} />
+                  <ListItemText
+                    primary={text}
+                    primaryTypographyProps={{
+                      style: { color: "#fff", fontWeight: 500 },
+                    }}
+                  />
                 </ListItem>
               ))}
             </List>
@@ -141,8 +181,11 @@ function LandingPage() {
                 px: 5,
                 py: 1.8,
                 boxShadow: "0 10px 30px rgba(192, 0, 0, 0.3)",
-                "&:hover": { backgroundColor: "#a40000", transform: "translateY(-2px)" },
-                transition: "all 0.3s"
+                "&:hover": {
+                  backgroundColor: "#a40000",
+                  transform: "translateY(-2px)",
+                },
+                transition: "all 0.3s",
               }}
             >
               Começar agora
@@ -157,26 +200,53 @@ function LandingPage() {
                 position: "relative",
                 perspective: "1000px",
               }}
-            >
-            
-            </Box>
+            ></Box>
           </Grid>
         </Grid>
       </Container>
 
       {/* --- RODAPÉ SIMPLES --- */}
-      <Box sx={{ backgroundColor: "rgba(0,0,0,0.8)", py: 4, borderTop: "1px solid rgba(255,255,255,0.1)", zIndex: 2 }}>
+      <Box
+        sx={{
+          backgroundColor: "rgba(0,0,0,0.8)",
+          py: 4,
+          borderTop: "1px solid rgba(255,255,255,0.1)",
+          zIndex: 2,
+        }}
+      >
         <Container maxWidth="lg">
-          <Stack direction={{ xs: "column", sm: "row" }} justifyContent="space-between" alignItems="center" spacing={2}>
+          <Stack
+            direction={{ xs: "column", sm: "row" }}
+            justifyContent="space-between"
+            alignItems="center"
+            spacing={2}
+          >
             <Typography variant="body2" sx={{ color: "rgba(255,255,255,0.6)" }}>
-              © {new Date().getFullYear()} StockBot. Todos os direitos reservados.
+              © {new Date().getFullYear()} StockBot. Todos os direitos
+              reservados.
             </Typography>
-            
-            <Box sx={{ display: "flex", alignItems: "center", gap: 1, color: "#fff" }}>
-                <EmailIcon fontSize="small" sx={{ color: "#C00000" }} />
-                <Typography variant="body2" component="a" href="mailto:stockbotdevstest@gmail.com" sx={{ color: "#fff", textDecoration: "none", "&:hover": { color: "#C00000" } }}>
-                    stockbotdevstest@gmail.com
-                </Typography>
+
+            <Box
+              sx={{
+                display: "flex",
+                alignItems: "center",
+                gap: 1,
+                color: "#fff",
+              }}
+            >
+              <EmailIcon fontSize="small" sx={{ color: "#C00000" }} />
+              <Typography
+                variant="body2"
+                component="a"
+                href="mailto:stockbotdevstest@gmail.com"
+                sx={{
+                  color: "#fff",
+                  textDecoration: "none",
+                  "&:hover": { color: "#C00000" },
+                }}
+              >
+                stockbotdevstest@gmail.com
+              </Typography>
             </Box>
           </Stack>
         </Container>
@@ -196,4 +266,4 @@ function LandingPage() {
   );
 }
 
-export default LandingPage;
+export default LandingPage;
