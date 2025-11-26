@@ -81,7 +81,12 @@ function Sidebar() {
   const drawerContent = (
     <div style={{ display: "flex", flexDirection: "column", height: "100%" }}>
       <Box sx={{ p: 2, textAlign: "center" }}>
-        <Typography variant="h5" component="h2" fontWeight="bold" color="#FFFFFF">
+        <Typography
+          variant="h5"
+          component="h2"
+          fontWeight="bold"
+          color="#FFFFFF"
+        >
           StockBot
         </Typography>
       </Box>
@@ -112,7 +117,11 @@ function Sidebar() {
         {isUserAdmin && (
           <>
             <ListItem disablePadding>
-              <ListItemButton component={NavLink} to="/aprovacoes" sx={listItemSx}>
+              <ListItemButton
+                component={NavLink}
+                to="/aprovacoes"
+                sx={listItemSx}
+              >
                 <ListItemIcon sx={iconSx}>
                   <CheckSquare size={20} />
                 </ListItemIcon>
@@ -121,7 +130,11 @@ function Sidebar() {
             </ListItem>
 
             <ListItem disablePadding>
-              <ListItemButton component={NavLink} to="/recebimento" sx={listItemSx}>
+              <ListItemButton
+                component={NavLink}
+                to="/recebimento"
+                sx={listItemSx}
+              >
                 <ListItemIcon sx={iconSx}>
                   <PackageCheck size={20} />
                 </ListItemIcon>
@@ -130,7 +143,11 @@ function Sidebar() {
             </ListItem>
 
             <ListItem disablePadding>
-              <ListItemButton component={NavLink} to="/usuarios" sx={listItemSx}>
+              <ListItemButton
+                component={NavLink}
+                to="/usuarios"
+                sx={listItemSx}
+              >
                 <ListItemIcon sx={iconSx}>
                   <Users size={20} />
                 </ListItemIcon>
@@ -146,14 +163,31 @@ function Sidebar() {
 
       {/* --- MENU INFERIOR (Configurações e Sistema) --- */}
       <List sx={{ p: 1, mt: "auto" }}>
-        
         {/* 2. MODO ESCURO */}
         <ListItem sx={{ color: "#FFFFFF" }}>
           <ListItemIcon sx={iconSx}>
             {isDarkMode ? <Sun size={20} /> : <Moon size={20} />}
           </ListItemIcon>
           <FormControlLabel
-            control={<Switch checked={isDarkMode} onChange={toggleColorMode} color="primary" />}
+            control={
+              <Switch
+                checked={isDarkMode}
+                onChange={toggleColorMode}
+                color="primary" // Mantém a bolinha (thumb) vermelha/primária quando ativo
+                sx={{
+                  // Estiliza a barra (track)
+                  "& .MuiSwitch-track": {
+                    backgroundColor: "#808080", // Define a cor CINZA
+                    opacity: 0.7, // Ajusta a opacidade para ficar visível no fundo preto
+                  },
+                  // Garante que a barra continue cinza (ou um tom diferente) quando ativado
+                  "& .MuiSwitch-switchBase.Mui-checked + .MuiSwitch-track": {
+                    backgroundColor: "#C00000", // Vermelho
+                    opacity: 1,
+                  },
+                }}
+              />
+            }
             label="Modo Escuro"
             sx={{ m: 0, flexGrow: 1 }}
           />
@@ -161,7 +195,11 @@ function Sidebar() {
 
         {/* 3. CONFIGURAÇÕES */}
         <ListItem disablePadding>
-          <ListItemButton component={NavLink} to="/configuracoes" sx={listItemSx}>
+          <ListItemButton
+            component={NavLink}
+            to="/configuracoes"
+            sx={listItemSx}
+          >
             <ListItemIcon sx={iconSx}>
               <Settings size={20} />
             </ListItemIcon>

@@ -49,8 +49,9 @@ function UserManagement({ users, onDeleteUser }) {
                 },
               }}
             >
-              <TableCell width="25%">ID</TableCell>
-              <TableCell width="25%">Email</TableCell>
+              {/* ADICIONADO align="center" nas colunas abaixo */}
+              <TableCell align="center" width="25%">ID</TableCell>
+              <TableCell align="center" width="25%">Email</TableCell>
               <TableCell align="center" width="25%">Cargo</TableCell>
               <TableCell align="center" width="25%">Ações</TableCell>
             </TableRow>
@@ -59,8 +60,9 @@ function UserManagement({ users, onDeleteUser }) {
             {users && users.length > 0 ? (
               usersPaginados.map((user) => (
                 <TableRow hover key={user.id}>
-                  <TableCell>{user.id}</TableCell>
-                  <TableCell>{user.email}</TableCell>
+                  {/* ADICIONADO align="center" nas células abaixo */}
+                  <TableCell align="center">{user.id}</TableCell>
+                  <TableCell align="center">{user.email}</TableCell>
 
                   <TableCell align="center">
                     <Chip
