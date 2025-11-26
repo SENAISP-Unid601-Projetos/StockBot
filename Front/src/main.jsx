@@ -33,12 +33,12 @@ const router = createBrowserRouter([
       { path: "/historico", element: <HistoricoPage /> },
       { path: "/reposicao", element: <ReposicaoPage /> },
       { path: "/pedidos", element: <PedidosPage /> },
+      { path: "/configuracoes", element: <ConfiguracoesPage /> },
 
       // --- ROTAS PROTEGIDAS (Admin) ---
       {
         element: <AdminRoute />,
         children: [
-          { path: "/configuracoes", element: <ConfiguracoesPage /> },
           { path: "/aprovacoes", element: <Aprovacaopages /> },
           { path: "/recebimento", element: <Recebimentopage /> },
           { path: "/usuarios", element: <UserManagementPage /> }, // <-- 2. ADICIONAR A ROTA

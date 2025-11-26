@@ -25,7 +25,7 @@ import {
   CheckSquare,
   ShoppingCart,
   PackageCheck,
-  Users, // <-- 1. Importar o ícone de Usuários
+  Users,
 } from "lucide-react";
 
 import { isAdmin } from "../services/authService";
@@ -86,8 +86,9 @@ function Sidebar() {
         </Typography>
       </Box>
 
-      {/* MENU GERAL (Para todos) */}
+      {/* --- MENU SUPERIOR (Conteúdo Principal) --- */}
       <List sx={{ p: 1 }}>
+        {/* Itens Padrão (Dashboard, Componentes, etc.) */}
         {menuItems.map((item) => (
           <ListItem key={item.text} disablePadding>
             <ListItemButton component={NavLink} to={item.path} sx={listItemSx}>
@@ -105,11 +106,48 @@ function Sidebar() {
             <ListItemText primary="Pedido de Compra" />
           </ListItemButton>
         </ListItem>
+
+        {/* --- 1. ITENS DE ADMIN (Movidos para cá) --- */}
+        {/* Eles agora aparecem logo abaixo de Pedido de Compra, sem espaçamento */}
+        {isUserAdmin && (
+          <>
+            <ListItem disablePadding>
+              <ListItemButton component={NavLink} to="/aprovacoes" sx={listItemSx}>
+                <ListItemIcon sx={iconSx}>
+                  <CheckSquare size={20} />
+                </ListItemIcon>
+                <ListItemText primary="Aprovações" />
+              </ListItemButton>
+            </ListItem>
+
+            <ListItem disablePadding>
+              <ListItemButton component={NavLink} to="/recebimento" sx={listItemSx}>
+                <ListItemIcon sx={iconSx}>
+                  <PackageCheck size={20} />
+                </ListItemIcon>
+                <ListItemText primary="Recebimento" />
+              </ListItemButton>
+            </ListItem>
+
+            <ListItem disablePadding>
+              <ListItemButton component={NavLink} to="/usuarios" sx={listItemSx}>
+                <ListItemIcon sx={iconSx}>
+                  <Users size={20} />
+                </ListItemIcon>
+                <ListItemText primary="Usuários" />
+              </ListItemButton>
+            </ListItem>
+          </>
+        )}
       </List>
 
+      {/* --- Espaçador (Empurra o restante para o fundo) --- */}
       <Box sx={{ flexGrow: 1 }} />
 
+      {/* --- MENU INFERIOR (Configurações e Sistema) --- */}
       <List sx={{ p: 1, mt: "auto" }}>
+        
+        {/* 2. MODO ESCURO */}
         <ListItem sx={{ color: "#FFFFFF" }}>
           <ListItemIcon sx={iconSx}>
             {isDarkMode ? <Sun size={20} /> : <Moon size={20} />}
@@ -121,51 +159,17 @@ function Sidebar() {
           />
         </ListItem>
 
-        <>
-          <ListItem disablePadding>
-            <ListItemButton component={NavLink} to="/aprovacoes" sx={listItemSx}>
-              <ListItemIcon sx={iconSx}>
-                <CheckSquare size={20} />
-              </ListItemIcon>
-              <ListItemText primary="Aprovações" />
-            </ListItemButton>
-          </ListItem>
+        {/* 3. CONFIGURAÇÕES */}
+        <ListItem disablePadding>
+          <ListItemButton component={NavLink} to="/configuracoes" sx={listItemSx}>
+            <ListItemIcon sx={iconSx}>
+              <Settings size={20} />
+            </ListItemIcon>
+            <ListItemText primary="Configurações" />
+          </ListItemButton>
+        </ListItem>
 
-          {/* --- BLOCO DE ADMINISTRAÇÃO --- */}
-          {isUserAdmin && (
-            <>
-              <ListItem disablePadding>
-                <ListItemButton component={NavLink} to="/recebimento" sx={listItemSx}>
-                  <ListItemIcon sx={iconSx}>
-                    <PackageCheck size={20} />
-                  </ListItemIcon>
-                  <ListItemText primary="Recebimento" />
-                </ListItemButton>
-              </ListItem>
-
-              {/* --- 2. NOVO ITEM DE MENU PARA USUÁRIOS --- */}
-              <ListItem disablePadding>
-                <ListItemButton component={NavLink} to="/usuarios" sx={listItemSx}>
-                  <ListItemIcon sx={iconSx}>
-                    <Users size={20} />
-                  </ListItemIcon>
-                  <ListItemText primary="Usuários" />
-                </ListItemButton>
-              </ListItem>
-
-              <ListItem disablePadding>
-                <ListItemButton component={NavLink} to="/configuracoes" sx={listItemSx}>
-                  <ListItemIcon sx={iconSx}>
-                    <Settings size={20} />
-                  </ListItemIcon>
-                  <ListItemText primary="Configurações" />
-                </ListItemButton>
-              </ListItem>
-            </>
-          )}
-        </>
-
-        {/* Botão Sair */}
+        {/* 4. SAIR */}
         <ListItem disablePadding>
           <ListItemButton
             onClick={handleLogout}

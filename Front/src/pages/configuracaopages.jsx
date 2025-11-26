@@ -23,24 +23,13 @@ function ConfiguracoesPage() {
   });
   const [loadingPass, setLoadingPass] = useState(false);
 
-  // Substitua este ID pelo real do usuário logado
-  const userId = 1;
-
+  // --- MUDANÇA 1: Carregar fonte do LocalStorage ao iniciar ---
   useEffect(() => {
-    const loadFont = async () => {
-      try {
-        const response = await api.get(
-          `/api/preferences/font?userId=${userId}`
-        );
-        document.documentElement.style.fontSize = response.data + "px";
-      } catch (error) {
-        console.error("Erro ao carregar preferências de fonte");
-      }
-    };
-    loadFont();
+    const savedFontSize = localStorage.getItem("stockbot_font_size");
+    if (savedFontSize) {
+      document.documentElement.style.fontSize = savedFontSize + "px";
+    }
   }, []);
-
-
 
   const handleChangePassword = async (e) => {
     e.preventDefault();
@@ -66,27 +55,28 @@ function ConfiguracoesPage() {
     }
   };
 
-  const alterarFonte = async (increment) => {
-    const current = parseFloat(
-      getComputedStyle(document.documentElement).fontSize
-    );
+  // --- MUDANÇA 2: Função simplificada para salvar no navegador ---
+  const alterarFonte = (increment) => {
+    // Pega o tamanho atual ou assume 16px (padrão)
+    const currentStyle = getComputedStyle(document.documentElement).fontSize;
+    const current = parseFloat(currentStyle) || 16;
+    
     const newSize = current + increment;
+
+    // Limites de segurança para a fonte não ficar gigante ou minuscula
+    if (newSize < 10 || newSize > 24) return;
+
+    // Aplica a mudança
     document.documentElement.style.fontSize = newSize + "px";
 
-    try {
-      await api.post(
-        `/api/preferences/font?userId=${userId}&fontSize=${newSize}`
-      );
-      toast.info(`Fonte ${increment > 0 ? "aumentada" : "diminuída"} e salva`);
-    } catch {
-      toast.error("Erro ao salvar tamanho da fonte");
-    }
+    // Salva no navegador para lembrar depois
+    localStorage.setItem("stockbot_font_size", newSize);
+    
+    // toast.info(`Fonte ajustada para ${newSize}px`); // Opcional
   };
 
   const aumentarFonte = () => alterarFonte(1);
   const diminuirFonte = () => alterarFonte(-1);
-
-
 
   return (
     <Box
@@ -167,8 +157,6 @@ function ConfiguracoesPage() {
             </Paper>
           </Grid>
 
-
-
           {/* Ajuste de Fonte */}
           <Grid item xs={12}>
             <Paper sx={{ p: 3, boxShadow: 3 }}>
@@ -196,12 +184,8 @@ function ConfiguracoesPage() {
               </Box>
             </Paper>
           </Grid>
-
-
         </Grid>
       </Container>
-
-
     </Box>
   );
 }
