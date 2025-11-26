@@ -18,7 +18,7 @@ function RecuperarSenhaPage() {
 
     try {
       await api.post("/api/auth/forgot-password", { email });
-      setMessage("Se o e-mail existir, você receberá uma nova senha temporária em instantes.");
+      setMessage("Você receberá uma nova senha temporária em instantes.");
     } catch (err) {
       setError(err.response?.data || "Erro ao solicitar recuperação.");
     } finally {
