@@ -174,6 +174,18 @@ function Sidebar() {
                 checked={isDarkMode}
                 onChange={toggleColorMode}
                 color="primary"
+                sx={{
+                  // Estado DESLIGADO (Modo Claro): Barra Cinza
+                  "& .MuiSwitch-track": {
+                    backgroundColor: "#808080",
+                    opacity: 0.7,
+                  },
+                  // Estado LIGADO (Modo Escuro): Barra Vermelha
+                  "& .MuiSwitch-switchBase.Mui-checked + .MuiSwitch-track": {
+                    backgroundColor: "#C00000", // Vermelho Senai
+                    opacity: 1, // Opacidade 100% para ficar bem vivo
+                  },
+                }}
               />
             }
             label="Modo Escuro"
