@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { toast } from "react-toastify";
 import _ from "lodash";
 
@@ -20,7 +20,6 @@ import {
   Stack,
   TextField,
   InputAdornment,
-  // Imports para o Dialog (Aviso Personalizado)
   Dialog,
   DialogActions,
   DialogContent,
@@ -32,12 +31,15 @@ import AddIcon from "@mui/icons-material/Add";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 import SearchIcon from "@mui/icons-material/Search";
+import FileDownloadIcon from "@mui/icons-material/FileDownload";
+import UploadFileIcon from "@mui/icons-material/UploadFile";
 
 import ModalComponente from "../components/modalcomponente";
 import api from "../services/api";
 import { isAdmin } from "../services/authService";
 
 function ComponentesPage() {
+  // --- ESTADOS ---
   const [componentes, setComponentes] = useState([]);
   const [loading, setLoading] = useState(true);
   const [page, setPage] = useState(0);
@@ -48,26 +50,28 @@ function ComponentesPage() {
   const [isUserAdmin, setIsUserAdmin] = useState(false);
   const [termoBusca, setTermoBusca] = useState("");
 
-  // --- ESTADOS PARA O DIALOG DE EXCLUSÃO ---
+  // Estados para o Dialog de Exclusão
   const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
   const [idToDelete, setIdToDelete] = useState(null);
 
+  // Referência para o input de arquivo (CSV)
+  const fileInputRef = useRef(null);
+
+  // --- LÓGICA DE BUSCA ---
   const fetchData = useCallback(
     async (termo = "") => {
       setLoading(true);
       try {
         const queryParam = typeof termo === "string" ? termo : "";
-
         const response = await api.get("/api/componentes", {
           params: { termo: queryParam },
         });
-
         const todosComponentes = response.data || [];
         setTotalElements(todosComponentes.length);
 
+        // Paginação no Front (já que o back retorna tudo na busca simples)
         const inicio = page * rowsPerPage;
         const fim = inicio + rowsPerPage;
-
         setComponentes(todosComponentes.slice(inicio, fim));
       } catch (error) {
         console.error("Erro ao buscar componentes:", error);
@@ -88,57 +92,24 @@ function ComponentesPage() {
     fetchData();
   }, [fetchData]);
 
-  const handleChangePage = (event, newPage) => {
-    setPage(newPage);
-  };
+  useEffect(() => {
+    debouncedFetchData(termoBusca);
+  }, [termoBusca, debouncedFetchData]);
+
+  // --- HANDLERS DE PAGINAÇÃO E BUSCA ---
+  const handleChangePage = (event, newPage) => setPage(newPage);
 
   const handleChangeRowsPerPage = (event) => {
     setRowsPerPage(parseInt(event.target.value, 10));
     setPage(0);
   };
 
-  useEffect(() => {
-    debouncedFetchData(termoBusca);
-  }, [termoBusca, debouncedFetchData]);
+  const handleBuscaChange = (event) => setTermoBusca(event.target.value);
 
-  const handleBuscaChange = (event) => {
-    setTermoBusca(event.target.value);
-  };
-
+  // --- HANDLERS DE EDIÇÃO E ADIÇÃO ---
   const handleEdit = (componente) => {
     setComponenteEmEdicao(componente);
     setModalVisible(true);
-  };
-
-  // --- LÓGICA DE EXCLUSÃO ATUALIZADA ---
-
-  // 1. Abre o aviso
-  const handleDeleteClick = (id) => {
-    setIdToDelete(id);
-    setOpenDeleteDialog(true);
-  };
-
-  // 2. Fecha o aviso
-  const handleCloseDeleteDialog = () => {
-    setOpenDeleteDialog(false);
-    setIdToDelete(null);
-  };
-
-  // 3. Confirma a exclusão
-  const handleConfirmDelete = async () => {
-    handleCloseDeleteDialog(); // Fecha o modal primeiro
-
-    if (!idToDelete) return;
-
-    try {
-      await api.delete(`/api/componentes/${idToDelete}`);
-      toast.success("Componente excluído com sucesso!");
-      // Atualiza a lista
-      fetchData(termoBusca);
-    } catch (error) {
-      toast.error("Falha ao excluir o componente.");
-      console.error(error);
-    }
   };
 
   const handleAdd = () => {
@@ -150,8 +121,87 @@ function ComponentesPage() {
     fetchData(termoBusca);
   };
 
+  // --- HANDLERS DE EXCLUSÃO ---
+  const handleDeleteClick = (id) => {
+    setIdToDelete(id);
+    setOpenDeleteDialog(true);
+  };
+
+  const handleCloseDeleteDialog = () => {
+    setOpenDeleteDialog(false);
+    setIdToDelete(null);
+  };
+
+  const handleConfirmDelete = async () => {
+    handleCloseDeleteDialog();
+    if (!idToDelete) return;
+
+    try {
+      await api.delete(`/api/componentes/${idToDelete}`);
+      toast.success("Componente excluído com sucesso!");
+      fetchData(termoBusca);
+    } catch (error) {
+      toast.error("Falha ao excluir o componente.");
+      console.error(error);
+    }
+  };
+
+  // --- HANDLERS DE IMPORTAÇÃO/EXPORTAÇÃO (CSV) ---
+  const handleImportClick = () => fileInputRef.current.click();
+
+  const handleFileUpload = async (event) => {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    const formData = new FormData();
+    formData.append("file", file);
+
+    setLoading(true);
+    try {
+      await api.post("/api/componentes/importar", formData, {
+        headers: { "Content-Type": "multipart/form-data" },
+      });
+      toast.success("Importação realizada com sucesso!");
+      fetchData(termoBusca);
+    } catch (error) {
+      console.error("Erro upload:", error);
+      toast.error("Erro ao importar CSV. Verifique o formato.");
+    } finally {
+      setLoading(false);
+      if (fileInputRef.current) fileInputRef.current.value = "";
+    }
+  };
+
+  const handleExportClick = async () => {
+    try {
+      const response = await api.get("/api/componentes/exportar", {
+        responseType: "blob",
+      });
+      const url = window.URL.createObjectURL(new Blob([response.data]));
+      const link = document.createElement("a");
+      link.href = url;
+      link.setAttribute("download", "estoque.csv");
+      document.body.appendChild(link);
+      link.click();
+      link.parentNode.removeChild(link);
+    } catch (error) {
+      console.error("Erro export:", error);
+      toast.error("Erro ao exportar CSV.");
+    }
+  };
+
+  // --- RENDERIZAÇÃO ---
   return (
     <>
+      {/* Input Oculto para Upload */}
+      <input
+        type="file"
+        ref={fileInputRef}
+        style={{ display: "none" }}
+        accept=".csv"
+        onChange={handleFileUpload}
+      />
+
       <Box
         component="main"
         sx={{
@@ -176,35 +226,53 @@ function ComponentesPage() {
               Gerenciamento de Itens
             </Typography>
 
-            {/* --- BARRA DE PESQUISA --- */}
-            <TextField
-              variant="outlined"
-              size="small"
-              placeholder="Buscar por nome ou id"
-              value={termoBusca}
-              onChange={handleBuscaChange}
-              InputProps={{
-                startAdornment: (
-                  <InputAdornment position="start">
-                    <SearchIcon />
-                  </InputAdornment>
-                ),
-              }}
-              sx={{ minWidth: "250px", backgroundColor: "background.paper" }}
-            />
-
-            {isUserAdmin && (
-              <Button
-                variant="contained"
-                onClick={handleAdd}
-                sx={{
-                  backgroundColor: "#ce0000",
-                  "&:hover": { backgroundColor: "#a40000" },
+            <Box sx={{ display: "flex", gap: 2, alignItems: "center" }}>
+              <TextField
+                variant="outlined"
+                size="small"
+                placeholder="Buscar por nome ou id"
+                value={termoBusca}
+                onChange={handleBuscaChange}
+                InputProps={{
+                  startAdornment: (
+                    <InputAdornment position="start">
+                      <SearchIcon />
+                    </InputAdornment>
+                  ),
                 }}
-              >
-                Novo Item
-              </Button>
-            )}
+                sx={{ minWidth: "250px", backgroundColor: "background.paper" }}
+              />
+
+              {isUserAdmin && (
+                <>
+                  <Button
+                    variant="outlined"
+                    startIcon={<FileDownloadIcon />}
+                    onClick={handleExportClick}
+                  >
+                    Exportar
+                  </Button>
+                  <Button
+                    variant="outlined"
+                    startIcon={<UploadFileIcon />}
+                    onClick={handleImportClick}
+                  >
+                    Importar
+                  </Button>
+
+                  <Button
+                    variant="contained"
+                    onClick={handleAdd}
+                    sx={{
+                      backgroundColor: "#ce0000",
+                      "&:hover": { backgroundColor: "#a40000" },
+                    }}
+                  >
+                    Novo Item
+                  </Button>
+                </>
+              )}
+            </Box>
           </Box>
 
           {loading ? (
@@ -271,7 +339,6 @@ function ComponentesPage() {
                                 <IconButton
                                   color="error"
                                   size="small"
-                                  // ALTERADO: Agora chama a função que abre o Dialog
                                   onClick={() =>
                                     handleDeleteClick(componente.id)
                                   }
@@ -285,7 +352,7 @@ function ComponentesPage() {
                       ))
                     ) : (
                       <TableRow>
-                        <TableCell colSpan={isUserAdmin ? 6 : 5} align="center">
+                        <TableCell colSpan={isUserAdmin ? 7 : 6} align="center">
                           <Typography color="text.secondary" sx={{ p: 3 }}>
                             Nenhum componente encontrado.
                           </Typography>
@@ -326,14 +393,14 @@ function ComponentesPage() {
         aria-describedby="alert-dialog-description"
         PaperProps={{
           sx: {
-            backgroundColor: "background.paper", // Adapta ao tema escuro/claro
+            backgroundColor: "background.paper",
             backgroundImage: "none",
           },
         }}
       >
         <DialogTitle
           id="alert-dialog-title"
-          sx={{ fontWeight: "bold", color: "#d32f2f" }} // Título Vermelho
+          sx={{ fontWeight: "bold", color: "#d32f2f" }}
         >
           {"Excluir Componente?"}
         </DialogTitle>
