@@ -1,8 +1,7 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import api from "../services/api";
 import { toast } from "react-toastify";
 
-// 1. Imports de Componentes do MUI
 import {
   Box,
   CircularProgress,
@@ -14,111 +13,201 @@ import {
   TableContainer,
   TableHead,
   TableRow,
-  TablePagination, // O componente de paginação!
+  TablePagination,
   Chip,
   Typography,
+  TextField,
+  InputAdornment,
 } from "@mui/material";
+import SearchIcon from "@mui/icons-material/Search";
 
 function HistoricoPage() {
-  // 2. Novos estados para controlar a paginação
   const [historico, setHistorico] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [page, setPage] = useState(0); // A página atual (começa em 0)
-  const [rowsPerPage, setRowsPerPage] = useState(10); // Itens por página
-  const [totalElements, setTotalElements] = useState(0); // Total de registos no backend
+  const [page, setPage] = useState(0);
+  const [rowsPerPage, setRowsPerPage] = useState(10);
+  const [totalElements, setTotalElements] = useState(0);
+  const [termoBusca, setTermoBusca] = useState("");
 
-  // 3. O useEffect agora reage a mudanças na página ou no número de itens por página
   useEffect(() => {
     const fetchData = async () => {
       setLoading(true);
       try {
-        // A chamada à API agora inclui os parâmetros de paginação
         const response = await api.get(
           `/api/historico?page=${page}&size=${rowsPerPage}`
         );
 
-        // O backend paginado retorna um objeto com os dados e informações da página
-        setHistorico(response.data.content);
+        setHistorico(response.data.content || []);
         setTotalElements(response.data.totalElements);
       } catch (error) {
         console.error("Erro ao buscar histórico:", error);
-        toast.error("Não foi possível carregar o histórico.");
+        if (error.response?.status !== 401) {
+          toast.error("Não foi possível carregar o histórico.");
+        }
       } finally {
         setLoading(false);
       }
     };
     fetchData();
-  }, [page, rowsPerPage]); // A cláusula do "contrato" com o React
+  }, [page, rowsPerPage]);
 
-  // 4. Funções para lidar com as ações de paginação
+  const historicoFiltrado = useMemo(() => {
+    if (!termoBusca) {
+      return historico;
+    }
+    const termoLower = termoBusca.toLowerCase();
+    return historico.filter(
+      (item) =>
+        item.componenteNome?.toLowerCase().includes(termoLower) ||
+        item.usuario?.toLowerCase().includes(termoLower)
+    );
+  }, [historico, termoBusca]);
+
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
   };
 
   const handleChangeRowsPerPage = (event) => {
     setRowsPerPage(parseInt(event.target.value, 10));
-    setPage(0); // Volta para a primeira página sempre que muda o número de itens
+    setPage(0);
+  };
+
+  const handleBuscaChange = (event) => {
+    setTermoBusca(event.target.value);
   };
 
   return (
     <Box
       component="main"
-      sx={{ flexGrow: 1, p: 3}}
+      sx={{
+        flexGrow: 1,
+        p: 3,
+        backgroundColor: "background.default",
+        minHeight: "100vh",
+      }}
     >
       <Container maxWidth="lg">
-        <Typography
-          variant="h4"
-          component="h1"
-          fontWeight="bold"
-          sx={{ mb: 4 }}
+        {/* --- Cabeçalho com Título e Barra de Busca --- */}
+        <Box
+          sx={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+            mb: 4,
+            flexWrap: "wrap",
+            gap: 2,
+          }}
         >
-          Histórico de Movimentações
-        </Typography>
+          <Typography
+            variant="h4"
+            component="h1"
+            sx={{
+              fontWeight: "bold",
+              letterSpacing: 0.5,
+            }}
+          >
+            Histórico de Movimentações
+          </Typography>
+          <TextField
+            variant="outlined"
+            size="small"
+            placeholder="Filtrar por item ou utilizador..."
+            value={termoBusca}
+            onChange={handleBuscaChange}
+            InputProps={{
+              startAdornment: (
+                <InputAdornment position="start">
+                  <SearchIcon />
+                </InputAdornment>
+              ),
+            }}
+            sx={{
+              minWidth: "300px",
+              backgroundColor: "background.paper",
+            }}
+          />
+        </Box>
 
-        {/* Paper: Um "pedaço de papel" elevado que envolve a nossa tabela */}
-        <Paper sx={{ width: "100%", overflow: "hidden", boxShadow: 3 }}>
+        {/* --- Paper Padronizado --- */}
+        <Paper sx={{ width: "100%", overflow: "hidden", boxShadow: 5 }}>
           <TableContainer>
             <Table stickyHeader>
               <TableHead>
-                <TableRow>
-                  <TableCell sx={{ fontWeight: "bold" }}>Data e Hora</TableCell>
-                  <TableCell sx={{ fontWeight: "bold" }}>Item</TableCell>
-                  <TableCell sx={{ fontWeight: "bold" }}>Tipo</TableCell>
-                  <TableCell sx={{ fontWeight: "bold" }}>Quantidade</TableCell>
-                  <TableCell sx={{ fontWeight: "bold" }}>Utilizador</TableCell>
+                {/* ESTILO DO CABEÇALHO PADRONIZADO */}
+                <TableRow
+                  sx={{
+                    "& th": {
+                      backgroundColor: "#2a3c61ff", // Azul escuro
+                      color: "#ffffff", // Texto branco
+                      fontWeight: "bold",
+                    },
+                  }}
+                >
+                  <TableCell align="center">Id</TableCell>
+                  <TableCell align="center">Item</TableCell>
+                  <TableCell align="center">Quantidade</TableCell>
+                  <TableCell align="center">Tipo</TableCell>
+                  <TableCell align="center">Data e Hora</TableCell>
+                  <TableCell align="center">Utilizador</TableCell>
                 </TableRow>
               </TableHead>
+
               <TableBody>
                 {loading ? (
                   <TableRow>
-                    <TableCell colSpan={5} align="center">
+                    <TableCell colSpan={6} align="center" sx={{ py: 5 }}>
                       <CircularProgress />
                     </TableCell>
                   </TableRow>
-                ) : (
-                  historico.map((item) => (
+                ) : historicoFiltrado.length > 0 ? (
+                  historicoFiltrado.map((item) => (
                     <TableRow hover key={item.id}>
-                      <TableCell>
-                        {new Date(item.dataHora).toLocaleString("pt-BR")}
+                      <TableCell align="center">{item.id}</TableCell>
+
+                      <TableCell align="center" sx={{ fontWeight: 500 }}>
+                        {item.componenteNome || "N/A"}
                       </TableCell>
-                      <TableCell>{item.componenteNome}</TableCell>
-                      <TableCell>
+
+                      <TableCell align="center">{item.quantidade}</TableCell>
+
+                      <TableCell align="center">
                         <Chip
                           label={item.tipo}
-                          color={item.tipo === "ENTRADA" ? "success" : "error"}
+                          color={
+                            item.tipo === "ENTRADA"
+                              ? "success"
+                              : item.tipo === "SAIDA"
+                              ? "error"
+                              : "warning"
+                          }
                           size="small"
+                          sx={{ fontWeight: "bold", minWidth: "80px" }}
                         />
                       </TableCell>
-                      <TableCell>{item.quantidade}</TableCell>
-                      <TableCell>{item.usuario}</TableCell>
+
+                      <TableCell align="center">
+                        {new Date(item.dataHora).toLocaleString("pt-BR")}
+                      </TableCell>
+
+                      <TableCell align="center">{item.usuario}</TableCell>
                     </TableRow>
                   ))
+                ) : (
+                  <TableRow>
+                    <TableCell colSpan={6} align="center">
+                      <Typography color="text.secondary" sx={{ p: 3 }}>
+                        {termoBusca
+                          ? `Nenhum registro encontrado para "${termoBusca}".`
+                          : "Nenhum registro de histórico nesta página."}
+                      </Typography>
+                    </TableCell>
+                  </TableRow>
                 )}
               </TableBody>
             </Table>
           </TableContainer>
 
-          {/* 5. O Componente de Paginação do MUI */}
+          {/* Paginação Padronizada (Fundo Branco) */}
           <TablePagination
             rowsPerPageOptions={[5, 10, 25]}
             component="div"

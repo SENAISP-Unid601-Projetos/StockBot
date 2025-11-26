@@ -3,6 +3,7 @@ import api from "../services/api";
 import { toast } from "react-toastify";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
+import { useNavigate } from "react-router-dom";
 
 import {
   Alert,
@@ -10,101 +11,129 @@ import {
   Button,
   CircularProgress,
   Container,
-  Grid,
   Typography,
+  Paper,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  TablePagination,
+  Chip,
 } from "@mui/material";
 import PrintIcon from "@mui/icons-material/Print";
-
-import ActionList from "../components/actionlist";
+import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
 
 function ReposicaoPage() {
   const [componentes, setComponentes] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [threshold, setThreshold] = useState(5);
+  const [page, setPage] = useState(0);
+  const [rowsPerPage, setRowsPerPage] = useState(10);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchData = async () => {
       try {
         setLoading(true);
-
-        // Buscar dados em paralelo para melhor performance
-        const [componentesResponse, thresholdResponse] = await Promise.all([
-          api.get("/api/componentes"),
-          api
-            .get("/api/configuracoes/limiteEstoqueBaixo")
-            .catch(() => ({ data: 5 })), // Fallback para 5 se der erro
-        ]);
-
-        if (Array.isArray(componentesResponse.data)) {
-          setComponentes(componentesResponse.data);
+        // Carrega os dados
+        const response = await api.get("/api/componentes");
+        if (Array.isArray(response.data)) {
+          setComponentes(response.data);
         }
-
-        setThreshold(thresholdResponse.data);
       } catch (error) {
-        console.error("Erro ao carregar dados:", error);
         toast.error("Não foi possível carregar os dados.");
       } finally {
         setLoading(false);
       }
     };
-
     fetchData();
   }, []);
 
+  // Filtra itens que atingiram o nível mínimo
+  const itensParaRepor = componentes.filter(
+    (comp) => comp.quantidade <= (comp.nivelMinimoEstoque || 0)
+  );
+  const necessitaReposicao = itensParaRepor.length > 0;
+
+  // Handlers de Paginação
+  const handleChangePage = (event, newPage) => {
+    setPage(newPage);
+  };
+
+  const handleChangeRowsPerPage = (event) => {
+    setRowsPerPage(parseInt(event.target.value, 10));
+    setPage(0);
+  };
+
+  // Dados paginados
+  const totalElements = itensParaRepor.length;
+  const inicio = page * rowsPerPage;
+  const fim = inicio + rowsPerPage;
+  const itensPaginados = itensParaRepor.slice(inicio, fim);
+
+  // Gerar PDF
   const handleGerarPedidoPDF = () => {
     const doc = new jsPDF();
-
-    // Adicionar título
     doc.setFontSize(18);
     doc.text("Relatório de Reposição de Estoque", 14, 22);
 
-    // Preparar dados para a tabela
-    const tableData = componentes
-      .filter((comp) => comp.quantidade <= threshold)
-      .map((comp) => [
-        comp.id || comp.codigo || "-",
-        comp.nome || "Sem nome",
-        comp.quantidade || 0,
-        comp.quantidade <= 0 ? "ESGOTADO" : "BAIXO",
-      ]);
+    const tableData = itensParaRepor.map((comp) => [
+      comp.nome || "Sem nome",
+      comp.codigoPatrimonio || "-",
+      comp.quantidade <= 0 ? "ESGOTADO" : "ESTOQUE BAIXO",
+      comp.quantidade || 0,
+      comp.nivelMinimoEstoque || 0,
+      (comp.nivelMinimoEstoque || 0) - (comp.quantidade || 0),
+    ]);
 
-    // Adicionar tabela
     autoTable(doc, {
-      head: [["Código", "Nome", "Quantidade", "Status"]],
+      head: [
+        [
+          "Nome",
+          "Patrimônio",
+          "Status",
+          "Qtd. Atual",
+          "Nível Mínimo",
+          "Repor Qtd.",
+        ],
+      ],
       body: tableData,
       startY: 30,
       styles: { fontSize: 10 },
       headStyles: { fillColor: [66, 66, 66] },
+      didParseCell: function (data) {
+        if (data.column.index === 2 && data.cell.section === "body") {
+          if (data.cell.raw === "ESGOTADO") {
+            data.cell.styles.textColor = [211, 47, 47];
+            data.cell.styles.fontStyle = "bold";
+          }
+          if (data.cell.raw === "ESTOQUE BAIXO") {
+            data.cell.styles.textColor = [237, 108, 2];
+          }
+        }
+      },
     });
-
-    // Salvar PDF
-    doc.save("relatorio-reposicao-estoque.pdf");
+    doc.save("relatorio-reposicao.pdf");
   };
 
-  const itensEmFalta = componentes.filter((comp) => comp.quantidade <= 0);
-  const itensEstoqueBaixo = componentes.filter(
-    (comp) => comp.quantidade > 0 && comp.quantidade <= threshold
-  );
-  const necessitaReposicao =
-    itensEmFalta.length > 0 || itensEstoqueBaixo.length > 0;
+  const handleSolicitarClick = () => {
+    navigate("/pedidos");
+    toast.info("Redirecionando para a página de Pedidos.");
+  };
 
-  if (loading) {
-    return (
-      <Box
-        display="flex"
-        justifyContent="center"
-        alignItems="center"
-        minHeight="50vh"
-      >
-        <CircularProgress />
-      </Box>
-    );
-  }
+  if (loading)
+    return <CircularProgress sx={{ display: "block", margin: "20px auto" }} />;
 
   return (
     <Box
       component="main"
-      sx={{ flexGrow: 1, p: 3}}
+      sx={{
+        flexGrow: 1,
+        p: 3,
+        backgroundColor: "background.default",
+        minHeight: "100vh",
+      }}
     >
       <Container maxWidth="lg">
         <Box
@@ -112,16 +141,17 @@ function ReposicaoPage() {
           justifyContent="space-between"
           alignItems="center"
           mb={3}
+          flexWrap="wrap"
+          gap={2}
         >
-          <Typography variant="h4" component="h1">
+          <Typography variant="h4" component="h1" fontWeight="bold">
             Relatório de Reposição
           </Typography>
-
           <Button
             variant="contained"
             startIcon={<PrintIcon />}
             onClick={handleGerarPedidoPDF}
-            disabled={componentes.length === 0}
+            disabled={!necessitaReposicao}
           >
             Gerar PDF
           </Button>
@@ -129,33 +159,87 @@ function ReposicaoPage() {
 
         {!necessitaReposicao && (
           <Alert severity="success" sx={{ mb: 3 }}>
-            Estoque em dia! Não há itens necessitando reposição.
+            Estoque em dia! Nenhum item necessitando reposição.
           </Alert>
         )}
 
-        <Grid container spacing={3}>
-          {itensEmFalta.length > 0 && (
-            <Grid item xs={12} md={6}>
-              <ActionList
-                title="Itens Esgotados"
-                items={itensEmFalta}
-                severity="error"
-                emptyMessage="Nenhum item completamente esgotado"
-              />
-            </Grid>
-          )}
+        {necessitaReposicao && (
+          <Paper sx={{ width: "100%", overflow: "hidden", boxShadow: 5 }}>
+            <TableContainer>
+              <Table stickyHeader aria-label="tabela de reposição">
+                <TableHead>
+                  {/* ESTILO PADRONIZADO (CABEÇALHO ESCURO) */}
+                  <TableRow
+                    sx={{
+                      "& th": {
+                        backgroundColor: "#2a3c61ff",
+                        color: "#ffffff",
+                        fontWeight: "bold",
+                      },
+                    }}
+                  >
+                    <TableCell align="center">Nome</TableCell>
+                    <TableCell align="center">Patrimônio</TableCell>
+                    <TableCell align="center">Status</TableCell>
+                    <TableCell align="center">Qtd. Atual</TableCell>
+                    <TableCell align="center">Nível Mínimo</TableCell>
+                    <TableCell align="center">Repor Qtd.</TableCell>
+                    <TableCell align="center">Ações</TableCell>
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {itensPaginados.map((comp) => (
+                    <TableRow hover key={comp.id}>
+                      <TableCell align="center">{comp.nome}</TableCell>
+                      <TableCell align="center">
+                        {comp.codigoPatrimonio}
+                      </TableCell>
+                      <TableCell align="center">
+                        <Chip
+                          label={
+                            comp.quantidade <= 0 ? "ESGOTADO" : "ESTOQUE BAIXO"
+                          }
+                          color={comp.quantidade <= 0 ? "error" : "warning"}
+                          size="small"
+                          sx={{ fontWeight: "bold" }}
+                        />
+                      </TableCell>
+                      <TableCell align="center">{comp.quantidade}</TableCell>
+                      <TableCell align="center">
+                        {comp.nivelMinimoEstoque}
+                      </TableCell>
+                      <TableCell align="center" sx={{ fontWeight: "bold" }}>
+                        {(comp.nivelMinimoEstoque || 0) -
+                          (comp.quantidade || 0)}
+                      </TableCell>
+                      <TableCell align="center">
+                        <Button
+                          variant="contained"
+                          size="small"
+                          startIcon={<ShoppingCartIcon />}
+                          onClick={handleSolicitarClick}
+                        >
+                          Solicitar
+                        </Button>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </TableContainer>
 
-          {itensEstoqueBaixo.length > 0 && (
-            <Grid item xs={12} md={6}>
-              <ActionList
-                title={`Itens com Estoque Baixo (≤ ${threshold} unidades)`}
-                items={itensEstoqueBaixo}
-                severity="warning"
-                emptyMessage="Nenhum item com estoque baixo"
-              />
-            </Grid>
-          )}
-        </Grid>
+            <TablePagination
+              rowsPerPageOptions={[10, 25, 50]}
+              component="div"
+              count={totalElements}
+              rowsPerPage={rowsPerPage}
+              page={page}
+              onPageChange={handleChangePage}
+              onRowsPerPageChange={handleChangeRowsPerPage}
+              labelRowsPerPage="Itens por página:"
+            />
+          </Paper>
+        )}
       </Container>
     </Box>
   );

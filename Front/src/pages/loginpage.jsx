@@ -1,40 +1,53 @@
-import { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
-import axios from 'axios';
-import './loginpage.css';
-
-const apiUrl = 'http://localhost:8080/api/auth';
+import { useState } from "react";
+import { useNavigate, Link } from "react-router-dom";
+import api from "../services/api";
+import "./loginpage.css";
+import ParticlesBackground from "../components/ParticlesBackground";
 
 function LoginPage() {
-  const [email, setEmail] = useState('');
-  const [senha, setSenha] = useState('');
-  const [dominioEmpresa, setDominioEmpresa] = useState('');
-  const [error, setError] = useState('');
+  const [email, setEmail] = useState("");
+  const [senha, setSenha] = useState("");
+  const [dominioEmpresa, setDominioEmpresa] = useState("");
+  const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
   const handleLogin = async (event) => {
     event.preventDefault();
-    setError('');
+    setError("");
     setLoading(true);
 
     try {
-      const response = await axios.post(`${apiUrl}/login`, { email, senha, dominioEmpresa });
+      const response = await api.post("/api/auth/login", {
+        email,
+        senha,
+        dominioEmpresa,
+      });
       const token = response.data.token;
-      localStorage.setItem('jwt-token', token);
-      navigate('/');
+      localStorage.setItem("jwt-token", token);
+      navigate("/");
     } catch (error) {
-      console.error('Erro de login:', error);
-      setError('Credenciais inválidas. Verifique o e-mail, senha e domínio.');
+      console.error("Erro de login:", error);
+      // Se o backend retornar apenas a string, usamos error.response.data
+      const errorMsg = error.response?.data?.message || error.response?.data || "Erro ao entrar.";
+      setError(errorMsg); // Vai exibir: "Este e-mail não está cadastrado."
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="login-container">
-      <div className="form-wrapper">
-        {/* ALTERAÇÃO AQUI: id="login-form" para className="auth-form" */}
+    <div
+      className="login-container"
+      style={{ position: "relative", minHeight: "100vh" }}
+    >
+      {/* 🎇 Fundo animado de partículas */}
+      <ParticlesBackground />
+
+      <div
+        className="form-wrapper"
+        style={{ position: "relative", zIndex: 10 }}
+      >
         <form className="auth-form" onSubmit={handleLogin}>
           <h2>Acessar o StockBot</h2>
 
@@ -71,12 +84,20 @@ function LoginPage() {
           {error && <p className="error-message">{error}</p>}
 
           <button type="submit" disabled={loading}>
-            {loading ? 'A entrar...' : 'Entrar'}
+            {loading ? "A entrar..." : "Entrar"}
           </button>
         </form>
+          
+          {/* LINK NOVO */}
+          <div style={{textAlign: 'center', marginTop: '10px'}}>
+            <Link to="/recuperar-senha" style={{color: '#ccc', fontSize: '0.9rem'}}>Esqueceu a senha?</Link>
+          </div>
 
+        {/* // <-- ADICIONAR ESTE BLOCO DE VOLTA */}
         <div className="register-link">
-          <p>Não tem uma conta? <Link to="/register">Crie uma conta</Link></p>
+          <p>
+            Não tem uma conta? <Link to="/register">Crie uma nova empresa</Link>
+          </p>
         </div>
       </div>
     </div>

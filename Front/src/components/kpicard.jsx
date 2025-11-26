@@ -1,32 +1,51 @@
-import React from 'react';
+import React from "react";
+import {
+  Card,
+  CardContent,
+  Typography,
+  Box,
+  // List, ListItem, ListItemIcon, ListItemText, Divider, FiberManualRecordIcon, removidos pois não são mais necessários
+} from "@mui/material";
+// Ícones removidos
 
-// 1. IMPORTAÇÕES DE COMPONENTES DO MUI
-import { Card, CardContent, Typography } from '@mui/material';
-
-// O componente recebe as mesmas props de antes
-function KpiCard({ title, value, description, isCritical = false }) {
+function KpiCard({
+  title,
+  value,
+  description,
+  isCritical = false,
+  // 'items' foi removido da desestruturação, pois não é mais usado
+}) {
   return (
-    // 2. O <div className="kpi-card"> é substituído pelo <Card> do MUI.
-    // Ele já vem com fundo, bordas arredondadas e sombra do nosso tema.
-    // 'sx' é uma prop para adicionar estilos customizados. 'height: 100%' garante que todos os cards na mesma linha tenham a mesma altura.
-    <Card sx={{ height: '100%', boxShadow: 3 }}>
-      {/* CardContent adiciona um espaçamento (padding) interno padrão. */}
-      <CardContent>
-        {/* 3. Todos os textos são substituídos por <Typography> para consistência. */}
-        <Typography
-          color="text.secondary" // Usa a cor de texto secundária do nosso tema
-          gutterBottom
-        >
+    <Card
+      sx={{
+        height: "100%",
+        boxShadow: 3,
+        display: "flex",
+        flexDirection: "column",
+      }}
+    >
+      <CardContent
+        sx={{
+          flexGrow: 1,
+          display: "flex",
+          flexDirection: "column",
+          // Garante que o conteúdo não transborde o padding
+          minHeight: 0,
+        }}
+      >
+        {/* --- PARTE 1: NÚMEROS --- */}
+        <Typography color="text.secondary" gutterBottom>
           {title}
         </Typography>
 
-        <Typography 
-          variant="h4" 
-          component="div" 
+        <Typography
+          variant="h4"
+          component="div"
           fontWeight="bold"
-          // 4. A lógica 'isCritical' agora é feita com a prop 'sx'.
-          // Se for crítico, usa a cor de erro do tema, senão, usa a cor primária de texto.
-          sx={{ color: isCritical ? 'error.main' : 'text.primary' }}
+          sx={{
+            // Usa a cor vermelha se for crítico e o valor for maior que zero
+            color: isCritical && value > 0 ? "error.main" : "text.primary",
+          }}
         >
           {value}
         </Typography>
@@ -34,6 +53,9 @@ function KpiCard({ title, value, description, isCritical = false }) {
         <Typography sx={{ mt: 1.5 }} color="text.secondary">
           {description}
         </Typography>
+
+        {/* --- PARTE 2: A LISTA DE NOMES (REMOVIDA) --- */}
+        
       </CardContent>
     </Card>
   );

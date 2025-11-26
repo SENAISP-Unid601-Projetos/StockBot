@@ -23,14 +23,36 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<LoginResponseDTO> login(@RequestBody @Valid AuthDTO data) {
-        String token = authService.login(data);
-        return ResponseEntity.ok(new LoginResponseDTO(token));
+    public ResponseEntity<?> login(@RequestBody @Valid AuthDTO data) {
+        try {
+            String token = authService.login(data);
+            return ResponseEntity.ok(new LoginResponseDTO(token));
+        } catch (RuntimeException e) {
+            // Retorna erro 400 (Bad Request) com a mensagem exata (ex: "Este e-mail não está cadastrado")
+            // Envolvemos num objeto JSON simples ou enviamos string pura, dependendo do seu front
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
     }
 
     @PostMapping("/register")
-    public ResponseEntity<Void> register(@RequestBody @Valid RegisterDTO data) {
-        authService.register(data);
-        return ResponseEntity.ok().build();
+    public ResponseEntity<?> register(@RequestBody @Valid RegisterDTO data) {
+        try {
+            authService.register(data);
+            return ResponseEntity.ok().build();
+        } catch (IllegalArgumentException e) {
+            // Retorna erro 400 com a mensagem "Este e-mail já está em uso"
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
+    @PostMapping("/forgot-password")
+    public ResponseEntity<String> forgotPassword(@RequestBody java.util.Map<String, String> body) {
+        String email = body.get("email");
+        try {
+            authService.recuperarSenha(email);
+            return ResponseEntity.ok("Uma nova senha foi enviada para o seu e-mail.");
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
     }
 }
