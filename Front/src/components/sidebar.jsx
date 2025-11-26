@@ -26,6 +26,7 @@ import {
   ShoppingCart,
   PackageCheck,
   Users,
+  CircleHelp,
 } from "lucide-react";
 
 import { isAdmin } from "../services/authService";
@@ -112,8 +113,7 @@ function Sidebar() {
           </ListItemButton>
         </ListItem>
 
-        {/* --- 1. ITENS DE ADMIN (Movidos para cá) --- */}
-        {/* Eles agora aparecem logo abaixo de Pedido de Compra, sem espaçamento */}
+        {/* --- 1. ITENS DE ADMIN --- */}
         {isUserAdmin && (
           <>
             <ListItem disablePadding>
@@ -173,19 +173,7 @@ function Sidebar() {
               <Switch
                 checked={isDarkMode}
                 onChange={toggleColorMode}
-                color="primary" // Mantém a bolinha (thumb) vermelha/primária quando ativo
-                sx={{
-                  // Estiliza a barra (track)
-                  "& .MuiSwitch-track": {
-                    backgroundColor: "#808080", // Define a cor CINZA
-                    opacity: 0.7, // Ajusta a opacidade para ficar visível no fundo preto
-                  },
-                  // Garante que a barra continue cinza (ou um tom diferente) quando ativado
-                  "& .MuiSwitch-switchBase.Mui-checked + .MuiSwitch-track": {
-                    backgroundColor: "#C00000", // Vermelho
-                    opacity: 1,
-                  },
-                }}
+                color="primary"
               />
             }
             label="Modo Escuro"
@@ -207,7 +195,17 @@ function Sidebar() {
           </ListItemButton>
         </ListItem>
 
-        {/* 4. SAIR */}
+        {/* 4. AJUDA */}
+        <ListItem disablePadding>
+          <ListItemButton component={NavLink} to="/ajuda" sx={listItemSx}>
+            <ListItemIcon sx={iconSx}>
+              <CircleHelp size={20} />
+            </ListItemIcon>
+            <ListItemText primary="Ajuda" />
+          </ListItemButton>
+        </ListItem>
+
+        {/* 5. SAIR */}
         <ListItem disablePadding>
           <ListItemButton
             onClick={handleLogout}
