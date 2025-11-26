@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 import { toast } from "react-toastify";
 import _ from "lodash";
+import { useMemo } from "react";
 
 import {
   Box,
@@ -85,7 +86,13 @@ function ComponentesPage() {
     [page, rowsPerPage]
   );
 
-  const debouncedFetchData = useCallback(_.debounce(fetchData, 500), []);
+  const debouncedFetchData = useMemo(
+    () =>
+      _.debounce((termo) => {
+        fetchData(termo);
+      }, 500),
+    [fetchData]
+  );
 
   useEffect(() => {
     setIsUserAdmin(isAdmin());
@@ -154,18 +161,24 @@ function ComponentesPage() {
     if (!file) return;
 
     const formData = new FormData();
-    formData.append("file", file);
+    formData.append("file", file); // Esse nome "file" tem que bater com o Java
 
     setLoading(true);
     try {
-      await api.post("/api/componentes/importar", formData, {
-        headers: { "Content-Type": "multipart/form-data" },
-      });
+      // --- CORREÇÃO AQUI ---
+      // 1. Removi o objeto { headers: ... }. O Axios faz isso automático corretamente.
+      await api.post("/api/componentes/importar", formData);
+
       toast.success("Importação realizada com sucesso!");
       fetchData(termoBusca);
     } catch (error) {
       console.error("Erro upload:", error);
-      toast.error("Erro ao importar CSV. Verifique o formato.");
+
+      // --- MELHORIA AQUI ---
+      // 2. Pegamos a mensagem que o seu Java mandou no "body" do ResponseEntity
+      // Se o Java mandar "Erro: Arquivo vazio", o Toast vai mostrar isso.
+      const mensagemDoBack = error.response?.data || "Erro ao importar CSV.";
+      toast.error(mensagemDoBack);
     } finally {
       setLoading(false);
       if (fileInputRef.current) fileInputRef.current.value = "";
