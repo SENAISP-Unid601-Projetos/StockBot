@@ -157,4 +157,59 @@ public class ComponenteService {
         componente.setNivelMinimoEstoque(Math.max(1, dto.getNivelMinimoEstoque()));
         return componente;
     }
+    @Transactional
+    public void importarComponentesViaCsv(org.springframework.web.multipart.MultipartFile file) throws java.io.IOException {
+        // Lê o arquivo linha por linha
+        try (java.io.BufferedReader br = new java.io.BufferedReader(new java.io.InputStreamReader(file.getInputStream()))) {
+            String line;
+            boolean isFirstLine = true;
+
+            while ((line = br.readLine()) != null) {
+                // Pula o cabeçalho
+                if (isFirstLine) {
+                    isFirstLine = false;
+                    continue;
+                }
+
+                // Divide a linha por vírgula (Atenção: CSV simples, sem vírgulas no nome)
+                String[] data = line.split(",");
+
+                // Esperado: Nome, Quantidade, Localizacao, Categoria, NivelMinimo
+                if (data.length >= 2) { // Pelo menos Nome e Qtd
+                    ComponenteDTO dto = new ComponenteDTO();
+                    dto.setNome(data[0].trim());
+                    dto.setQuantidade(Integer.parseInt(data[1].trim()));
+
+                    // Tratamento para campos opcionais
+                    dto.setLocalizacao(data.length > 2 ? data[2].trim() : "-");
+                    dto.setCategoria(data.length > 3 ? data[3].trim() : "Geral");
+                    dto.setNivelMinimoEstoque(data.length > 4 ? Integer.parseInt(data[4].trim()) : 5);
+
+                    // Reutiliza seu método create para garantir segurança e gerar patrimônio
+                    this.create(dto);
+                }
+            }
+        }
+    }
+
+    // 2. EXPORTAR (Gerar arquivo para download)
+    public java.io.ByteArrayInputStream gerarCsvDeComponentes() {
+        // Busca itens apenas da empresa logada
+        List<ComponenteDTO> componentes = this.findAll(null);
+
+        StringBuilder csvBuilder = new StringBuilder();
+        // Cabeçalho
+        csvBuilder.append("ID,Nome,Patrimonio,Quantidade,Localizacao,Categoria\n");
+
+        for (ComponenteDTO comp : componentes) {
+            csvBuilder.append(comp.getId()).append(",")
+                    .append(comp.getNome()).append(",")
+                    .append(comp.getCodigoPatrimonio()).append(",")
+                    .append(comp.getQuantidade()).append(",")
+                    .append(comp.getLocalizacao()).append(",")
+                    .append(comp.getCategoria()).append("\n");
+        }
+
+        return new java.io.ByteArrayInputStream(csvBuilder.toString().getBytes());
+    }
 }
