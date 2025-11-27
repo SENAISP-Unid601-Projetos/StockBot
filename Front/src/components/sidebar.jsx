@@ -25,6 +25,8 @@ import {
   CheckSquare,
   ShoppingCart,
   PackageCheck,
+  Users,
+  CircleHelp,
 } from "lucide-react";
 
 import { isAdmin } from "../services/authService";
@@ -56,12 +58,11 @@ function Sidebar() {
 
   const isDarkMode = theme.palette.mode === "dark";
 
-  // Estilo comum para os itens do menu (para evitar repetição e garantir cor branca)
   const listItemSx = {
-    color: "#FFFFFF", // Texto sempre branco
+    color: "#FFFFFF",
     borderRadius: 2,
     "&:hover": {
-      backgroundColor: "rgba(255, 255, 255, 0.1)", // Hover sutil claro
+      backgroundColor: "rgba(255, 255, 255, 0.1)",
     },
     "&.active": {
       backgroundColor: "primary.main",
@@ -73,9 +74,8 @@ function Sidebar() {
     },
   };
 
-  // Estilo comum para ícones
   const iconSx = {
-    color: "#FFFFFF", // Ícone sempre branco
+    color: "#FFFFFF",
     minWidth: 40,
   };
 
@@ -86,76 +86,49 @@ function Sidebar() {
           variant="h5"
           component="h2"
           fontWeight="bold"
-          color="#FFFFFF" // Título branco
+          color="#FFFFFF"
         >
           StockBot
         </Typography>
       </Box>
 
+      {/* --- MENU SUPERIOR (Conteúdo Principal) --- */}
       <List sx={{ p: 1 }}>
+        {/* Itens Padrão (Dashboard, Componentes, etc.) */}
         {menuItems.map((item) => (
           <ListItem key={item.text} disablePadding>
-            <ListItemButton
-              component={NavLink}
-              to={item.path}
-              sx={listItemSx}
-            >
-              <ListItemIcon sx={iconSx}>
-                {item.icon}
-              </ListItemIcon>
+            <ListItemButton component={NavLink} to={item.path} sx={listItemSx}>
+              <ListItemIcon sx={iconSx}>{item.icon}</ListItemIcon>
               <ListItemText primary={item.text} />
             </ListItemButton>
           </ListItem>
         ))}
 
         <ListItem disablePadding>
-          <ListItemButton
-            component={NavLink}
-            to="/pedidos"
-            sx={listItemSx}
-          >
+          <ListItemButton component={NavLink} to="/pedidos" sx={listItemSx}>
             <ListItemIcon sx={iconSx}>
               <ShoppingCart size={20} />
             </ListItemIcon>
             <ListItemText primary="Pedido de Compra" />
           </ListItemButton>
         </ListItem>
-      </List>
 
-      <Box sx={{ flexGrow: 1 }} />
-
-      <List sx={{ p: 1, mt: "auto" }}>
-        <ListItem sx={{ color: "#FFFFFF" }}>
-          <ListItemIcon sx={iconSx}>
-            {isDarkMode ? <Sun size={20} /> : <Moon size={20} />}
-          </ListItemIcon>
-          <FormControlLabel
-            control={
-              <Switch
-                checked={isDarkMode}
-                onChange={toggleColorMode}
-                color="primary"
-              />
-            }
-            label="Modo Escuro"
-            sx={{ m: 0, flexGrow: 1 }}
-          />
-        </ListItem>
-
-      <>
-        {/* Item de Aprovações */}
-        <ListItem disablePadding>
-          <ListItemButton component={NavLink} to="/aprovacoes" sx={listItemSx}>
-            <ListItemIcon sx={iconSx}>
-              <CheckSquare size={20} />
-            </ListItemIcon>
-            <ListItemText primary="Aprovações" />
-          </ListItemButton>
-        </ListItem>
-
-        {/* --- BLOCO DE ADMINISTRAÇÃO --- */}
+        {/* --- 1. ITENS DE ADMIN --- */}
         {isUserAdmin && (
           <>
+            <ListItem disablePadding>
+              <ListItemButton
+                component={NavLink}
+                to="/aprovacoes"
+                sx={listItemSx}
+              >
+                <ListItemIcon sx={iconSx}>
+                  <CheckSquare size={20} />
+                </ListItemIcon>
+                <ListItemText primary="Aprovações" />
+              </ListItemButton>
+            </ListItem>
+
             <ListItem disablePadding>
               <ListItemButton
                 component={NavLink}
@@ -169,27 +142,89 @@ function Sidebar() {
               </ListItemButton>
             </ListItem>
 
-            {/* Item de Configurações */}
             <ListItem disablePadding>
-              <ListItemButton component={NavLink} to="/configuracoes" sx={listItemSx}>
+              <ListItemButton
+                component={NavLink}
+                to="/usuarios"
+                sx={listItemSx}
+              >
                 <ListItemIcon sx={iconSx}>
-                  <Settings size={20} />
+                  <Users size={20} />
                 </ListItemIcon>
-                <ListItemText primary="Configurações" />
+                <ListItemText primary="Usuários" />
               </ListItemButton>
             </ListItem>
           </>
         )}
-      </>
+      </List>
 
+      {/* --- Espaçador (Empurra o restante para o fundo) --- */}
+      <Box sx={{ flexGrow: 1 }} />
 
+      {/* --- MENU INFERIOR (Configurações e Sistema) --- */}
+      <List sx={{ p: 1, mt: "auto" }}>
+        {/* 2. MODO ESCURO */}
+        <ListItem sx={{ color: "#FFFFFF" }}>
+          <ListItemIcon sx={iconSx}>
+            {isDarkMode ? <Sun size={20} /> : <Moon size={20} />}
+          </ListItemIcon>
+          <FormControlLabel
+            control={
+              <Switch
+                checked={isDarkMode}
+                onChange={toggleColorMode}
+                color="primary"
+                sx={{
+                  // Estado DESLIGADO (Modo Claro): Barra Cinza
+                  "& .MuiSwitch-track": {
+                    backgroundColor: "#808080",
+                    opacity: 0.7,
+                  },
+                  // Estado LIGADO (Modo Escuro): Barra Vermelha
+                  "& .MuiSwitch-switchBase.Mui-checked + .MuiSwitch-track": {
+                    backgroundColor: "#C00000", // Vermelho Senai
+                    opacity: 1, // Opacidade 100% para ficar bem vivo
+                  },
+                }}
+              />
+            }
+            label="Modo Escuro"
+            sx={{ m: 0, flexGrow: 1 }}
+          />
+        </ListItem>
+
+        {/* 3. CONFIGURAÇÕES */}
+        <ListItem disablePadding>
+          <ListItemButton
+            component={NavLink}
+            to="/configuracoes"
+            sx={listItemSx}
+          >
+            <ListItemIcon sx={iconSx}>
+              <Settings size={20} />
+            </ListItemIcon>
+            <ListItemText primary="Configurações" />
+          </ListItemButton>
+        </ListItem>
+
+        {/* 4. AJUDA */}
+        <ListItem disablePadding>
+          <ListItemButton component={NavLink} to="/ajuda" sx={listItemSx}>
+            <ListItemIcon sx={iconSx}>
+              <CircleHelp size={20} />
+            </ListItemIcon>
+            <ListItemText primary="Ajuda" />
+          </ListItemButton>
+        </ListItem>
+
+        {/* 5. SAIR */}
         <ListItem disablePadding>
           <ListItemButton
             onClick={handleLogout}
             sx={{
-               color: "#FFFFFF",
-               borderRadius: 2,
-               "&:hover": { backgroundColor: "rgba(255, 255, 255, 0.1)" },
+              color: "#FFFFFF",
+              borderRadius: 2,
+              "&:hover": { backgroundColor: "rgba(255, 255, 255, 0.1)" },
             }}
           >
             <ListItemIcon sx={iconSx}>
@@ -211,9 +246,8 @@ function Sidebar() {
         "& .MuiDrawer-paper": {
           width: drawerWidth,
           boxSizing: "border-box",
-          // --- FUNDO FORÇADO PARA PRETO ---
-          backgroundColor: "#000000", 
-          borderRight: "none", // Remove borda se desejar visual clean
+          backgroundColor: "#000000",
+          borderRight: "none",
           display: "flex",
           flexDirection: "column",
         },

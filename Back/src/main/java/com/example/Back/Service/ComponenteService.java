@@ -157,4 +157,86 @@ public class ComponenteService {
         componente.setNivelMinimoEstoque(Math.max(1, dto.getNivelMinimoEstoque()));
         return componente;
     }
+    @Transactional
+    public void importarComponentesViaCsv(org.springframework.web.multipart.MultipartFile file) throws java.io.IOException {
+        // Usa UTF-8 para aceitar acentos
+        try (java.io.BufferedReader br = new java.io.BufferedReader(new java.io.InputStreamReader(file.getInputStream(), java.nio.charset.StandardCharsets.UTF_8))) {
+            String line;
+            boolean isFirstLine = true;
+
+            while ((line = br.readLine()) != null) {
+                if (isFirstLine) {
+                    isFirstLine = false;
+                    continue; // Pula cabeçalho
+                }
+
+                // Aceita vírgula ou ponto e vírgula (Excel BR)
+                String[] data = line.split("[,;]");
+
+                // Limpa espaços extras
+                for(int i=0; i<data.length; i++) data[i] = data[i].trim();
+
+                try {
+                    ComponenteDTO dto = new ComponenteDTO();
+
+                    // --- O PULO DO GATO ---
+                    // Verifica se é o formato de EXPORTAÇÃO (Começa com ID numérico)
+                    // Formato Export: ID(0), Nome(1), Pat(2), Qtd(3), Local(4), Cat(5)
+                    boolean isArquivoExportado = isNumeric(data[0]) && !isNumeric(data[1]);
+
+                    if (isArquivoExportado && data.length >= 4) {
+                        dto.setNome(data[1]); // Nome está na coluna 1
+                        dto.setQuantidade(Integer.parseInt(data[3])); // Qtd está na coluna 3
+                        dto.setLocalizacao(data.length > 4 ? data[4] : "-");
+                        dto.setCategoria(data.length > 5 ? data[5] : "Geral");
+                        dto.setNivelMinimoEstoque(5);
+                    }
+                    // Verifica se é formato SIMPLES (Começa com Nome texto)
+                    // Formato Simples: Nome(0), Qtd(1), Local(2)...
+                    else if (data.length >= 2) {
+                        dto.setNome(data[0]); // Nome está na coluna 0
+                        dto.setQuantidade(Integer.parseInt(data[1])); // Qtd está na coluna 1
+                        dto.setLocalizacao(data.length > 2 ? data[2] : "-");
+                        dto.setCategoria(data.length > 3 ? data[3] : "Geral");
+                        dto.setNivelMinimoEstoque(data.length > 4 ? tryParseInt(data[4], 5) : 5);
+                    } else {
+                        continue; // Linha inválida/vazia
+                    }
+
+                    this.create(dto); // Salva no banco
+
+                } catch (NumberFormatException e) {
+                    System.err.println("Ignorando linha com erro de formato: " + line);
+                }
+            }
+        }
+    }
+
+    // --- Helpers para a importação funcionar ---
+    private boolean isNumeric(String str) {
+        if (str == null) return false;
+        try { Integer.parseInt(str); return true; } catch (NumberFormatException e) { return false; }
+    }
+
+    private int tryParseInt(String value, int def) {
+        try { return Integer.parseInt(value); } catch (Exception e) { return def; }
+    }
+
+    // 2. EXPORTAR (MANTIDO IGUAL)
+    public java.io.ByteArrayInputStream gerarCsvDeComponentes() {
+        List<ComponenteDTO> componentes = this.findAll(null);
+        StringBuilder csvBuilder = new StringBuilder();
+        csvBuilder.append("ID,Nome,Patrimonio,Quantidade,Localizacao,Categoria\n");
+
+        for (ComponenteDTO comp : componentes) {
+            csvBuilder.append(comp.getId()).append(",")
+                    .append(comp.getNome()).append(",")
+                    .append(comp.getCodigoPatrimonio()).append(",")
+                    .append(comp.getQuantidade()).append(",")
+                    .append(comp.getLocalizacao()).append(",")
+                    .append(comp.getCategoria()).append("\n");
+        }
+        return new java.io.ByteArrayInputStream(csvBuilder.toString().getBytes());
+    }
 }
+

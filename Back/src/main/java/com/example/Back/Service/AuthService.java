@@ -13,7 +13,7 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import java.util.Optional; // Importar Optional
+import java.util.Optional;
 
 @Service
 public class AuthService {
@@ -46,41 +46,40 @@ public class AuthService {
         usuario.setSenha(passwordEncoder.encode(novaSenha));
         usuarioRepository.save(usuario);
 
-        // Envia por e-mail
+        // --- ALTERAÇÃO AQUI: Link adicionado ---
+        String linkAplicacao = "https://stockbot-front.onrender.com";
+
         String mensagem = "Olá,\n\nSua senha foi resetada com sucesso.\n" +
                 "Sua nova senha temporária é: " + novaSenha + "\n\n" +
-                "Por favor, acesse o sistema e troque sua senha imediatamente em Configurações.";
+                "Acesse o sistema em: " + linkAplicacao + "\n\n" +
+                "Por favor, faça login e troque sua senha imediatamente no menu de Configurações.";
 
         emailService.enviarEmailTexto(email, "Recuperação de Senha - StockBot", mensagem);
     }
 
+    // ... (Restante dos métodos login e register permanecem iguais)
     @Transactional(readOnly = true)
     public String login(AuthDTO data) {
-        // 1. VERIFICA SE O E-MAIL EXISTE NO BANCO
         Usuario usuario = usuarioRepository.findByEmail(data.email())
-                .orElseThrow(() -> new RuntimeException("Este e-mail não está cadastrado.")); //
+                .orElseThrow(() -> new RuntimeException("Este e-mail não está cadastrado."));
 
-        // 2. VERIFICA SE O DOMÍNIO ESTÁ CORRETO
         if (usuario.getEmpresa() == null || !usuario.getEmpresa().getDominio().equals(data.dominioEmpresa())) {
             throw new RuntimeException("Este usuário não pertence ao domínio " + data.dominioEmpresa());
         }
 
-        // 3. TENTA AUTENTICAR (VERIFICA A SENHA)
         try {
             var usernamePassword = new UsernamePasswordAuthenticationToken(data.email(), data.senha());
             var auth = this.authenticationManager.authenticate(usernamePassword);
             return tokenService.gerarToken((Usuario) auth.getPrincipal());
         } catch (AuthenticationException e) {
-            // Se o e-mail existe mas falhou aqui, é a senha
             throw new RuntimeException("Senha incorreta.");
         }
     }
 
     @Transactional
     public void register(RegisterDTO data) {
-        // 1. VERIFICAÇÃO NO CADASTRO: SE O E-MAIL JÁ EXISTE
         if (this.usuarioRepository.findByEmail(data.email()).isPresent()) {
-            throw new IllegalArgumentException("Este e-mail já está em uso. Tente fazer login."); //
+            throw new IllegalArgumentException("Este e-mail já está em uso. Tente fazer login.");
         }
 
         Optional<Empresa> empresaExistente = empresaRepository.findByDominio(data.dominioEmpresa());
@@ -97,7 +96,6 @@ public class AuthService {
             novoUsuario.setSenha(passwordEncoder.encode(data.senha()));
             novoUsuario.setRole(UserRole.ADMIN);
             novoUsuario.setEmpresa(novaEmpresa);
-            // Não definimos 'enabled', assume-se true por padrão ou ajuste na entidade se tiver mudado
 
             this.usuarioRepository.save(novoUsuario);
         }
