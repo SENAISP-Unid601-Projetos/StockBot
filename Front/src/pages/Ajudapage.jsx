@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from "react";
-
 import {
   Box,
   Container,
@@ -11,9 +10,7 @@ import {
   Chip,
   Divider,
 } from "@mui/material";
-
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
-
 import {
   HelpOutline,
   Dashboard,
@@ -25,15 +22,13 @@ import {
 } from "@mui/icons-material";
 
 // Importa a lógica de segurança
-
-import { isAdmin } from "../services/authService";
+import { isAdmin } from "../services/authService"; //
 
 function AjudaPage() {
   const [isUserAdmin, setIsUserAdmin] = useState(false);
 
   useEffect(() => {
     // Verifica se é admin ao carregar a página
-
     setIsUserAdmin(isAdmin());
   }, []);
 
@@ -42,103 +37,107 @@ function AjudaPage() {
       component="main"
       sx={{
         flexGrow: 1,
-
         p: 3,
-
         backgroundColor: "background.default",
-
         minHeight: "100vh",
       }}
     >
       <Container maxWidth="md">
-        {/* Cabeçalho */}
-
+        {/* --- 1. CABEÇALHO CENTRALIZADO --- */}
         <Paper
           elevation={0}
           sx={{
             p: 4,
-
             mb: 4,
-
             backgroundColor: "primary.main",
-
             color: "#fff",
-
             borderRadius: 2,
+            // Layout em coluna para centralizar ícone e texto
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            textAlign: "center",
           }}
         >
-          <Box display="flex" alignItems="center" gap={2}>
-            <HelpOutline sx={{ fontSize: 40 }} />
+          {/* Ícone maior e com margem inferior */}
+          <HelpOutline sx={{ fontSize: 60, mb: 2 }} />
 
-            <Box>
-              <Typography variant="h4" component="h1" fontWeight="bold">
-                Central de Ajuda
-              </Typography>
+          <Box>
+            <Typography variant="h4" component="h1" fontWeight="bold" gutterBottom>
+              Central de Ajuda
+            </Typography>
 
-              <Typography variant="subtitle1">
-                {isUserAdmin
-                  ? "Guia completo de Administração do Sistema."
-                  : "Guia rápido para colaboradores."}
-              </Typography>
-            </Box>
+            <Typography variant="subtitle1">
+              {isUserAdmin
+                ? "Guia completo de Administração do Sistema."
+                : "Guia rápido para colaboradores."}
+            </Typography>
           </Box>
         </Paper>
 
+        {/* Título da Seção Centralizado */}
         <Typography
           variant="h6"
           gutterBottom
-          sx={{ mt: 2, color: "text.secondary" }}
+          align="center"
+          sx={{ mt: 2, mb: 3, color: "text.secondary", fontWeight: "bold" }}
         >
           Funcionalidades Gerais
         </Typography>
 
-        {/* 1. Dashboard (Para TODOS) */}
-
+        {/* --- 2. ACORDEÕES (DASHBOARD) --- */}
         <Accordion sx={{ mb: 1 }}>
           <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-            <Box display="flex" alignItems="center" gap={2}>
+            {/* Centraliza o conteúdo do título na barra */}
+            <Box
+              display="flex"
+              alignItems="center"
+              gap={2}
+              sx={{ width: "100%", justifyContent: "center" }}
+            >
               <Dashboard color="primary" />
-
               <Typography variant="h6" fontWeight="bold">
                 Dashboard
               </Typography>
             </Box>
           </AccordionSummary>
 
-          <AccordionDetails>
-            <Typography>
+          {/* Conteúdo centralizado com ajuste na lista */}
+          <AccordionDetails sx={{ textAlign: "center" }}>
+            <Typography component="div">
               A tela inicial mostra um resumo do estoque:
-              <ul>
+              <ul style={{ listStylePosition: "inside", paddingLeft: 0, marginTop: '10px' }}>
                 <li>Total de itens cadastrados.</li>
-
                 <li>
                   Alertas de <strong>Estoque Baixo</strong> ou em Falta.
                 </li>
-
                 <li>Resumo de suas solicitações pendentes.</li>
               </ul>
             </Typography>
           </AccordionDetails>
         </Accordion>
 
-        {/* 2. Componentes (Para TODOS) */}
-
+        {/* --- 3. ACORDEÕES (ESTOQUE E ITENS) --- */}
         <Accordion sx={{ mb: 1 }}>
           <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-            <Box display="flex" alignItems="center" gap={2}>
+            <Box
+              display="flex"
+              alignItems="center"
+              gap={2}
+              sx={{ width: "100%", justifyContent: "center" }}
+            >
               <Build color="primary" />
-
               <Typography variant="h6" fontWeight="bold">
                 Estoque e Itens
               </Typography>
             </Box>
           </AccordionSummary>
 
-          <AccordionDetails>
+          <AccordionDetails sx={{ textAlign: "center" }}>
             <Typography component="div">
               Na aba <strong>Componentes</strong>, você pode visualizar todo o
               inventário.
-              <ul>
+              <ul style={{ listStylePosition: "inside", paddingLeft: 0, marginTop: '10px' }}>
                 <li>
                   Use a barra de pesquisa para encontrar itens por nome ou
                   patrimônio.
@@ -160,8 +159,7 @@ function AjudaPage() {
           </AccordionDetails>
         </Accordion>
 
-        {/* 3. SEÇÃO EXCLUSIVA DE ADMIN */}
-
+        {/* --- 4. SEÇÃO EXCLUSIVA DE ADMIN --- */}
         {isUserAdmin && (
           <>
             <Divider sx={{ my: 4 }}>
@@ -169,21 +167,27 @@ function AjudaPage() {
                 label="ÁREA ADMINISTRATIVA"
                 color="error"
                 variant="outlined"
+                sx={{ fontWeight: "bold" }}
               />
             </Divider>
 
+            {/* Aprovações */}
             <Accordion sx={{ mb: 1 }}>
               <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-                <Box display="flex" alignItems="center" gap={2}>
+                <Box
+                  display="flex"
+                  alignItems="center"
+                  gap={2}
+                  sx={{ width: "100%", justifyContent: "center" }}
+                >
                   <FactCheck color="error" />
-
                   <Typography variant="h6" fontWeight="bold">
                     Aprovações
                   </Typography>
                 </Box>
               </AccordionSummary>
 
-              <AccordionDetails>
+              <AccordionDetails sx={{ textAlign: "center" }}>
                 <Typography>
                   Gerencie os pedidos de compra e requisições internas. Você
                   pode <strong>Aprovar</strong> ou <strong>Recusar</strong>{" "}
@@ -192,18 +196,23 @@ function AjudaPage() {
               </AccordionDetails>
             </Accordion>
 
+            {/* Recebimento */}
             <Accordion sx={{ mb: 1 }}>
               <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-                <Box display="flex" alignItems="center" gap={2}>
+                <Box
+                  display="flex"
+                  alignItems="center"
+                  gap={2}
+                  sx={{ width: "100%", justifyContent: "center" }}
+                >
                   <AssignmentTurnedIn color="error" />
-
                   <Typography variant="h6" fontWeight="bold">
                     Recebimento
                   </Typography>
                 </Box>
               </AccordionSummary>
 
-              <AccordionDetails>
+              <AccordionDetails sx={{ textAlign: "center" }}>
                 <Typography>
                   Utilize esta tela quando chegarem novos materiais físicos. Ao
                   confirmar um recebimento, o estoque do item aumenta
@@ -212,18 +221,23 @@ function AjudaPage() {
               </AccordionDetails>
             </Accordion>
 
+            {/* Gestão de Usuários */}
             <Accordion sx={{ mb: 1 }}>
               <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-                <Box display="flex" alignItems="center" gap={2}>
+                <Box
+                  display="flex"
+                  alignItems="center"
+                  gap={2}
+                  sx={{ width: "100%", justifyContent: "center" }}
+                >
                   <People color="error" />
-
                   <Typography variant="h6" fontWeight="bold">
                     Gestão de Usuários
                   </Typography>
                 </Box>
               </AccordionSummary>
 
-              <AccordionDetails>
+              <AccordionDetails sx={{ textAlign: "center" }}>
                 <Typography>
                   Cadastre novos colaboradores, remova acessos antigos e defina
                   quem tem permissão de Administrador.
@@ -235,20 +249,23 @@ function AjudaPage() {
 
         <Divider sx={{ my: 4 }} />
 
-        {/* 4. Configurações (Texto Dinâmico) */}
-
+        {/* --- 5. CONFIGURAÇÕES --- */}
         <Accordion>
           <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-            <Box display="flex" alignItems="center" gap={2}>
+            <Box
+              display="flex"
+              alignItems="center"
+              gap={2}
+              sx={{ width: "100%", justifyContent: "center" }}
+            >
               <Settings color="action" />
-
               <Typography variant="h6" fontWeight="bold">
                 Configurações
               </Typography>
             </Box>
           </AccordionSummary>
 
-          <AccordionDetails>
+          <AccordionDetails sx={{ textAlign: "center" }}>
             <Typography>
               Aqui você pode alterar sua senha de acesso e alternar o tema
               (Claro/Escuro).

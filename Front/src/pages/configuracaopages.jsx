@@ -23,7 +23,6 @@ function ConfiguracoesPage() {
   });
   const [loadingPass, setLoadingPass] = useState(false);
 
-  // --- MUDANÇA 1: Carregar fonte do LocalStorage ao iniciar ---
   useEffect(() => {
     const savedFontSize = localStorage.getItem("stockbot_font_size");
     if (savedFontSize) {
@@ -55,24 +54,16 @@ function ConfiguracoesPage() {
     }
   };
 
-  // --- MUDANÇA 2: Função simplificada para salvar no navegador ---
   const alterarFonte = (increment) => {
-    // Pega o tamanho atual ou assume 16px (padrão)
     const currentStyle = getComputedStyle(document.documentElement).fontSize;
     const current = parseFloat(currentStyle) || 16;
     
     const newSize = current + increment;
 
-    // Limites de segurança para a fonte não ficar gigante ou minuscula
     if (newSize < 10 || newSize > 24) return;
 
-    // Aplica a mudança
     document.documentElement.style.fontSize = newSize + "px";
-
-    // Salva no navegador para lembrar depois
     localStorage.setItem("stockbot_font_size", newSize);
-    
-    // toast.info(`Fonte ajustada para ${newSize}px`); // Opcional
   };
 
   const aumentarFonte = () => alterarFonte(1);
@@ -88,15 +79,19 @@ function ConfiguracoesPage() {
         backgroundColor: "background.default",
       }}
     >
+      {/* MUDANÇA PRINCIPAL AQUI:
+          Alterado de maxWidth="lg" para maxWidth={false}.
+          Isso remove a trava de largura e deixa o conteúdo expandir até as bordas.
+      */}
       <Container maxWidth="lg">
         <Typography variant="h4" fontWeight="bold" sx={{ mb: 4 }}>
           Configurações
         </Typography>
 
-        <Grid container spacing={3} direction="column">
-          {/* Alterar Senha */}
-          <Grid item xs={12}>
-            <Paper sx={{ p: 3, boxShadow: 3, width: "100%" }}>
+        <Grid container spacing={3}>
+          {/* Card Alterar Senha */}
+          <Grid item xs={12} md={6}>
+            <Paper sx={{ p: 7, boxShadow: 3, width: "100%", height: '100%' }}>
               <Typography variant="h6" gutterBottom>
                 Alterar Minha Senha
               </Typography>
@@ -107,7 +102,6 @@ function ConfiguracoesPage() {
                   display: "flex",
                   flexDirection: "column",
                   gap: 2,
-                  maxWidth: "400px",
                 }}
               >
                 <TextField
@@ -157,29 +151,31 @@ function ConfiguracoesPage() {
             </Paper>
           </Grid>
 
-          {/* Ajuste de Fonte */}
-          <Grid item xs={12}>
-            <Paper sx={{ p: 3, boxShadow: 3 }}>
+          {/* Card Acessibilidade */}
+          <Grid item xs={12} md={6}>
+            <Paper sx={{ p: 7, boxShadow: 3, height: '100%' }}>
               <Typography variant="h6" gutterBottom>
                 Acessibilidade
               </Typography>
-              <Typography sx={{ mb: 2 }}>Ajustar tamanho da fonte</Typography>
+              <Typography sx={{ mb: 2 }}>Ajustar tamanho da fonte do sistema</Typography>
               <Box sx={{ display: "flex", gap: 2 }}>
                 <MuiButton
                   variant="contained"
                   color="primary"
                   startIcon={<TextIncreaseIcon />}
                   onClick={aumentarFonte}
+                  fullWidth
                 >
-                  A+
+                  Aumentar
                 </MuiButton>
                 <MuiButton
                   variant="contained"
                   color="secondary"
                   startIcon={<TextDecreaseIcon />}
                   onClick={diminuirFonte}
+                  fullWidth
                 >
-                  A−
+                  Diminuir
                 </MuiButton>
               </Box>
             </Paper>
