@@ -44,6 +44,8 @@ public class EmailService {
 
         } catch (Exception e) {
             // Apenas loga o erro, mas deixa o fluxo continuar
+            e.printStackTrace();
+
             System.err.println("⚠️ Aviso: Não foi possível enviar o e-mail real (SMTP não configurado ou bloqueado).");
             System.err.println("O fluxo seguirá normalmente pois estamos em modo DEV.");
         }
