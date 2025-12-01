@@ -41,6 +41,8 @@ public class SecurityConfig {
                         // Auth público
                         .requestMatchers(HttpMethod.POST, "/api/auth/**").permitAll()
 
+                        .requestMatchers("/api/users/me/**").authenticated()
+
                         // Usuários (somente ADMIN)
                         .requestMatchers("/api/users/**").hasRole("ADMIN")
 
