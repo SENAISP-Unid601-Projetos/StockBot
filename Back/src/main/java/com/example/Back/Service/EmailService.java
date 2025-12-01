@@ -9,10 +9,11 @@ import org.springframework.stereotype.Service;
 public class EmailService {
 
     private final JavaMailSender mailSender;
+    
+    // @Value("${spring.mail.username}")
 
-    // Injetamos, mas se não tiver configurado, usamos um padrão
-    @Value("${spring.mail.username:teste@stockbot.com}")
-    private String remetente;
+    private String remetente = "stockbotdevstest@gmail.com";
+    // -------------------
 
     public EmailService(JavaMailSender mailSender) {
         this.mailSender = mailSender;
