@@ -83,7 +83,7 @@ function ConfiguracoesPage() {
           Alterado de maxWidth="lg" para maxWidth={false}.
           Isso remove a trava de largura e deixa o conteúdo expandir até as bordas.
       */}
-      <Container maxWidth="lg">
+      <Container maxWidth={false}>
         <Typography variant="h4" fontWeight="bold" sx={{ mb: 4 }}>
           Configurações
         </Typography>
@@ -91,7 +91,7 @@ function ConfiguracoesPage() {
         <Grid container spacing={3}>
           {/* Card Alterar Senha */}
           <Grid item xs={12} md={6}>
-            <Paper sx={{ p: 7, boxShadow: 3, width: "100%", height: '100%' }}>
+            <Paper sx={{ p: 9, boxShadow: 3, width: "100%", height: '100%' }}>
               <Typography variant="h6" gutterBottom>
                 Alterar Minha Senha
               </Typography>
@@ -153,7 +153,7 @@ function ConfiguracoesPage() {
 
           {/* Card Acessibilidade */}
           <Grid item xs={12} md={6}>
-            <Paper sx={{ p: 7, boxShadow: 3, height: '100%' }}>
+            <Paper sx={{ p: 10, boxShadow: 3, height: '100%' }}>
               <Typography variant="h6" gutterBottom>
                 Acessibilidade
               </Typography>
